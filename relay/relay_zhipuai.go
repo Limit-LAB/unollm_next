@@ -1,6 +1,5 @@
 package relay
 
-// TODO: system prompt is not supported yet
 // TODO: n is not supported yet
 
 // TODO: characterglm meta info is not readed from meta
@@ -22,22 +21,34 @@ func ChatGLMBlockingRequest(ctx context.Context, rs *model.LLMRequestSchema) (*m
 	prompt := make([]interface{}, 0)
 	messages := rs.GetMessages()
 	for _, m := range messages {
+		if m.GetRole() == "system" {
+			// TODO: system prompt is not supported yet
+			prompt = append(prompt, map[string]interface{}{
+				"role":    "user",
+				"content": m.GetContent(),
+			})
+			prompt = append(prompt, map[string]interface{}{
+				"role":    "system",
+				"content": "好的，我明白了。",
+			})
+			continue
+		}
 		prompt = append(prompt, map[string]interface{}{
 			"role":    m.GetRole(),
 			"content": m.GetContent(),
 		})
 	}
 
-	res, error := utils.GLMBlockingRequest(map[string]interface{}{
+	res, err := utils.GLMBlockingRequest(map[string]interface{}{
 		"prompt":      prompt,
 		"temperature": info.GetTemperature(),
 		"top_p":       info.GetTopP(),
 	}, info.GetModel(), info.GetToken())
 
-	if error != nil {
-		return nil, status.Errorf(codes.Internal, error.Error())
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
 	}
-	if !res["success"].(bool) {
+	if resSuccess, ok := res["success"].(bool); ok && !resSuccess {
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("chatGLM response success is false Error code: %f, Error msg: %s", res["code"], res["msg"]))
 	}
 	data := res["data"].(map[string]interface{})
@@ -61,5 +72,5 @@ func ChatGLMBlockingRequest(ctx context.Context, rs *model.LLMRequestSchema) (*m
 		LlmTokenCount: &count,
 	}
 	return &retResp, nil
-	
+
 }
