@@ -10,7 +10,7 @@ import (
 )
 
 func (c *Client) ChatCompletionStreamingRequest(body zhipu.ChatCompletionRequest, modelName string) (chan string, chan zhipu.ChatCompletionStreamFinishResponse, error) {
-	token, err := utils.CreateJWTToken(c.token, jwtExpire)
+	token, err := utils.CreateJWTToken(c.apiKey, jwtExpire)
 	if err != nil {
 		return nil, nil, err
 	}

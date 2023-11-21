@@ -12,7 +12,7 @@ import (
 const jwtExpire = time.Duration(10000) * time.Second
 
 func (c *Client) ChatCompletion(body zhipu.ChatCompletionRequest, modelName string) (result zhipu.ChatCompletionResponse, err error) {
-	token, err := utils.CreateJWTToken(c.token, jwtExpire)
+	token, err := utils.CreateJWTToken(c.apiKey, jwtExpire)
 	if err != nil {
 		return
 	}
