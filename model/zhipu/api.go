@@ -27,9 +27,10 @@ type ChatCompletionRequest struct {
 	Temperature float32                 `json:"temperature,omitempty"`
 	TopP        float32                 `json:"top_p,omitempty"`
 	RequestId   string                  `json:"request_id"`
-	Incremental bool                    `json:"incremental"`
-	ReturnType  string                  `json:"return_type,omitempty"`
-	Ref         ChatCompletionRef       `json:"ref"`
+	// in SSE mode, incremental means whether to return incremental result or add to previous result
+	Incremental bool              `json:"incremental"`
+	ReturnType  string            `json:"return_type,omitempty"`
+	Ref         ChatCompletionRef `json:"ref"`
 }
 
 // ChatCompletionResponse represents a response structure for chat completion API.
