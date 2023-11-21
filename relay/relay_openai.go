@@ -29,8 +29,10 @@ func OpenaiBlockingRequest(ctx context.Context, rs *model.LLMRequestSchema) (*mo
 	resp, err := client.CreateChatCompletion(
 		ctx,
 		openai.ChatCompletionRequest{
-			Model:    info.GetModel(),
-			Messages: openaiMessages,
+			Model:       info.GetModel(),
+			Messages:    openaiMessages,
+			TopP:        float32(info.GetTopP()),
+			Temperature: float32(info.GetTemperature()),
 		},
 	)
 	if err != nil {
