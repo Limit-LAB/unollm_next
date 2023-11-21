@@ -6,9 +6,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var _ (ResponseOpenAICompletionTransformer) = ChatGPTTranslateToOpenAI
+var _ (OpenAICompletionTransformer) = ChatGPT2OpenAI
 
-func ChatGPTTranslateToOpenAI(resp any) (openai.ChatCompletionResponse, error) {
+func ChatGPT2OpenAI(resp any) (openai.ChatCompletionResponse, error) {
 	switch resp.(type) {
 	case openai.ChatCompletionResponse:
 		return resp.(openai.ChatCompletionResponse), nil

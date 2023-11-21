@@ -12,7 +12,7 @@ import (
 
 // TODO: read max_tokens, n, stop, frequency_penalty, presence_penalty from meta
 
-func OpenaiBlockingRequest(ctx context.Context, rs *unoLlmMod.LLMRequestSchema) (*unoLlmMod.LLMResponseSchema, error) {
+func OpenAIChatCompletionRequest(ctx context.Context, rs *unoLlmMod.LLMRequestSchema) (*unoLlmMod.LLMResponseSchema, error) {
 	info := rs.GetLlmRequestInfo()
 	fmt.Println("OPENAI_LLM_API")
 	config := openai.DefaultConfig(info.GetToken())
@@ -38,5 +38,5 @@ func OpenaiBlockingRequest(ctx context.Context, rs *unoLlmMod.LLMRequestSchema) 
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
-	return chatGPTTranslateToRelay(resp)
+	return chatGPT2Grpc(resp)
 }

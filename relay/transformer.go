@@ -5,5 +5,5 @@ import (
 	"limit.dev/unollm/model/unoLlmMod"
 )
 
-type ResponseGrpcTransformer func(any) (*unoLlmMod.LLMResponseSchema, error)
-type ResponseOpenAICompletionTransformer func(any) (openai.ChatCompletionResponse, error)
+type GrpcTransformer func(any) (*unoLlmMod.LLMResponseSchema, error)
+type OpenAICompletionTransformer func(any) (openai.ChatCompletionResponse, error)

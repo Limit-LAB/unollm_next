@@ -7,17 +7,17 @@ import (
 	"limit.dev/unollm/model/unoLlmMod"
 )
 
-var _ ResponseGrpcTransformer = ChatGPTTranslateToRelay
+var _ GrpcTransformer = ChatGPT2Grpc
 
-func ChatGPTTranslateToRelay(resp any) (*unoLlmMod.LLMResponseSchema, error) {
+func ChatGPT2Grpc(resp any) (*unoLlmMod.LLMResponseSchema, error) {
 	switch resp.(type) {
 	case openai.ChatCompletionResponse:
-		return chatGPTTranslateToRelay(resp.(openai.ChatCompletionResponse))
+		return chatGPT2Grpc(resp.(openai.ChatCompletionResponse))
 	default:
 		return nil, status.Errorf(codes.Internal, "ChatGPTTranslateToRelay: resp type is not openai.ChatCompletionResponse")
 	}
 }
-func chatGPTTranslateToRelay(resp openai.ChatCompletionResponse) (*unoLlmMod.LLMResponseSchema, error) {
+func chatGPT2Grpc(resp openai.ChatCompletionResponse) (*unoLlmMod.LLMResponseSchema, error) {
 	if len(resp.Choices) == 0 {
 		return nil, status.Errorf(codes.Internal, "OpenAI choices is empty")
 	}

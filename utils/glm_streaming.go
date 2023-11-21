@@ -3,68 +3,12 @@ package utils
 import (
 	"bufio"
 	"bytes"
-	"encoding/json"
 	"io"
-	"net/http"
-	"strings"
-	"time"
-
-	"limit.dev/unollm/model/zhipu"
 )
-
-func GLMStreamingRequest(body zhipu.ChatCompletionRequest, modelName string, token string) (chan string, chan zhipu.ChatCompletionStreamResponse, error) {
-	expire := time.Duration(10000) * time.Second
-	token, err := CreateJWTToken(token, expire)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	client := &http.Client{}
-	reqBody, err := json.Marshal(body)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req, err := http.NewRequest("POST", "https://open.bigmodel.cn/api/paas/v3/model-api/"+modelName+"/sse-invoke", strings.NewReader(string(reqBody)))
-	if err != nil {
-		return nil, nil, err
-	}
-
-	req.Header.Set("Authorization", token)
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Accept", "text/event-stream")
-
-	resp, err := client.Do(req)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	reader := NewEventStreamReader(resp.Body, 4096)
-
-	llmCh := make(chan string)
-	resultCh := make(chan zhipu.ChatCompletionStreamResponse, 1)
-
-	go func() {
-		for reader.scanner.Scan() {
-			kv := strings.Split(reader.scanner.Text(), "\n")
-			switch kv[0] {
-			case "event:add":
-				llmCh <- kv[2][5:]
-			case "event:finish":
-				var usage zhipu.ChatCompletionStreamResponse
-				json.NewDecoder(strings.NewReader(kv[3][5:])).Decode(&usage)
-				resultCh <- usage
-			}
-		}
-		defer resp.Body.Close()
-	}()
-
-	return llmCh, resultCh, nil
-}
 
 // EventStreamReader scans an io.Reader looking for EventStream messages.
 type EventStreamReader struct {
-	scanner *bufio.Scanner
+	Scanner *bufio.Scanner
 }
 
 // Returns the minimum non-negative value out of the two values. If both
@@ -130,6 +74,6 @@ func NewEventStreamReader(eventStream io.Reader, maxBufferSize int) *EventStream
 	scanner.Split(split)
 
 	return &EventStreamReader{
-		scanner: scanner,
+		Scanner: scanner,
 	}
 }

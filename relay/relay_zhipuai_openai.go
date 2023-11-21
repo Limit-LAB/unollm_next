@@ -8,15 +8,15 @@ import (
 	"strconv"
 )
 
-func ChatGLMTranslateToOpenAI(resp any) (openai.ChatCompletionResponse, error) {
+func ChatGLM2OpenAI(resp any) (openai.ChatCompletionResponse, error) {
 	switch resp.(type) {
 	case zhipu.ChatCompletionResponse:
-		return chatGLMTranslateToOpenAI(resp.(zhipu.ChatCompletionResponse))
+		return chatGlm2OpenAI(resp.(zhipu.ChatCompletionResponse))
 	default:
 		return openai.ChatCompletionResponse{}, status.Errorf(codes.Internal, "ChatGPTTranslateToRelay: resp type is not openai.ChatCompletionResponse")
 	}
 }
-func chatGLMTranslateToOpenAI(res zhipu.ChatCompletionResponse) (openai.ChatCompletionResponse, error) {
+func chatGlm2OpenAI(res zhipu.ChatCompletionResponse) (openai.ChatCompletionResponse, error) {
 	content, err := strconv.Unquote(res.Data.Choices[0].Content)
 	if err != nil {
 		content = res.Data.Choices[0].Content

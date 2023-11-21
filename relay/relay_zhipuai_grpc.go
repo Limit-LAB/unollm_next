@@ -12,16 +12,16 @@ import (
 	"strconv"
 )
 
-func ChatGLMTranslateToRelay(resp any) (*unoLlmMod.LLMResponseSchema, error) {
+func ChatGLM2Grpc(resp any) (*unoLlmMod.LLMResponseSchema, error) {
 	switch resp.(type) {
 	case zhipu.ChatCompletionResponse:
-		return chatGLMTranslateToRelay(resp.(zhipu.ChatCompletionResponse))
+		return chatGLM2Grpcs(resp.(zhipu.ChatCompletionResponse))
 	default:
 		return nil, status.Errorf(codes.Internal, "ChatGPTTranslateToRelay: resp type is not openai.ChatCompletionResponse")
 	}
 }
 
-func chatGLMTranslateToRelay(res zhipu.ChatCompletionResponse) (*unoLlmMod.LLMResponseSchema, error) {
+func chatGLM2Grpcs(res zhipu.ChatCompletionResponse) (*unoLlmMod.LLMResponseSchema, error) {
 	content, err := strconv.Unquote(res.Data.Choices[0].Content)
 	if err != nil {
 		content = res.Data.Choices[0].Content
@@ -40,4 +40,29 @@ func chatGLMTranslateToRelay(res zhipu.ChatCompletionResponse) (*unoLlmMod.LLMRe
 		LlmTokenCount: &count,
 	}
 	return &retResp, nil
+}
+
+func chatGLMStream2Grpc(llm chan string, result chan zhipu.ChatCompletionStreamResponse, sv unoLlmMod.UnoLLMv1_StreamRequestLLMServer) error {
+	for {
+		select {
+		case chunk := <-llm:
+			resp := unoLlmMod.PartialLLMResponse{
+				Response: &unoLlmMod.PartialLLMResponse_Content{
+					Content: chunk,
+				},
+			}
+			if err := sv.Send(&resp); err != nil {
+				return err
+			}
+		case res := <-result:
+			tokenCount := res.Usage.ToGrpc()
+			resp := unoLlmMod.PartialLLMResponse{
+				Response:      &unoLlmMod.PartialLLMResponse_Done{},
+				LlmTokenCount: &tokenCount,
+			}
+			if err := sv.Send(&resp); err != nil {
+				return err
+			}
+		}
+	}
 }

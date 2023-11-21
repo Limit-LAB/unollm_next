@@ -8,20 +8,21 @@ import (
 	"context"
 	"fmt"
 	"limit.dev/unollm/model/unoLlmMod"
+	"limit.dev/unollm/provider/ChatGLM"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"limit.dev/unollm/model/zhipu"
-	"limit.dev/unollm/utils"
 )
 
-func ChatGLMBlockingRequest(ctx context.Context, rs *unoLlmMod.LLMRequestSchema) (*unoLlmMod.LLMResponseSchema, error) {
+func ChatGLMChatCompletionRequest(ctx context.Context, rs *unoLlmMod.LLMRequestSchema) (*unoLlmMod.LLMResponseSchema, error) {
 	info := rs.GetLlmRequestInfo()
 	fmt.Println("CHATGLM_LLM_API")
 
 	req := zhipu.FromLLMRequest(rs)
 
-	res, err := utils.GLMBlockingRequest(req, info.GetModel(), info.GetToken())
+	cli := ChatGLM.NewClient(info.GetToken())
+	res, err := cli.ChatCompletion(req, info.GetModel())
 
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
@@ -30,40 +31,20 @@ func ChatGLMBlockingRequest(ctx context.Context, rs *unoLlmMod.LLMRequestSchema)
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("chatGLM response success is false Error code: %d, Error msg: %s", res.ErrorCode, res.ErrorMsg))
 	}
 
-	return chatGLMTranslateToRelay(res)
+	return chatGLM2Grpcs(res)
 }
 
-func ChatGLMStreamingRequestLLM(rs *unoLlmMod.LLMRequestSchema, sv unoLlmMod.UnoLLMv1_StreamRequestLLMServer) error {
+func ChatGLMChatCompletionStreamingRequest(rs *unoLlmMod.LLMRequestSchema, sv unoLlmMod.UnoLLMv1_StreamRequestLLMServer) error {
 	info := rs.GetLlmRequestInfo()
 	fmt.Println("CHATGLM_LLM_API")
 
 	req := zhipu.FromLLMRequest(rs)
 	req.Incremental = true
 
-	llm, result, err := utils.GLMStreamingRequest(req, info.GetModel(), info.GetToken())
+	cli := ChatGLM.NewClient(info.GetToken())
+	llm, result, err := cli.ChatCompletionStreamingRequest(req, info.GetModel())
 	if err != nil {
 		return status.Errorf(codes.Internal, err.Error())
 	}
-	for {
-		select {
-		case chunk := <-llm:
-			resp := unoLlmMod.PartialLLMResponse{
-				Response: &unoLlmMod.PartialLLMResponse_Content{
-					Content: chunk,
-				},
-			}
-			if err = sv.Send(&resp); err != nil {
-				return err
-			}
-		case res := <-result:
-			tokenCount := res.Usage.ToGrpc()
-			resp := unoLlmMod.PartialLLMResponse{
-				Response:      &unoLlmMod.PartialLLMResponse_Done{},
-				LlmTokenCount: &tokenCount,
-			}
-			if err = sv.Send(&resp); err != nil {
-				return err
-			}
-		}
-	}
+	return chatGLMStream2Grpc(llm, result, sv)
 }
