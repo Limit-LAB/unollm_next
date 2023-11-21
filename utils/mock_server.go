@@ -4,17 +4,17 @@ import (
 	"context"
 	"fmt"
 	"google.golang.org/grpc/metadata"
-	"limit.dev/unollm/model/unoLlmMod"
+	"limit.dev/unollm/model"
 )
 
 type MockServerStream struct {
-	Stream  chan *unoLlmMod.PartialLLMResponse
+	Stream  chan *model.PartialLLMResponse
 	header  metadata.MD
 	trailer metadata.MD
 	ctx     context.Context
 }
 
-func (m *MockServerStream) Send(res *unoLlmMod.PartialLLMResponse) error {
+func (m *MockServerStream) Send(res *model.PartialLLMResponse) error {
 	fmt.Println(res)
 	m.Stream <- res
 	return nil

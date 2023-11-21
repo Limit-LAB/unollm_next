@@ -1,6 +1,8 @@
-package zhipu
+package ChatGLM
 
-import "limit.dev/unollm/model/unoLlmMod"
+import (
+	"limit.dev/unollm/model"
+)
 
 const (
 	ChatMessageRoleUser      = "user"
@@ -67,8 +69,8 @@ type Usage struct {
 	TotalTokens      int `json:"total_tokens"`
 }
 
-func (u Usage) ToGrpc() unoLlmMod.LLMTokenCount {
-	return unoLlmMod.LLMTokenCount{
+func (u Usage) ToGrpc() model.LLMTokenCount {
+	return model.LLMTokenCount{
 		TotalToken:      int64(u.TotalTokens),
 		PromptToken:     int64(u.PromptTokens),
 		CompletionToken: int64(u.CompletionTokens),

@@ -7,20 +7,19 @@ package relay
 import (
 	"context"
 	"fmt"
+	"limit.dev/unollm/model"
 
-	"limit.dev/unollm/model/unoLlmMod"
 	"limit.dev/unollm/provider/ChatGLM"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"limit.dev/unollm/model/zhipu"
 )
 
-func ChatGLMChatCompletionRequest(ctx context.Context, rs *unoLlmMod.LLMRequestSchema) (*unoLlmMod.LLMResponseSchema, error) {
+func ChatGLMChatCompletionRequest(ctx context.Context, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
 	info := rs.GetLlmRequestInfo()
 	fmt.Println("CHATGLM_LLM_API")
 
-	req := zhipu.FromLLMRequest(rs)
+	req := ChatGLM.RequestFromLLMRequest(rs)
 
 	cli := ChatGLM.NewClient(info.GetToken())
 	res, err := cli.ChatCompletion(req, info.GetModel())
@@ -35,11 +34,11 @@ func ChatGLMChatCompletionRequest(ctx context.Context, rs *unoLlmMod.LLMRequestS
 	return chatGLM2Grpcs(res)
 }
 
-func ChatGLMChatCompletionStreamingRequest(rs *unoLlmMod.LLMRequestSchema, sv unoLlmMod.UnoLLMv1_StreamRequestLLMServer) error {
+func ChatGLMChatCompletionStreamingRequest(rs *model.LLMRequestSchema, sv model.UnoLLMv1_StreamRequestLLMServer) error {
 	info := rs.GetLlmRequestInfo()
 	fmt.Println("CHATGLM_LLM_API")
 
-	req := zhipu.FromLLMRequest(rs)
+	req := ChatGLM.RequestFromLLMRequest(rs)
 	req.Incremental = true
 
 	cli := ChatGLM.NewClient(info.GetToken())

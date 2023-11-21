@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package unoLLM;
-option go_package = "./unollm_proto";
+// option go_package = "./model";
 
 message LLMTokenCount {
   int64 total_token = 1;

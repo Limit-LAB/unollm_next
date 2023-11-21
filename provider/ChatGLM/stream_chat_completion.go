@@ -3,13 +3,12 @@ package ChatGLM
 import (
 	"bytes"
 	"encoding/json"
-	"limit.dev/unollm/model/zhipu"
 	"limit.dev/unollm/utils"
 	"net/http"
 	"strings"
 )
 
-func (c *Client) ChatCompletionStreamingRequest(body zhipu.ChatCompletionRequest, modelName string) (chan string, chan zhipu.ChatCompletionStreamFinishResponse, error) {
+func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest, modelName string) (chan string, chan ChatCompletionStreamFinishResponse, error) {
 	token, err := utils.CreateJWTToken(c.apiKey, jwtExpire)
 	if err != nil {
 		return nil, nil, err
@@ -37,7 +36,7 @@ func (c *Client) ChatCompletionStreamingRequest(body zhipu.ChatCompletionRequest
 	reader := utils.NewEventStreamReader(resp.Body, 4096)
 
 	llmCh := make(chan string)
-	resultCh := make(chan zhipu.ChatCompletionStreamFinishResponse, 1)
+	resultCh := make(chan ChatCompletionStreamFinishResponse, 1)
 
 	go func() {
 		defer resp.Body.Close()
@@ -47,7 +46,7 @@ func (c *Client) ChatCompletionStreamingRequest(body zhipu.ChatCompletionRequest
 			case "event:add":
 				llmCh <- kv[2][5:]
 			case "event:finish":
-				var usage zhipu.ChatCompletionStreamFinishResponse
+				var usage ChatCompletionStreamFinishResponse
 				json.NewDecoder(strings.NewReader(kv[3][5:])).Decode(&usage)
 				resultCh <- usage
 			}

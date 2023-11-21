@@ -7,20 +7,20 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"io"
-	"limit.dev/unollm/model/zhipu"
+	"limit.dev/unollm/provider/ChatGLM"
 	"limit.dev/unollm/utils"
 	"strconv"
 )
 
 func ChatGLM2OpenAI(resp any) (openai.ChatCompletionResponse, error) {
 	switch resp.(type) {
-	case zhipu.ChatCompletionResponse:
-		return chatGlm2OpenAI(resp.(zhipu.ChatCompletionResponse))
+	case ChatGLM.ChatCompletionResponse:
+		return chatGlm2OpenAI(resp.(ChatGLM.ChatCompletionResponse))
 	default:
 		return openai.ChatCompletionResponse{}, status.Errorf(codes.Internal, "ChatGPTTranslateToRelay: resp type is not openai.ChatCompletionResponse")
 	}
 }
-func chatGlm2OpenAI(res zhipu.ChatCompletionResponse) (openai.ChatCompletionResponse, error) {
+func chatGlm2OpenAI(res ChatGLM.ChatCompletionResponse) (openai.ChatCompletionResponse, error) {
 	content, err := strconv.Unquote(res.Data.Choices[0].Content)
 	if err != nil {
 		content = res.Data.Choices[0].Content
@@ -44,7 +44,7 @@ func chatGlm2OpenAI(res zhipu.ChatCompletionResponse) (openai.ChatCompletionResp
 	}, nil
 }
 
-func ChatGlmStream2OpenAI(c *gin.Context, llm chan string, result chan zhipu.ChatCompletionStreamFinishResponse) {
+func ChatGlmStream2OpenAI(c *gin.Context, llm chan string, result chan ChatGLM.ChatCompletionStreamFinishResponse) {
 	utils.SetEventStreamHeaders(c)
 	// TODO: Stop chan?
 	c.Stream(func(w io.Writer) bool {

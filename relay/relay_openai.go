@@ -3,16 +3,15 @@ package relay
 import (
 	"context"
 	"fmt"
-	"limit.dev/unollm/model/unoLlmMod"
-
 	"github.com/sashabaranov/go-openai"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"limit.dev/unollm/model"
 )
 
 // TODO: read max_tokens, n, stop, frequency_penalty, presence_penalty from meta
 
-func OpenAIChatCompletionRequest(ctx context.Context, rs *unoLlmMod.LLMRequestSchema) (*unoLlmMod.LLMResponseSchema, error) {
+func OpenAIChatCompletionRequest(ctx context.Context, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
 	info := rs.GetLlmRequestInfo()
 	fmt.Println("OPENAI_LLM_API")
 	config := openai.DefaultConfig(info.GetToken())

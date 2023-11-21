@@ -7,55 +7,55 @@ package relay
 import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"limit.dev/unollm/model/unoLlmMod"
-	"limit.dev/unollm/model/zhipu"
+	"limit.dev/unollm/model"
+	"limit.dev/unollm/provider/ChatGLM"
 	"strconv"
 )
 
-func ChatGLM2Grpc(resp any) (*unoLlmMod.LLMResponseSchema, error) {
+func ChatGLM2Grpc(resp any) (*model.LLMResponseSchema, error) {
 	switch resp.(type) {
-	case zhipu.ChatCompletionResponse:
-		return chatGLM2Grpcs(resp.(zhipu.ChatCompletionResponse))
+	case ChatGLM.ChatCompletionResponse:
+		return chatGLM2Grpcs(resp.(ChatGLM.ChatCompletionResponse))
 	default:
 		return nil, status.Errorf(codes.Internal, "ChatGPTTranslateToRelay: resp type is not openai.ChatCompletionResponse")
 	}
 }
 
-func chatGLM2Grpcs(res zhipu.ChatCompletionResponse) (*unoLlmMod.LLMResponseSchema, error) {
+func chatGLM2Grpcs(res ChatGLM.ChatCompletionResponse) (*model.LLMResponseSchema, error) {
 	content, err := strconv.Unquote(res.Data.Choices[0].Content)
 	if err != nil {
 		content = res.Data.Choices[0].Content
 	}
-	retMessage := unoLlmMod.LLMChatCompletionMessage{
+	retMessage := model.LLMChatCompletionMessage{
 		Role:    res.Data.Choices[0].Role,
 		Content: content,
 	}
-	count := unoLlmMod.LLMTokenCount{
+	count := model.LLMTokenCount{
 		TotalToken:      int64(res.Data.Usage.TotalTokens),
 		PromptToken:     int64(res.Data.Usage.PromptTokens),
 		CompletionToken: int64(res.Data.Usage.CompletionTokens),
 	}
-	retResp := unoLlmMod.LLMResponseSchema{
+	retResp := model.LLMResponseSchema{
 		Message:       &retMessage,
 		LlmTokenCount: &count,
 	}
 	return &retResp, nil
 }
 
-func chatGLMStream2Grpc(llm chan string, result chan zhipu.ChatCompletionStreamFinishResponse, sv unoLlmMod.UnoLLMv1_StreamRequestLLMServer) error {
+func chatGLMStream2Grpc(llm chan string, result chan ChatGLM.ChatCompletionStreamFinishResponse, sv model.UnoLLMv1_StreamRequestLLMServer) error {
 	for {
 		select {
 		case chunk := <-llm:
-			resp := unoLlmMod.PartialLLMResponse{
-				Response: &unoLlmMod.PartialLLMResponse_Content{
+			resp := model.PartialLLMResponse{
+				Response: &model.PartialLLMResponse_Content{
 					Content: chunk,
 				},
 			}
 			sv.Send(&resp)
 		case res := <-result:
 			tokenCount := res.Usage.ToGrpc()
-			resp := unoLlmMod.PartialLLMResponse{
-				Response:      &unoLlmMod.PartialLLMResponse_Done{},
+			resp := model.PartialLLMResponse{
+				Response:      &model.PartialLLMResponse_Done{},
 				LlmTokenCount: &tokenCount,
 			}
 			return sv.Send(&resp)

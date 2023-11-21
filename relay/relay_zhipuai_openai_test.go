@@ -7,7 +7,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/sashabaranov/go-openai"
 	"io"
-	"limit.dev/unollm/model/zhipu"
 	"limit.dev/unollm/provider/ChatGLM"
 	"limit.dev/unollm/relay"
 	"log"
@@ -29,14 +28,14 @@ func mockServer() *gin.Engine {
 		}
 		cli := ChatGLM.NewClient(zhipuaiApiKey)
 
-		zpReq := zhipu.ChatCompletionRequest{
+		zpReq := ChatGLM.ChatCompletionRequest{
 			Temperature: req.Temperature,
 			TopP:        req.TopP,
 			Incremental: true,
 		}
 
 		for _, m := range req.Messages {
-			zpReq.Prompt = append(zpReq.Prompt, zhipu.ChatCompletionMessage{
+			zpReq.Prompt = append(zpReq.Prompt, ChatGLM.ChatCompletionMessage{
 				Role:    m.Role,
 				Content: m.Content,
 			})
@@ -63,7 +62,7 @@ func TestZhipuChatCompletionStream(t *testing.T) {
 	client := openai.NewClientWithConfig(config)
 	resp, err := client.CreateChatCompletionStream(context.Background(),
 		openai.ChatCompletionRequest{
-			Model: zhipu.ModelTurbo,
+			Model: ChatGLM.ModelTurbo,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    "user",

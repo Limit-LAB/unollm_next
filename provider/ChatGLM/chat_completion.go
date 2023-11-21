@@ -3,7 +3,6 @@ package ChatGLM
 import (
 	"bytes"
 	"encoding/json"
-	"limit.dev/unollm/model/zhipu"
 	"limit.dev/unollm/utils"
 	"net/http"
 	"time"
@@ -11,7 +10,7 @@ import (
 
 const jwtExpire = time.Duration(10000) * time.Second
 
-func (c *Client) ChatCompletion(body zhipu.ChatCompletionRequest, modelName string) (result zhipu.ChatCompletionResponse, err error) {
+func (c *Client) ChatCompletion(body ChatCompletionRequest, modelName string) (result ChatCompletionResponse, err error) {
 	token, err := utils.CreateJWTToken(c.apiKey, jwtExpire)
 	if err != nil {
 		return

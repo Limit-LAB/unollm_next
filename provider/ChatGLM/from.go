@@ -1,10 +1,10 @@
-package zhipu
+package ChatGLM
 
 import (
-	"limit.dev/unollm/model/unoLlmMod"
+	"limit.dev/unollm/model"
 )
 
-func FromLLMRequest(rs *unoLlmMod.LLMRequestSchema) ChatCompletionRequest {
+func RequestFromLLMRequest(rs *model.LLMRequestSchema) ChatCompletionRequest {
 	info := rs.GetLlmRequestInfo()
 	messages := rs.GetMessages()
 	req := ChatCompletionRequest{
