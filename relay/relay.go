@@ -3,6 +3,7 @@ package relay
 import (
 	context "context"
 	"fmt"
+
 	"limit.dev/unollm/model"
 
 	codes "google.golang.org/grpc/codes"
@@ -35,6 +36,11 @@ func (UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.LLMReq
 }
 
 func (UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv model.UnoLLMv1_StreamRequestLLMServer) error {
+	info := rs.GetLlmRequestInfo()
+	switch info.GetLlmApiType() {
+	case CHATGLM_LLM_API:
+		return ChatGLMStreamingRequestLLM(rs, sv)
+	}
 	return status.Errorf(codes.Unimplemented, "method StreamRequestLLM not implemented")
 }
 func (UnoForwardServer) mustEmbedUnimplementedUnoLLMv1Server() {}

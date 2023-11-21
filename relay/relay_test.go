@@ -2,10 +2,14 @@ package relay_test
 
 import (
 	"context"
-	"limit.dev/unollm/relay"
+	"fmt"
+	"log"
 	"os"
 	"testing"
 
+	"limit.dev/unollm/relay"
+
+	"google.golang.org/grpc/metadata"
 	"limit.dev/unollm/model"
 
 	"github.com/joho/godotenv"
@@ -69,4 +73,87 @@ func TestChatGLM(t *testing.T) {
 		t.Error(err)
 	}
 	t.Log("res: ", res)
+}
+
+type MockServerStream struct {
+	stream  []*model.PartialLLMResponse
+	header  metadata.MD
+	trailer metadata.MD
+	ctx     context.Context
+}
+
+func (m *MockServerStream) Send(res *model.PartialLLMResponse) error {
+	fmt.Println(res)
+	m.stream = append(m.stream, res)
+	return nil
+}
+
+func NewMockServerStream(ctx context.Context) *MockServerStream {
+	return &MockServerStream{
+		ctx: ctx,
+	}
+}
+
+func (m *MockServerStream) SetHeader(md metadata.MD) error {
+	m.header = md
+	return nil
+}
+
+func (m *MockServerStream) SendHeader(md metadata.MD) error {
+	m.header = md
+	return nil
+}
+
+func (m *MockServerStream) SetTrailer(md metadata.MD) {
+	m.trailer = md
+}
+
+func (m *MockServerStream) Context() context.Context {
+	return m.ctx
+}
+
+func (m *MockServerStream) SendMsg(msg interface{}) error {
+	// Mock implementation, no action needed
+	return nil
+}
+
+func (m *MockServerStream) RecvMsg(msg interface{}) error {
+	// Mock implementation, no action needed
+	return nil
+}
+
+func TestChatGLMStreaming(t *testing.T) {
+	err := godotenv.Load("../.env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	messages := make([]*model.LLMChatCompletionMessage, 0)
+	messages = append(messages, &model.LLMChatCompletionMessage{
+		Role:    "user",
+		Content: "假如今天下大雨，我是否需要带伞？",
+	})
+	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
+	req_info := model.LLMRequestInfo{
+		LlmApiType:  relay.CHATGLM_LLM_API,
+		Model:       "chatglm_turbo",
+		Temperature: 0.9,
+		TopP:        0.9,
+		TopK:        1,
+		Url:         "",
+		Token:       zhipuaiApiKey,
+	}
+	req := model.LLMRequestSchema{
+		Messages:       messages,
+		LlmRequestInfo: &req_info,
+	}
+	mockServer := relay.UnoForwardServer{}
+	mockServerPipe := MockServerStream{
+		stream: []*model.PartialLLMResponse{},
+	}
+	err = mockServer.StreamRequestLLM(&req, &mockServerPipe)
+	if err != nil {
+		t.Error(err)
+	}
+
 }
