@@ -44,7 +44,7 @@ func chatGlm2OpenAI(res zhipu.ChatCompletionResponse) (openai.ChatCompletionResp
 	}, nil
 }
 
-func chatGlmStream2OpenAI(c *gin.Context, llm chan string, result chan zhipu.ChatCompletionStreamFinishResponse) {
+func ChatGlmStream2OpenAI(c *gin.Context, llm chan string, result chan zhipu.ChatCompletionStreamFinishResponse) {
 	utils.SetEventStreamHeaders(c)
 	// TODO: Stop chan?
 	c.Stream(func(w io.Writer) bool {

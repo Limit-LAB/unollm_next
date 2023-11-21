@@ -1,0 +1,96 @@
+package relay_test
+
+import (
+	"context"
+	"errors"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"github.com/sashabaranov/go-openai"
+	"io"
+	"limit.dev/unollm/model/zhipu"
+	"limit.dev/unollm/provider/ChatGLM"
+	"limit.dev/unollm/relay"
+	"log"
+	"os"
+	"testing"
+	"time"
+)
+
+func mockServer() *gin.Engine {
+	godotenv.Load("../.env")
+	g := gin.New()
+	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
+	g.POST("/v1/chat/completions", func(c *gin.Context) {
+		var req openai.ChatCompletionRequest
+		err := c.BindJSON(&req)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		cli := ChatGLM.NewClient(zhipuaiApiKey)
+
+		zpReq := zhipu.ChatCompletionRequest{
+			Temperature: req.Temperature,
+			TopP:        req.TopP,
+			Incremental: true,
+		}
+
+		for _, m := range req.Messages {
+			zpReq.Prompt = append(zpReq.Prompt, zhipu.ChatCompletionMessage{
+				Role:    m.Role,
+				Content: m.Content,
+			})
+		}
+		llm, result, err := cli.ChatCompletionStreamingRequest(zpReq, req.Model)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		relay.ChatGlmStream2OpenAI(c, llm, result)
+	})
+	return g
+}
+
+func TestZhipuChatCompletionStream(t *testing.T) {
+	addr := "127.0.0.1:11451"
+	go func() {
+		e := mockServer()
+		e.Run(addr)
+	}()
+	time.Sleep(3 * time.Second) // Wait for server to start
+	config := openai.DefaultConfig("114514")
+	config.BaseURL = "http://" + addr + "/v1"
+	client := openai.NewClientWithConfig(config)
+	resp, err := client.CreateChatCompletionStream(context.Background(),
+		openai.ChatCompletionRequest{
+			Model: zhipu.ModelTurbo,
+			Messages: []openai.ChatCompletionMessage{
+				{
+					Role:    "user",
+					Content: "假如今天下大雨，我是否需要带伞？",
+				},
+				{
+					Role:    "assistant",
+					Content: "需要",
+				},
+				{
+					Role:    "user",
+					Content: "1+1=?",
+				},
+			},
+		})
+	if err != nil {
+		t.Error(err)
+	}
+	for {
+		cv, e := resp.Recv()
+		if e != nil {
+			if errors.Is(e, io.EOF) {
+				break
+			}
+			t.Error(e)
+			break
+		}
+		t.Log(cv)
+	}
+}
