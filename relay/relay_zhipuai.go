@@ -36,31 +36,30 @@ func ChatGLMBlockingRequest(ctx context.Context, rs *model.LLMRequestSchema) (*m
 
 	if error != nil {
 		return nil, status.Errorf(codes.Internal, error.Error())
-	} else {
-		if !res["success"].(bool) {
-			return nil, status.Errorf(codes.Internal, fmt.Sprintf("chatGLM response success is false Error code: %f, Error msg: %s", res["code"], res["msg"]))
-		} else {
-			data := res["data"].(map[string]interface{})
-			choices := data["choices"].([]interface{})
-			content, err := strconv.Unquote(choices[0].(map[string]interface{})["content"].(string))
-			if err != nil {
-				content = choices[0].(map[string]interface{})["content"].(string)
-			}
-			retMessage := model.LLMChatCompletionMessage{
-				Role:    choices[0].(map[string]interface{})["role"].(string),
-				Content: content,
-			}
-			usage := data["usage"].(map[string]interface{})
-			count := model.LLMTokenCount{
-				TotalToken:      int64(usage["total_tokens"].(float64)),
-				PromptToken:     int64(usage["prompt_tokens"].(float64)),
-				CompletionToken: int64(usage["completion_tokens"].(float64)),
-			}
-			retResp := model.LLMResponseSchema{
-				Message:       &retMessage,
-				LlmTokenCount: &count,
-			}
-			return &retResp, nil
-		}
 	}
+	if !res["success"].(bool) {
+		return nil, status.Errorf(codes.Internal, fmt.Sprintf("chatGLM response success is false Error code: %f, Error msg: %s", res["code"], res["msg"]))
+	}
+	data := res["data"].(map[string]interface{})
+	choices := data["choices"].([]interface{})
+	content, err := strconv.Unquote(choices[0].(map[string]interface{})["content"].(string))
+	if err != nil {
+		content = choices[0].(map[string]interface{})["content"].(string)
+	}
+	retMessage := model.LLMChatCompletionMessage{
+		Role:    choices[0].(map[string]interface{})["role"].(string),
+		Content: content,
+	}
+	usage := data["usage"].(map[string]interface{})
+	count := model.LLMTokenCount{
+		TotalToken:      int64(usage["total_tokens"].(float64)),
+		PromptToken:     int64(usage["prompt_tokens"].(float64)),
+		CompletionToken: int64(usage["completion_tokens"].(float64)),
+	}
+	retResp := model.LLMResponseSchema{
+		Message:       &retMessage,
+		LlmTokenCount: &count,
+	}
+	return &retResp, nil
+	
 }
