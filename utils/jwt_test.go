@@ -1,20 +1,16 @@
 package utils
 
 import (
+	"github.com/joho/godotenv"
 	"log"
 	"os"
 	"testing"
 
 	"limit.dev/unollm/model/zhipu"
-
-	"github.com/joho/godotenv"
 )
 
 func TestJWT(t *testing.T) {
-	err := godotenv.Load("../.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	godotenv.Load("../.env")
 
 	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
 	body := zhipu.ChatCompletionRequest{

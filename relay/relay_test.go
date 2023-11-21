@@ -2,7 +2,6 @@ package relay
 
 import (
 	"context"
-	"log"
 	"os"
 	"testing"
 
@@ -12,10 +11,7 @@ import (
 )
 
 func TestOpenAI(t *testing.T) {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	godotenv.Load()
 
 	messages := make([]*model.LLMChatCompletionMessage, 0)
 	messages = append(messages, &model.LLMChatCompletionMessage{
@@ -45,10 +41,7 @@ func TestOpenAI(t *testing.T) {
 }
 
 func TestChatGLM(t *testing.T) {
-	err := godotenv.Load("../.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	godotenv.Load("../.env")
 
 	messages := make([]*model.LLMChatCompletionMessage, 0)
 	messages = append(messages, &model.LLMChatCompletionMessage{
