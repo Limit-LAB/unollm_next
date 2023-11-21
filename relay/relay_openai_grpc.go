@@ -7,6 +7,8 @@ import (
 	"limit.dev/unollm/model"
 )
 
+var _ ResponseGrpcTransformer = ChatGPTTranslateToRelay
+
 func ChatGPTTranslateToRelay(resp any) (*model.LLMResponseSchema, error) {
 	switch resp.(type) {
 	case openai.ChatCompletionResponse:

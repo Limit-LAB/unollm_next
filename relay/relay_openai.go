@@ -19,7 +19,7 @@ func OpenaiBlockingRequest(ctx context.Context, rs *model.LLMRequestSchema) (*mo
 	config.BaseURL = info.GetUrl()
 	client := openai.NewClientWithConfig(config)
 	messages := rs.GetMessages()
-	openaiMessages := make([]openai.ChatCompletionMessage, 0)
+	var openaiMessages []openai.ChatCompletionMessage
 	for _, m := range messages {
 		openaiMessages = append(openaiMessages, openai.ChatCompletionMessage{
 			Role:    m.GetRole(),

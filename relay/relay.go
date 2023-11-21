@@ -38,5 +38,3 @@ func (UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv model.Un
 	return status.Errorf(codes.Unimplemented, "method StreamRequestLLM not implemented")
 }
 func (UnoForwardServer) mustEmbedUnimplementedUnoLLMv1Server() {}
-
-type ResponseTransformer func(any) (*model.LLMResponseSchema, error)
