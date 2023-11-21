@@ -3,7 +3,6 @@ package relay_test
 import (
 	"context"
 	"limit.dev/unollm/utils"
-	"log"
 	"os"
 	"testing"
 
@@ -75,10 +74,7 @@ func TestChatGLM(t *testing.T) {
 }
 
 func TestChatGLMStreaming(t *testing.T) {
-	err := godotenv.Load("../.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	godotenv.Load("../.env")
 
 	messages := make([]*unoLlmMod.LLMChatCompletionMessage, 0)
 	messages = append(messages, &unoLlmMod.LLMChatCompletionMessage{
@@ -103,7 +99,7 @@ func TestChatGLMStreaming(t *testing.T) {
 	mockServerPipe := utils.MockServerStream{
 		Stream: make(chan *unoLlmMod.PartialLLMResponse, 1000),
 	}
-	err = mockServer.StreamRequestLLM(&req, &mockServerPipe)
+	err := mockServer.StreamRequestLLM(&req, &mockServerPipe)
 	if err != nil {
 		t.Error(err)
 	}
