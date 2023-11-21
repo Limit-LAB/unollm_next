@@ -12,7 +12,7 @@ import (
 	"limit.dev/unollm/model/zhipu"
 )
 
-func GLMStreamingRequest(body zhipu.ChatCompletionRequest, modelName string, token string) (chan string, chan map[string]interface{}, error) {
+func GLMStreamingRequest(body zhipu.ChatCompletionRequest, modelName string, token string) (chan string, chan zhipu.ChatCompletionStreamResponse, error) {
 	expire := time.Duration(10000) * time.Second
 	token, err := CreateJWTToken(token, expire)
 	if err != nil {
@@ -39,28 +39,27 @@ func GLMStreamingRequest(body zhipu.ChatCompletionRequest, modelName string, tok
 		return nil, nil, err
 	}
 
-	var result map[string]interface{}
-
 	reader := NewEventStreamReader(resp.Body, 4096)
 
-	llm_chan := make(chan string)
-	result_chan := make(chan map[string]interface{}, 1)
+	llmCh := make(chan string)
+	resultCh := make(chan zhipu.ChatCompletionStreamResponse, 1)
 
 	go func() {
 		for reader.scanner.Scan() {
 			kv := strings.Split(reader.scanner.Text(), "\n")
 			switch kv[0] {
 			case "event:add":
-				llm_chan <- kv[2][5:]
+				llmCh <- kv[2][5:]
 			case "event:finish":
-				json.NewDecoder(strings.NewReader(kv[3][5:])).Decode(&result)
-				result_chan <- result
+				var usage zhipu.ChatCompletionStreamResponse
+				json.NewDecoder(strings.NewReader(kv[3][5:])).Decode(&usage)
+				resultCh <- usage
 			}
 		}
 		defer resp.Body.Close()
 	}()
 
-	return llm_chan, result_chan, nil
+	return llmCh, resultCh, nil
 }
 
 // EventStreamReader scans an io.Reader looking for EventStream messages.

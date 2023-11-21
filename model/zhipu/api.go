@@ -1,5 +1,7 @@
 package zhipu
 
+import "limit.dev/unollm/model/unoLlmMod"
+
 const (
 	ChatMessageRoleUser      = "user"
 	ChatMessageRoleAssistant = "assistant"
@@ -43,6 +45,11 @@ type ChatCompletionResponse struct {
 	Success   bool   `json:"success"`
 }
 
+type ChatCompletionStreamResponse struct {
+	Event string `json:"event"`
+	Usage Usage  `json:"usage"`
+}
+
 type ChatCompletionResponseData struct {
 	TaskId  string                 `json:"task_id"`
 	Usage   Usage                  `json:"usage"`
@@ -58,4 +65,12 @@ type Usage struct {
 	PromptTokens     int `json:"prompt_tokens"`
 	CompletionTokens int `json:"completion_tokens"`
 	TotalTokens      int `json:"total_tokens"`
+}
+
+func (u Usage) ToGrpc() unoLlmMod.LLMTokenCount {
+	return unoLlmMod.LLMTokenCount{
+		TotalToken:      int64(u.TotalTokens),
+		PromptToken:     int64(u.PromptTokens),
+		CompletionToken: int64(u.CompletionTokens),
+	}
 }

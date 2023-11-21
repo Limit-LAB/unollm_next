@@ -46,21 +46,17 @@ func ChatGLMStreamingRequestLLM(rs *unoLlmMod.LLMRequestSchema, sv unoLlmMod.Uno
 	}
 	for {
 		select {
-		case llm_message := <-llm:
+		case chunk := <-llm:
 			resp := unoLlmMod.PartialLLMResponse{
 				Response: &unoLlmMod.PartialLLMResponse_Content{
-					Content: llm_message,
+					Content: chunk,
 				},
 			}
 			if err = sv.Send(&resp); err != nil {
 				return err
 			}
 		case res := <-result:
-			tokenCount := unoLlmMod.LLMTokenCount{
-				TotalToken:      int64(res["usage"].(map[string]interface{})["total_tokens"].(float64)),
-				PromptToken:     int64(res["usage"].(map[string]interface{})["prompt_tokens"].(float64)),
-				CompletionToken: int64(res["usage"].(map[string]interface{})["completion_tokens"].(float64)),
-			}
+			tokenCount := res.Usage.ToGrpc()
 			resp := unoLlmMod.PartialLLMResponse{
 				Response:      &unoLlmMod.PartialLLMResponse_Done{},
 				LlmTokenCount: &tokenCount,
