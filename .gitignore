@@ -1,1 +1,15 @@
 .env
+.idea
+.vscode
+.fleet
+.DS_Store
+DS_Store
+
+out/
+*_priv.go
+
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
