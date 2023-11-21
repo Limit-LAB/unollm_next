@@ -1,8 +1,9 @@
-package unollm
+package relay
 
 import (
 	context "context"
 	"fmt"
+	"limit.dev/unollm/model"
 
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -16,7 +17,7 @@ const CHATGLM_LLM_API = "chatglm"
 const AZURE_OPENAI_LLM_API = "azure_openai"
 const BAICHUAN_LLM_API = "baichuan"
 
-func (UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *LLMRequestSchema) (*LLMResponseSchema, error) {
+func (UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
 	info := rs.GetLlmRequestInfo()
 	switch info.GetLlmApiType() {
 	case OPENAI_LLM_API:
@@ -33,7 +34,7 @@ func (UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *LLMRequestSc
 	return nil, status.Errorf(codes.Unimplemented, "method BlockingRequestLLM not implemented")
 }
 
-func (UnoForwardServer) StreamRequestLLM(rs *LLMRequestSchema, sv UnoLLMv1_StreamRequestLLMServer) error {
+func (UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv model.UnoLLMv1_StreamRequestLLMServer) error {
 	return status.Errorf(codes.Unimplemented, "method StreamRequestLLM not implemented")
 }
 func (UnoForwardServer) mustEmbedUnimplementedUnoLLMv1Server() {}

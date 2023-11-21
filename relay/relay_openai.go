@@ -1,8 +1,9 @@
-package unollm
+package relay
 
 import (
 	"context"
 	"fmt"
+	"limit.dev/unollm/model"
 
 	"github.com/sashabaranov/go-openai"
 	"google.golang.org/grpc/codes"
@@ -11,7 +12,7 @@ import (
 
 // TODO: read max_tokens, n, stop, frequency_penalty, presence_penalty from meta
 
-func OpenaiBlockingRequest(ctx context.Context, rs *LLMRequestSchema) (*LLMResponseSchema, error) {
+func OpenaiBlockingRequest(ctx context.Context, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
 	info := rs.GetLlmRequestInfo()
 	fmt.Println("OPENAI_LLM_API")
 	config := openai.DefaultConfig(info.GetToken())
@@ -39,16 +40,16 @@ func OpenaiBlockingRequest(ctx context.Context, rs *LLMRequestSchema) (*LLMRespo
 			return nil, status.Errorf(codes.Internal, "OpenAI choices is empty")
 		}
 		message := resp.Choices[0].Message
-		retMessage := LLMChatCompletionMessage{
+		retMessage := model.LLMChatCompletionMessage{
 			Role:    message.Role,
 			Content: message.Content,
 		}
-		count := LLMTokenCount{
+		count := model.LLMTokenCount{
 			TotalToken:      int64(resp.Usage.TotalTokens),
 			PromptToken:     int64(resp.Usage.PromptTokens),
 			CompletionToken: int64(resp.Usage.CompletionTokens),
 		}
-		retResp := LLMResponseSchema{
+		retResp := model.LLMResponseSchema{
 			Message:       &retMessage,
 			LlmTokenCount: &count,
 		}

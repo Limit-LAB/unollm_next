@@ -1,7 +1,8 @@
-package unollm
+package relay
 
 import (
 	"context"
+	"limit.dev/unollm/model"
 	"log"
 	"os"
 	"testing"
@@ -15,13 +16,13 @@ func TestOpenAI(t *testing.T) {
 		log.Fatal("Error loading .env file")
 	}
 
-	messages := make([]*LLMChatCompletionMessage, 0)
-	messages = append(messages, &LLMChatCompletionMessage{
+	messages := make([]*model.LLMChatCompletionMessage, 0)
+	messages = append(messages, &model.LLMChatCompletionMessage{
 		Role:    "user",
 		Content: "假如今天下大雨，我是否需要带伞？",
 	})
 	openaiApiKey := os.Getenv("TEST_OPENAI_API")
-	req_info := LLMRequestInfo{
+	req_info := model.LLMRequestInfo{
 		LlmApiType:  OPENAI_LLM_API,
 		Model:       "gpt-3.5-turbo",
 		Temperature: 0.9,
@@ -30,7 +31,7 @@ func TestOpenAI(t *testing.T) {
 		Url:         "https://api.openai-sb.com/v1",
 		Token:       openaiApiKey,
 	}
-	req := LLMRequestSchema{
+	req := model.LLMRequestSchema{
 		Messages:       messages,
 		LlmRequestInfo: &req_info,
 	}
@@ -48,13 +49,13 @@ func TestChatGLM(t *testing.T) {
 		log.Fatal("Error loading .env file")
 	}
 
-	messages := make([]*LLMChatCompletionMessage, 0)
-	messages = append(messages, &LLMChatCompletionMessage{
+	messages := make([]*model.LLMChatCompletionMessage, 0)
+	messages = append(messages, &model.LLMChatCompletionMessage{
 		Role:    "user",
 		Content: "假如今天下大雨，我是否需要带伞？",
 	})
 	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
-	req_info := LLMRequestInfo{
+	req_info := model.LLMRequestInfo{
 		LlmApiType:  CHATGLM_LLM_API,
 		Model:       "chatglm_turbo",
 		Temperature: 0.9,
@@ -63,7 +64,7 @@ func TestChatGLM(t *testing.T) {
 		Url:         "",
 		Token:       zhipuaiApiKey,
 	}
-	req := LLMRequestSchema{
+	req := model.LLMRequestSchema{
 		Messages:       messages,
 		LlmRequestInfo: &req_info,
 	}

@@ -4,7 +4,7 @@
 // 	protoc        v4.25.1
 // source: unollm.proto
 
-package unollm
+package model
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"

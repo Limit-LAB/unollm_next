@@ -1,4 +1,4 @@
-package unollm
+package relay
 
 // TODO: system prompt is not supported yet
 // TODO: n is not supported yet
@@ -8,6 +8,7 @@ package unollm
 import (
 	"context"
 	"fmt"
+	"limit.dev/unollm/model"
 	"strconv"
 
 	"google.golang.org/grpc/codes"
@@ -15,7 +16,7 @@ import (
 	"limit.dev/unollm/utils"
 )
 
-func ChatGLMBlockingRequest(ctx context.Context, rs *LLMRequestSchema) (*LLMResponseSchema, error) {
+func ChatGLMBlockingRequest(ctx context.Context, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
 	info := rs.GetLlmRequestInfo()
 	fmt.Println("CHATGLM_LLM_API")
 	prompt := make([]interface{}, 0)
@@ -45,17 +46,17 @@ func ChatGLMBlockingRequest(ctx context.Context, rs *LLMRequestSchema) (*LLMResp
 			if err != nil {
 				content = choices[0].(map[string]interface{})["content"].(string)
 			}
-			retMessage := LLMChatCompletionMessage{
+			retMessage := model.LLMChatCompletionMessage{
 				Role:    choices[0].(map[string]interface{})["role"].(string),
 				Content: content,
 			}
 			usage := data["usage"].(map[string]interface{})
-			count := LLMTokenCount{
+			count := model.LLMTokenCount{
 				TotalToken:      int64(usage["total_tokens"].(float64)),
 				PromptToken:     int64(usage["prompt_tokens"].(float64)),
 				CompletionToken: int64(usage["completion_tokens"].(float64)),
 			}
-			retResp := LLMResponseSchema{
+			retResp := model.LLMResponseSchema{
 				Message:       &retMessage,
 				LlmTokenCount: &count,
 			}
