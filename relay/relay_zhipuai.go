@@ -7,6 +7,7 @@ package relay
 import (
 	"context"
 	"fmt"
+
 	"limit.dev/unollm/model/unoLlmMod"
 
 	"google.golang.org/grpc/codes"
@@ -52,8 +53,8 @@ func ChatGLMStreamingRequestLLM(rs *unoLlmMod.LLMRequestSchema, sv unoLlmMod.Uno
 					Content: llm_message,
 				},
 			}
-			if err = sv.Send(&resp); err != nil {
-				return err
+			if err := sv.Send(&resp); err != nil {
+				continue
 			}
 		case res := <-result:
 			tokenCount := unoLlmMod.LLMTokenCount{
@@ -68,6 +69,7 @@ func ChatGLMStreamingRequestLLM(rs *unoLlmMod.LLMRequestSchema, sv unoLlmMod.Uno
 			if err = sv.Send(&resp); err != nil {
 				return err
 			}
+			return err
 		}
 	}
 }

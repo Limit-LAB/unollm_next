@@ -3,10 +3,11 @@ package relay_test
 import (
 	"context"
 	"fmt"
-	"limit.dev/unollm/model/unoLlmMod"
 	"log"
 	"os"
 	"testing"
+
+	"limit.dev/unollm/model/unoLlmMod"
 
 	"limit.dev/unollm/relay"
 
@@ -75,7 +76,7 @@ func TestChatGLM(t *testing.T) {
 }
 
 type MockServerStream struct {
-	stream  []*unoLlmMod.PartialLLMResponse
+	stream  chan *unoLlmMod.PartialLLMResponse
 	header  metadata.MD
 	trailer metadata.MD
 	ctx     context.Context
@@ -83,7 +84,7 @@ type MockServerStream struct {
 
 func (m *MockServerStream) Send(res *unoLlmMod.PartialLLMResponse) error {
 	fmt.Println(res)
-	m.stream = append(m.stream, res)
+	m.stream <- res
 	return nil
 }
 
@@ -148,11 +149,18 @@ func TestChatGLMStreaming(t *testing.T) {
 	}
 	mockServer := relay.UnoForwardServer{}
 	mockServerPipe := MockServerStream{
-		stream: []*unoLlmMod.PartialLLMResponse{},
+		stream: make(chan *unoLlmMod.PartialLLMResponse, 1000),
 	}
 	err = mockServer.StreamRequestLLM(&req, &mockServerPipe)
 	if err != nil {
 		t.Error(err)
 	}
-
+	for {
+		res := <-mockServerPipe.stream
+		t.Log(res)
+		if res.LlmTokenCount != nil {
+			t.Log(res.LlmTokenCount)
+			return
+		}
+	}
 }
