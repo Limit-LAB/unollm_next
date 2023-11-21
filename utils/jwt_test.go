@@ -2,7 +2,7 @@ package utils_test
 
 import (
 	"github.com/joho/godotenv"
-	"limit.dev/unollm/utils"
+	"limit.dev/unollm/provider/ChatGLM"
 	"log"
 	"os"
 	"testing"
@@ -23,8 +23,9 @@ func TestJWT(t *testing.T) {
 			},
 		},
 	}
+	cli := ChatGLM.NewClient(zhipuaiApiKey)
 
-	llm, res, err := utils.GLMStreamingRequest(body, zhipu.ModelTurbo, zhipuaiApiKey)
+	llm, res, err := cli.ChatCompletionStreamingRequest(body, zhipu.ModelTurbo)
 	if err != nil {
 		log.Fatal(err)
 	}

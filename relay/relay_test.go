@@ -2,7 +2,7 @@ package relay_test
 
 import (
 	"context"
-	"fmt"
+	"limit.dev/unollm/utils"
 	"log"
 	"os"
 	"testing"
@@ -12,7 +12,6 @@ import (
 	"limit.dev/unollm/relay"
 
 	"github.com/joho/godotenv"
-	"google.golang.org/grpc/metadata"
 )
 
 func TestOpenAI(t *testing.T) {
@@ -75,53 +74,6 @@ func TestChatGLM(t *testing.T) {
 	t.Log("res: ", res)
 }
 
-type MockServerStream struct {
-	stream  chan *unoLlmMod.PartialLLMResponse
-	header  metadata.MD
-	trailer metadata.MD
-	ctx     context.Context
-}
-
-func (m *MockServerStream) Send(res *unoLlmMod.PartialLLMResponse) error {
-	fmt.Println(res)
-	m.stream <- res
-	return nil
-}
-
-func NewMockServerStream(ctx context.Context) *MockServerStream {
-	return &MockServerStream{
-		ctx: ctx,
-	}
-}
-
-func (m *MockServerStream) SetHeader(md metadata.MD) error {
-	m.header = md
-	return nil
-}
-
-func (m *MockServerStream) SendHeader(md metadata.MD) error {
-	m.header = md
-	return nil
-}
-
-func (m *MockServerStream) SetTrailer(md metadata.MD) {
-	m.trailer = md
-}
-
-func (m *MockServerStream) Context() context.Context {
-	return m.ctx
-}
-
-func (m *MockServerStream) SendMsg(msg interface{}) error {
-	// Mock implementation, no action needed
-	return nil
-}
-
-func (m *MockServerStream) RecvMsg(msg interface{}) error {
-	// Mock implementation, no action needed
-	return nil
-}
-
 func TestChatGLMStreaming(t *testing.T) {
 	err := godotenv.Load("../.env")
 	if err != nil {
@@ -148,15 +100,15 @@ func TestChatGLMStreaming(t *testing.T) {
 		LlmRequestInfo: &req_info,
 	}
 	mockServer := relay.UnoForwardServer{}
-	mockServerPipe := MockServerStream{
-		stream: make(chan *unoLlmMod.PartialLLMResponse, 1000),
+	mockServerPipe := utils.MockServerStream{
+		Stream: make(chan *unoLlmMod.PartialLLMResponse, 1000),
 	}
 	err = mockServer.StreamRequestLLM(&req, &mockServerPipe)
 	if err != nil {
 		t.Error(err)
 	}
 	for {
-		res := <-mockServerPipe.stream
+		res := <-mockServerPipe.Stream
 		t.Log(res)
 		if res.LlmTokenCount != nil {
 			t.Log(res.LlmTokenCount)
