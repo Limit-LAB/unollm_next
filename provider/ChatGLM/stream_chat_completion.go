@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func (c *Client) ChatCompletionStreamingRequest(body zhipu.ChatCompletionRequest, modelName string) (chan string, chan zhipu.ChatCompletionStreamResponse, error) {
+func (c *Client) ChatCompletionStreamingRequest(body zhipu.ChatCompletionRequest, modelName string) (chan string, chan zhipu.ChatCompletionStreamFinishResponse, error) {
 	token, err := utils.CreateJWTToken(c.token, jwtExpire)
 	if err != nil {
 		return nil, nil, err
@@ -37,7 +37,7 @@ func (c *Client) ChatCompletionStreamingRequest(body zhipu.ChatCompletionRequest
 	reader := utils.NewEventStreamReader(resp.Body, 4096)
 
 	llmCh := make(chan string)
-	resultCh := make(chan zhipu.ChatCompletionStreamResponse, 1)
+	resultCh := make(chan zhipu.ChatCompletionStreamFinishResponse, 1)
 
 	go func() {
 		defer resp.Body.Close()
@@ -47,7 +47,7 @@ func (c *Client) ChatCompletionStreamingRequest(body zhipu.ChatCompletionRequest
 			case "event:add":
 				llmCh <- kv[2][5:]
 			case "event:finish":
-				var usage zhipu.ChatCompletionStreamResponse
+				var usage zhipu.ChatCompletionStreamFinishResponse
 				json.NewDecoder(strings.NewReader(kv[3][5:])).Decode(&usage)
 				resultCh <- usage
 			}

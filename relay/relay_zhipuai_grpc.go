@@ -42,7 +42,7 @@ func chatGLM2Grpcs(res zhipu.ChatCompletionResponse) (*unoLlmMod.LLMResponseSche
 	return &retResp, nil
 }
 
-func chatGLMStream2Grpc(llm chan string, result chan zhipu.ChatCompletionStreamResponse, sv unoLlmMod.UnoLLMv1_StreamRequestLLMServer) error {
+func chatGLMStream2Grpc(llm chan string, result chan zhipu.ChatCompletionStreamFinishResponse, sv unoLlmMod.UnoLLMv1_StreamRequestLLMServer) error {
 	for {
 		select {
 		case chunk := <-llm:
@@ -51,18 +51,14 @@ func chatGLMStream2Grpc(llm chan string, result chan zhipu.ChatCompletionStreamR
 					Content: chunk,
 				},
 			}
-			if err := sv.Send(&resp); err != nil {
-				return err
-			}
+			sv.Send(&resp)
 		case res := <-result:
 			tokenCount := res.Usage.ToGrpc()
 			resp := unoLlmMod.PartialLLMResponse{
 				Response:      &unoLlmMod.PartialLLMResponse_Done{},
 				LlmTokenCount: &tokenCount,
 			}
-			if err := sv.Send(&resp); err != nil {
-				return err
-			}
+			return sv.Send(&resp)
 		}
 	}
 }

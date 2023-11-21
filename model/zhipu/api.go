@@ -45,7 +45,7 @@ type ChatCompletionResponse struct {
 	Success   bool   `json:"success"`
 }
 
-type ChatCompletionStreamResponse struct {
+type ChatCompletionStreamFinishResponse struct {
 	Event string `json:"event"`
 	Usage Usage  `json:"usage"`
 }
