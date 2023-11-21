@@ -2,12 +2,13 @@ package utils
 
 import (
 	"encoding/json"
+	"limit.dev/unollm/model/zhipu"
 	"net/http"
 	"strings"
 	"time"
 )
 
-func GLMBlockingRequest(body map[string]interface{}, modelName string, token string) (map[string]interface{}, error) {
+func GLMBlockingRequest(body zhipu.ChatCompletionRequest, modelName string, token string) (map[string]interface{}, error) {
 	expire := time.Duration(10000) * time.Second
 	token, err := CreateJWTToken(token, expire)
 	if err != nil {

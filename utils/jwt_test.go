@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"limit.dev/unollm/model/zhipu"
 	"log"
 	"os"
 	"testing"
@@ -15,11 +16,11 @@ func TestJWT(t *testing.T) {
 	}
 
 	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
-	body := map[string]interface{}{
-		"prompt": []map[string]interface{}{
-			{
-				"role":    "user",
-				"content": "我问丁真你是哪个省的，为什么丁真回答 “我是妈妈生的？” 请给出我200字以上的答案。",
+	body := zhipu.ChatCompletionRequest{
+		Prompt: []zhipu.ChatCompletionMessage{
+			zhipu.ChatCompletionMessage{
+				Role:    "user",
+				Content: "我问丁真你是哪个省的，为什么丁真回答 “我是妈妈生的？” 请给出我200字以上的答案。",
 			},
 		},
 	}
