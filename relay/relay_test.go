@@ -3,28 +3,27 @@ package relay_test
 import (
 	"context"
 	"fmt"
+	"limit.dev/unollm/model/unoLlmMod"
 	"log"
 	"os"
 	"testing"
 
 	"limit.dev/unollm/relay"
 
-	"google.golang.org/grpc/metadata"
-	"limit.dev/unollm/model"
-
 	"github.com/joho/godotenv"
+	"google.golang.org/grpc/metadata"
 )
 
 func TestOpenAI(t *testing.T) {
 	godotenv.Load()
 
-	messages := make([]*model.LLMChatCompletionMessage, 0)
-	messages = append(messages, &model.LLMChatCompletionMessage{
+	messages := make([]*unoLlmMod.LLMChatCompletionMessage, 0)
+	messages = append(messages, &unoLlmMod.LLMChatCompletionMessage{
 		Role:    "user",
 		Content: "假如今天下大雨，我是否需要带伞？",
 	})
 	openaiApiKey := os.Getenv("TEST_OPENAI_API")
-	req_info := model.LLMRequestInfo{
+	req_info := unoLlmMod.LLMRequestInfo{
 		LlmApiType:  relay.OPENAI_LLM_API,
 		Model:       "gpt-3.5-turbo",
 		Temperature: 0.9,
@@ -33,7 +32,7 @@ func TestOpenAI(t *testing.T) {
 		Url:         "https://api.openai-sb.com/v1",
 		Token:       openaiApiKey,
 	}
-	req := model.LLMRequestSchema{
+	req := unoLlmMod.LLMRequestSchema{
 		Messages:       messages,
 		LlmRequestInfo: &req_info,
 	}
@@ -48,13 +47,13 @@ func TestOpenAI(t *testing.T) {
 func TestChatGLM(t *testing.T) {
 	godotenv.Load("../.env")
 
-	messages := make([]*model.LLMChatCompletionMessage, 0)
-	messages = append(messages, &model.LLMChatCompletionMessage{
+	messages := make([]*unoLlmMod.LLMChatCompletionMessage, 0)
+	messages = append(messages, &unoLlmMod.LLMChatCompletionMessage{
 		Role:    "user",
 		Content: "假如今天下大雨，我是否需要带伞？",
 	})
 	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
-	req_info := model.LLMRequestInfo{
+	req_info := unoLlmMod.LLMRequestInfo{
 		LlmApiType:  relay.CHATGLM_LLM_API,
 		Model:       "chatglm_turbo",
 		Temperature: 0.9,
@@ -63,7 +62,7 @@ func TestChatGLM(t *testing.T) {
 		Url:         "",
 		Token:       zhipuaiApiKey,
 	}
-	req := model.LLMRequestSchema{
+	req := unoLlmMod.LLMRequestSchema{
 		Messages:       messages,
 		LlmRequestInfo: &req_info,
 	}
@@ -76,13 +75,13 @@ func TestChatGLM(t *testing.T) {
 }
 
 type MockServerStream struct {
-	stream  []*model.PartialLLMResponse
+	stream  []*unoLlmMod.PartialLLMResponse
 	header  metadata.MD
 	trailer metadata.MD
 	ctx     context.Context
 }
 
-func (m *MockServerStream) Send(res *model.PartialLLMResponse) error {
+func (m *MockServerStream) Send(res *unoLlmMod.PartialLLMResponse) error {
 	fmt.Println(res)
 	m.stream = append(m.stream, res)
 	return nil
@@ -128,13 +127,13 @@ func TestChatGLMStreaming(t *testing.T) {
 		log.Fatal("Error loading .env file")
 	}
 
-	messages := make([]*model.LLMChatCompletionMessage, 0)
-	messages = append(messages, &model.LLMChatCompletionMessage{
+	messages := make([]*unoLlmMod.LLMChatCompletionMessage, 0)
+	messages = append(messages, &unoLlmMod.LLMChatCompletionMessage{
 		Role:    "user",
 		Content: "假如今天下大雨，我是否需要带伞？",
 	})
 	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
-	req_info := model.LLMRequestInfo{
+	req_info := unoLlmMod.LLMRequestInfo{
 		LlmApiType:  relay.CHATGLM_LLM_API,
 		Model:       "chatglm_turbo",
 		Temperature: 0.9,
@@ -143,13 +142,13 @@ func TestChatGLMStreaming(t *testing.T) {
 		Url:         "",
 		Token:       zhipuaiApiKey,
 	}
-	req := model.LLMRequestSchema{
+	req := unoLlmMod.LLMRequestSchema{
 		Messages:       messages,
 		LlmRequestInfo: &req_info,
 	}
 	mockServer := relay.UnoForwardServer{}
 	mockServerPipe := MockServerStream{
-		stream: []*model.PartialLLMResponse{},
+		stream: []*unoLlmMod.PartialLLMResponse{},
 	}
 	err = mockServer.StreamRequestLLM(&req, &mockServerPipe)
 	if err != nil {

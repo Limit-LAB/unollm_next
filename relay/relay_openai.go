@@ -3,7 +3,7 @@ package relay
 import (
 	"context"
 	"fmt"
-	"limit.dev/unollm/model"
+	"limit.dev/unollm/model/unoLlmMod"
 
 	"github.com/sashabaranov/go-openai"
 	"google.golang.org/grpc/codes"
@@ -12,7 +12,7 @@ import (
 
 // TODO: read max_tokens, n, stop, frequency_penalty, presence_penalty from meta
 
-func OpenaiBlockingRequest(ctx context.Context, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
+func OpenaiBlockingRequest(ctx context.Context, rs *unoLlmMod.LLMRequestSchema) (*unoLlmMod.LLMResponseSchema, error) {
 	info := rs.GetLlmRequestInfo()
 	fmt.Println("OPENAI_LLM_API")
 	config := openai.DefaultConfig(info.GetToken())

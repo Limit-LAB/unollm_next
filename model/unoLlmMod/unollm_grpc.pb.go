@@ -4,7 +4,7 @@
 // - protoc             v4.25.1
 // source: unollm.proto
 
-package model
+package unoLlmMod
 
 import (
 	context "context"

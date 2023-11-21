@@ -7,12 +7,12 @@ package relay
 import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"limit.dev/unollm/model"
+	"limit.dev/unollm/model/unoLlmMod"
 	"limit.dev/unollm/model/zhipu"
 	"strconv"
 )
 
-func ChatGLMTranslateToRelay(resp any) (*model.LLMResponseSchema, error) {
+func ChatGLMTranslateToRelay(resp any) (*unoLlmMod.LLMResponseSchema, error) {
 	switch resp.(type) {
 	case zhipu.ChatCompletionResponse:
 		return chatGLMTranslateToRelay(resp.(zhipu.ChatCompletionResponse))
@@ -21,21 +21,21 @@ func ChatGLMTranslateToRelay(resp any) (*model.LLMResponseSchema, error) {
 	}
 }
 
-func chatGLMTranslateToRelay(res zhipu.ChatCompletionResponse) (*model.LLMResponseSchema, error) {
+func chatGLMTranslateToRelay(res zhipu.ChatCompletionResponse) (*unoLlmMod.LLMResponseSchema, error) {
 	content, err := strconv.Unquote(res.Data.Choices[0].Content)
 	if err != nil {
 		content = res.Data.Choices[0].Content
 	}
-	retMessage := model.LLMChatCompletionMessage{
+	retMessage := unoLlmMod.LLMChatCompletionMessage{
 		Role:    res.Data.Choices[0].Role,
 		Content: content,
 	}
-	count := model.LLMTokenCount{
+	count := unoLlmMod.LLMTokenCount{
 		TotalToken:      int64(res.Data.Usage.TotalTokens),
 		PromptToken:     int64(res.Data.Usage.PromptTokens),
 		CompletionToken: int64(res.Data.Usage.CompletionTokens),
 	}
-	retResp := model.LLMResponseSchema{
+	retResp := unoLlmMod.LLMResponseSchema{
 		Message:       &retMessage,
 		LlmTokenCount: &count,
 	}
