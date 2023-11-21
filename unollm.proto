@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package unoLLM;
+option go_package = "./unollm_proto";
+
+message LLMTokenCount {
+  int64 total_token = 1;
+  int64 prompt_token = 2;
+  int64 completion_token = 3;
+}
+
+message LLMChatCompletionMessage {
+  string role = 1;
+  string content = 2;
+}
+
+message LLMRequestInfo {
+  string llm_api_type = 1;
+  string model = 2;
+  double temperature = 3;
+  double top_p = 4;
+  double top_k = 5;
+  string url = 6;
+  string token = 7;
+  map<string, string> metainfo = 8;
+}
+
+message LLMRequestSchema {
+  repeated LLMChatCompletionMessage messages = 1;
+  LLMRequestInfo llm_request_info = 2;
+}
+
+message LLMResponseSchema {
+  LLMChatCompletionMessage message = 1;
+  LLMTokenCount llm_token_count = 2;
+}
+
+
+message Done {
+}
+
+message PartialLLMResponse {
+    oneof response {
+        string content = 1;
+        Done done = 2;
+    }
+    optional LLMTokenCount llm_token_count = 3;
+}
+
+service UnoLLMv1 {
+    rpc BlockingRequestLLM(LLMRequestSchema) returns (LLMResponseSchema) {}
+    rpc StreamRequestLLM(LLMRequestSchema) returns (stream PartialLLMResponse) {}
+}
