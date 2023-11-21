@@ -1,7 +1,8 @@
-package relay
+package relay_test
 
 import (
 	"context"
+	"limit.dev/unollm/relay"
 	"os"
 	"testing"
 
@@ -20,7 +21,7 @@ func TestOpenAI(t *testing.T) {
 	})
 	openaiApiKey := os.Getenv("TEST_OPENAI_API")
 	req_info := model.LLMRequestInfo{
-		LlmApiType:  OPENAI_LLM_API,
+		LlmApiType:  relay.OPENAI_LLM_API,
 		Model:       "gpt-3.5-turbo",
 		Temperature: 0.9,
 		TopP:        0.9,
@@ -32,7 +33,7 @@ func TestOpenAI(t *testing.T) {
 		Messages:       messages,
 		LlmRequestInfo: &req_info,
 	}
-	mockServer := UnoForwardServer{}
+	mockServer := relay.UnoForwardServer{}
 	res, err := mockServer.BlockingRequestLLM(context.Background(), &req)
 	if err != nil {
 		t.Error(err)
@@ -50,7 +51,7 @@ func TestChatGLM(t *testing.T) {
 	})
 	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
 	req_info := model.LLMRequestInfo{
-		LlmApiType:  CHATGLM_LLM_API,
+		LlmApiType:  relay.CHATGLM_LLM_API,
 		Model:       "chatglm_turbo",
 		Temperature: 0.9,
 		TopP:        0.9,
@@ -62,7 +63,7 @@ func TestChatGLM(t *testing.T) {
 		Messages:       messages,
 		LlmRequestInfo: &req_info,
 	}
-	mockServer := UnoForwardServer{}
+	mockServer := relay.UnoForwardServer{}
 	res, err := mockServer.BlockingRequestLLM(context.Background(), &req)
 	if err != nil {
 		t.Error(err)

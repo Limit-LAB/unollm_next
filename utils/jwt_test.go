@@ -1,7 +1,8 @@
-package utils
+package utils_test
 
 import (
 	"github.com/joho/godotenv"
+	"limit.dev/unollm/utils"
 	"log"
 	"os"
 	"testing"
@@ -23,15 +24,15 @@ func TestJWT(t *testing.T) {
 		},
 	}
 
-	llm, res, err := GLMStreamingRequest(body, "chatglm_turbo", zhipuaiApiKey)
+	llm, res, err := utils.GLMStreamingRequest(body, zhipu.ModelTurbo, zhipuaiApiKey)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	for {
 		select {
-		case llm_message := <-llm:
-			log.Print(llm_message)
+		case llmMessage := <-llm:
+			log.Print(llmMessage)
 		case result := <-res:
 			log.Print(result)
 			goto BYE
