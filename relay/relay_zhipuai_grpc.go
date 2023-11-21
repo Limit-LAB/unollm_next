@@ -8,33 +8,32 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"limit.dev/unollm/model"
+	"limit.dev/unollm/model/zhipu"
 	"strconv"
 )
 
 func ChatGLMTranslateToRelay(resp any) (*model.LLMResponseSchema, error) {
 	switch resp.(type) {
-	case map[string]any:
-		return chatGLMTranslateToRelay(resp.(map[string]any))
+	case zhipu.ChatCompletionResponse:
+		return chatGLMTranslateToRelay(resp.(zhipu.ChatCompletionResponse))
 	default:
 		return nil, status.Errorf(codes.Internal, "ChatGPTTranslateToRelay: resp type is not openai.ChatCompletionResponse")
 	}
 }
-func chatGLMTranslateToRelay(res map[string]any) (*model.LLMResponseSchema, error) {
-	data := res["data"].(map[string]interface{})
-	choices := data["choices"].([]interface{})
-	content, err := strconv.Unquote(choices[0].(map[string]interface{})["content"].(string))
+
+func chatGLMTranslateToRelay(res zhipu.ChatCompletionResponse) (*model.LLMResponseSchema, error) {
+	content, err := strconv.Unquote(res.Data.Choices[0].Content)
 	if err != nil {
-		content = choices[0].(map[string]interface{})["content"].(string)
+		content = res.Data.Choices[0].Content
 	}
 	retMessage := model.LLMChatCompletionMessage{
-		Role:    choices[0].(map[string]interface{})["role"].(string),
+		Role:    res.Data.Choices[0].Role,
 		Content: content,
 	}
-	usage := data["usage"].(map[string]interface{})
 	count := model.LLMTokenCount{
-		TotalToken:      int64(usage["total_tokens"].(float64)),
-		PromptToken:     int64(usage["prompt_tokens"].(float64)),
-		CompletionToken: int64(usage["completion_tokens"].(float64)),
+		TotalToken:      int64(res.Data.Usage.TotalTokens),
+		PromptToken:     int64(res.Data.Usage.PromptTokens),
+		CompletionToken: int64(res.Data.Usage.CompletionTokens),
 	}
 	retResp := model.LLMResponseSchema{
 		Message:       &retMessage,

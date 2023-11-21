@@ -8,22 +8,22 @@ import (
 	"time"
 )
 
-func GLMBlockingRequest(body zhipu.ChatCompletionRequest, modelName string, token string) (map[string]interface{}, error) {
+func GLMBlockingRequest(body zhipu.ChatCompletionRequest, modelName string, token string) (result zhipu.ChatCompletionResponse, err error) {
 	expire := time.Duration(10000) * time.Second
-	token, err := CreateJWTToken(token, expire)
+	token, err = CreateJWTToken(token, expire)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	client := &http.Client{}
 	reqBody, err := json.Marshal(body)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	req, err := http.NewRequest("POST", "https://open.bigmodel.cn/api/paas/v3/model-api/"+modelName+"/invoke", strings.NewReader(string(reqBody)))
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	req.Header.Set("Authorization", token)
@@ -31,15 +31,11 @@ func GLMBlockingRequest(body zhipu.ChatCompletionRequest, modelName string, toke
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return
 	}
 	defer resp.Body.Close()
 
-	var result map[string]interface{}
 	err = json.NewDecoder(resp.Body).Decode(&result)
-	if err != nil {
-		return nil, err
-	}
-
-	return result, nil
+	
+	return
 }

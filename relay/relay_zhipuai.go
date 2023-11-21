@@ -46,8 +46,9 @@ func ChatGLMBlockingRequest(ctx context.Context, rs *model.LLMRequestSchema) (*m
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
-	if resSuccess, ok := res["success"].(bool); ok && !resSuccess {
-		return nil, status.Errorf(codes.Internal, fmt.Sprintf("chatGLM response success is false Error code: %f, Error msg: %s", res["code"], res["msg"]))
+	if !res.Success {
+		return nil, status.Errorf(codes.Internal, fmt.Sprintf("chatGLM response success is false Error code: %f, Error msg: %s", res.ErrorCode, res.ErrorMsg))
 	}
+	
 	return chatGLMTranslateToRelay(res)
 }

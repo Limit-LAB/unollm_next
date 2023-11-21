@@ -34,18 +34,23 @@ type ChatCompletionRequest struct {
 
 // ChatCompletionResponse represents a response structure for chat completion API.
 type ChatCompletionResponse struct {
-	Id    string                      `json:"id"`
 	Event string                      `json:"event"`
-	Data  string                      `json:"data"`
-	Meta  *ChatCompletionResponseMeta `json:"meta"`
+	Data  *ChatCompletionResponseData `json:"data"`
 
 	ErrorCode int    `json:"code"`
 	ErrorMsg  string `json:"msg"`
 	Success   bool   `json:"success"`
 }
 
-type ChatCompletionResponseMeta struct {
-	Usage Usage `json:"usage"`
+type ChatCompletionResponseData struct {
+	TaskId  string                 `json:"task_id"`
+	Usage   Usage                  `json:"usage"`
+	Choices []ChatCompletionChoice `json:"choices"`
+}
+
+type ChatCompletionChoice struct {
+	Role    string `json:"role"`
+	Content string `json:"content"`
 }
 
 type Usage struct {
