@@ -7,6 +7,7 @@ require (
 	github.com/gin-gonic/gin v1.9.1
 	github.com/joho/godotenv v1.5.1
 	github.com/sashabaranov/go-openai v1.17.8
+	github.com/sirupsen/logrus v1.9.3
 	google.golang.org/grpc v1.59.0
 	google.golang.org/protobuf v1.31.0
 )

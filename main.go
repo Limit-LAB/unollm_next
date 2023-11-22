@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 	"os"
+	"time"
 
 	"limit.dev/unollm/relay/respTransformer"
 
@@ -11,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/sashabaranov/go-openai"
+	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"limit.dev/unollm/model"
 	"limit.dev/unollm/provider/ChatGLM"
@@ -20,8 +22,31 @@ import (
 func main() {
 	// start openai style server
 	go func() {
+		logger := logrus.New()
+		logger.Out = os.Stdout
+		logger.SetLevel(logrus.InfoLevel)
+
 		godotenv.Load("./.env")
 		g := gin.New()
+		g.Use(func(c *gin.Context) {
+			startTime := time.Now()
+			//Process request
+			c.Next()
+			//End time
+			endTime := time.Now()
+			latencyTime := endTime.Sub(startTime)
+			reqMethod := c.Request.Method
+			reqUri := c.Request.RequestURI
+			statusCode := c.Writer.Status()
+			clientIP := c.ClientIP()
+			logger.Infof("| %3d | %13v | %15s | %s | %s |",
+				statusCode,
+				latencyTime,
+				clientIP,
+				reqMethod,
+				reqUri,
+			)
+		})
 		g.Use(gin.Logger())
 		corsCfg := cors.DefaultConfig()
 		corsCfg.AllowAllOrigins = true
