@@ -1,12 +1,10 @@
 package main
 
 import (
+	"limit.dev/unollm/relay/respTransformer"
 	"log"
 	"net"
 	"os"
-	"time"
-
-	"limit.dev/unollm/relay/respTransformer"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -28,25 +26,6 @@ func main() {
 
 		godotenv.Load("./.env")
 		g := gin.New()
-		g.Use(func(c *gin.Context) {
-			startTime := time.Now()
-			//Process request
-			c.Next()
-			//End time
-			endTime := time.Now()
-			latencyTime := endTime.Sub(startTime)
-			reqMethod := c.Request.Method
-			reqUri := c.Request.RequestURI
-			statusCode := c.Writer.Status()
-			clientIP := c.ClientIP()
-			logger.Infof("| %3d | %13v | %15s | %s | %s |",
-				statusCode,
-				latencyTime,
-				clientIP,
-				reqMethod,
-				reqUri,
-			)
-		})
 		g.Use(gin.Logger())
 		corsCfg := cors.DefaultConfig()
 		corsCfg.AllowAllOrigins = true
