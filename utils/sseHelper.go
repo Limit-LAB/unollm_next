@@ -85,3 +85,17 @@ func SetEventStreamHeaders(c *gin.Context) {
 	c.Writer.Header().Set("Transfer-Encoding", "chunked")
 	c.Writer.Header().Set("X-Accel-Buffering", "no")
 }
+
+func GetAuthorisation(c *gin.Context) string {
+	auth := c.GetHeader("Authorization")
+	if auth == "" {
+		auth = c.GetHeader("Authorisation")
+	}
+	if auth == "" {
+		return ""
+	}
+	auths := strings.Split(auth, " ")
+
+	auth = strings.TrimSpace(auths[len(auths)-1])
+	return auth
+}

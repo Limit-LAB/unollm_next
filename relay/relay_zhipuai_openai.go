@@ -10,6 +10,7 @@ import (
 	"limit.dev/unollm/provider/ChatGLM"
 	"limit.dev/unollm/utils"
 	"strconv"
+	"time"
 )
 
 func ChatGLM2OpenAI(resp any) (openai.ChatCompletionResponse, error) {
@@ -51,8 +52,9 @@ func ChatGlmStream2OpenAI(c *gin.Context, llm chan string, result chan ChatGLM.C
 		select {
 		case data := <-llm:
 			response := openai.ChatCompletionStreamResponse{
-				Object: "chat.completion.chunk",
-				Model:  "chatglm",
+				Object:  "chat.completion.chunk",
+				Model:   "chatglm",
+				Created: time.Now().Unix(),
 				Choices: []openai.ChatCompletionStreamChoice{
 					{
 						Delta: openai.ChatCompletionStreamChoiceDelta{
