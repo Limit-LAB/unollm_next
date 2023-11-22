@@ -21,11 +21,11 @@ func main() {
 	go func() {
 		godotenv.Load("./.env")
 		g := gin.New()
+		g.Use(gin.Logger())
 		corsCfg := cors.DefaultConfig()
 		corsCfg.AllowAllOrigins = true
-		corsCfg.AddAllowHeaders("Authorization")
+		corsCfg.AllowHeaders = append(corsCfg.AllowHeaders, "Authorization")
 		g.Use(cors.New(corsCfg))
-		g.Use(gin.Logger())
 		g.Use(gin.Recovery())
 
 		zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
