@@ -4,7 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
 	"limit.dev/unollm/provider/ChatGLM"
-	"limit.dev/unollm/relay"
+	"limit.dev/unollm/relay/respTransformer"
 	"limit.dev/unollm/utils"
 	"log"
 	"net/http"
@@ -35,10 +35,13 @@ func ChatGLM_ChatCompletionHandler(c *gin.Context, req openai.ChatCompletionRequ
 	if !req.Stream {
 		rst, err := cli.ChatCompletion(zpReq, req.Model)
 		if err != nil {
-			log.Println(err)
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
 			return
 		}
-		c.JSON(200, rst)
+		c.JSON(200, respTransformer.ChatGLMToOpenAICompletion(rst))
+		return
 	}
 	llm, result, err := cli.ChatCompletionStreamingRequest(zpReq, req.Model)
 	defer safeClose(llm)
@@ -48,7 +51,7 @@ func ChatGLM_ChatCompletionHandler(c *gin.Context, req openai.ChatCompletionRequ
 		log.Println(err)
 		return
 	}
-	relay.ChatGlmStream2OpenAI(c, llm, result)
+	respTransformer.ChatGLMToOpenAIStream(c, llm, result)
 }
 
 func safeClose[T any](ch chan<- T) {

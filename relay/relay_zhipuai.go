@@ -8,6 +8,7 @@ import (
 	"context"
 	"fmt"
 	"limit.dev/unollm/model"
+	"limit.dev/unollm/relay/respTransformer"
 
 	"limit.dev/unollm/provider/ChatGLM"
 
@@ -31,7 +32,7 @@ func ChatGLMChatCompletionRequest(ctx context.Context, rs *model.LLMRequestSchem
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("chatGLM response success is false Error code: %d, Error msg: %s", res.ErrorCode, res.ErrorMsg))
 	}
 
-	return chatGLM2Grpcs(res)
+	return respTransformer.ChatGLMToGrpcCompletion(res)
 }
 
 func ChatGLMChatCompletionStreamingRequest(rs *model.LLMRequestSchema, sv model.UnoLLMv1_StreamRequestLLMServer) error {
@@ -46,5 +47,5 @@ func ChatGLMChatCompletionStreamingRequest(rs *model.LLMRequestSchema, sv model.
 	if err != nil {
 		return status.Errorf(codes.Internal, err.Error())
 	}
-	return chatGLMStream2Grpc(llm, result, sv)
+	return respTransformer.ChatGLMToGrpcStream(llm, result, sv)
 }

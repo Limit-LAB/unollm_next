@@ -8,7 +8,7 @@ import (
 	"github.com/sashabaranov/go-openai"
 	"io"
 	"limit.dev/unollm/provider/ChatGLM"
-	"limit.dev/unollm/relay"
+	"limit.dev/unollm/relay/respTransformer"
 	"log"
 	"os"
 	"testing"
@@ -45,7 +45,7 @@ func mockServer() *gin.Engine {
 			log.Println(err)
 			return
 		}
-		relay.ChatGlmStream2OpenAI(c, llm, result)
+		respTransformer.ChatGLMToOpenAIStream(c, llm, result)
 	})
 	return g
 }

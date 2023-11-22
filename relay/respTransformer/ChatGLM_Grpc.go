@@ -1,27 +1,12 @@
-package relay
-
-// TODO: n is not supported yet
-
-// TODO: characterglm meta info is not readed from meta
+package respTransformer
 
 import (
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"limit.dev/unollm/model"
 	"limit.dev/unollm/provider/ChatGLM"
 	"strconv"
 )
 
-func ChatGLM2Grpc(resp any) (*model.LLMResponseSchema, error) {
-	switch resp.(type) {
-	case ChatGLM.ChatCompletionResponse:
-		return chatGLM2Grpcs(resp.(ChatGLM.ChatCompletionResponse))
-	default:
-		return nil, status.Errorf(codes.Internal, "ChatGPTTranslateToRelay: resp type is not openai.ChatCompletionResponse")
-	}
-}
-
-func chatGLM2Grpcs(res ChatGLM.ChatCompletionResponse) (*model.LLMResponseSchema, error) {
+func ChatGLMToGrpcCompletion(res ChatGLM.ChatCompletionResponse) (*model.LLMResponseSchema, error) {
 	content, err := strconv.Unquote(res.Data.Choices[0].Content)
 	if err != nil {
 		content = res.Data.Choices[0].Content
@@ -42,7 +27,7 @@ func chatGLM2Grpcs(res ChatGLM.ChatCompletionResponse) (*model.LLMResponseSchema
 	return &retResp, nil
 }
 
-func chatGLMStream2Grpc(llm chan string, result chan ChatGLM.ChatCompletionStreamFinishResponse, sv model.UnoLLMv1_StreamRequestLLMServer) error {
+func ChatGLMToGrpcStream(llm chan string, result chan ChatGLM.ChatCompletionStreamFinishResponse, sv model.UnoLLMv1_StreamRequestLLMServer) error {
 	for {
 		select {
 		case chunk := <-llm:
