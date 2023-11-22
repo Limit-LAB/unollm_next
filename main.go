@@ -1,0 +1,63 @@
+package main
+
+import (
+	"log"
+	"net"
+	"os"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"github.com/sashabaranov/go-openai"
+	"google.golang.org/grpc"
+	"limit.dev/unollm/model"
+	"limit.dev/unollm/provider/ChatGLM"
+	"limit.dev/unollm/relay"
+)
+
+func main() {
+	// start openai style server
+	go func() {
+		godotenv.Load("./.env")
+		g := gin.New()
+		zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
+		g.POST("/v1/chat/completions", func(c *gin.Context) {
+			var req openai.ChatCompletionRequest
+			err := c.BindJSON(&req)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			cli := ChatGLM.NewClient(zhipuaiApiKey)
+
+			zpReq := ChatGLM.ChatCompletionRequest{
+				Temperature: req.Temperature,
+				TopP:        req.TopP,
+				Incremental: true,
+			}
+
+			for _, m := range req.Messages {
+				zpReq.Prompt = append(zpReq.Prompt, ChatGLM.ChatCompletionMessage{
+					Role:    m.Role,
+					Content: m.Content,
+				})
+			}
+			llm, result, err := cli.ChatCompletionStreamingRequest(zpReq, req.Model)
+			if err != nil {
+				log.Println(err)
+				return
+			}
+			relay.ChatGlmStream2OpenAI(c, llm, result)
+		})
+		g.Run("127.0.0.1:11451")
+	}()
+
+	// start grpc server
+	grpcServer := grpc.NewServer()
+	lis, err := net.Listen("tcp", "127.0.0.1:19198")
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	service := relay.UnoForwardServer{}
+	model.RegisterUnoLLMv1Server(grpcServer, &service)
+	grpcServer.Serve(lis)
+}

@@ -14,7 +14,7 @@ import (
 )
 
 func TestOpenAI(t *testing.T) {
-	godotenv.Load()
+	godotenv.Load("../.env")
 
 	messages := make([]*model.LLMChatCompletionMessage, 0)
 	messages = append(messages, &model.LLMChatCompletionMessage{

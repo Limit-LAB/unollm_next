@@ -10,14 +10,19 @@ import (
 )
 
 type UnoForwardServer struct {
+	model.UnimplementedUnoLLMv1Server
 }
+
+// mustEmbedUnimplementedUnoLLMv1Server implements model.UnoLLMv1Server.
+
+var _ (model.UnoLLMv1Server) = (*UnoForwardServer)(nil)
 
 const OPENAI_LLM_API = "openai"
 const CHATGLM_LLM_API = "chatglm"
 const AZURE_OPENAI_LLM_API = "azure_openai"
 const BAICHUAN_LLM_API = "baichuan"
 
-func (UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
+func (uno *UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
 	info := rs.GetLlmRequestInfo()
 	switch info.GetLlmApiType() {
 	case OPENAI_LLM_API:
@@ -34,7 +39,7 @@ func (UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.LLMReq
 	return nil, status.Errorf(codes.Unimplemented, "method BlockingRequestLLM not implemented")
 }
 
-func (UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv model.UnoLLMv1_StreamRequestLLMServer) error {
+func (uno *UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv model.UnoLLMv1_StreamRequestLLMServer) error {
 	info := rs.GetLlmRequestInfo()
 	switch info.GetLlmApiType() {
 	case OPENAI_LLM_API:
@@ -44,4 +49,3 @@ func (UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv model.Un
 	}
 	return status.Errorf(codes.Unimplemented, "method StreamRequestLLM not implemented")
 }
-func (UnoForwardServer) mustEmbedUnimplementedUnoLLMv1Server() {}
