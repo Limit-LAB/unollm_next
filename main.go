@@ -1,10 +1,12 @@
 package main
 
 import (
+	"limit.dev/unollm/relay/respTransformer"
 	"log"
 	"net"
 	"os"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/sashabaranov/go-openai"
@@ -19,6 +21,13 @@ func main() {
 	go func() {
 		godotenv.Load("./.env")
 		g := gin.New()
+		corsCfg := cors.DefaultConfig()
+		corsCfg.AllowAllOrigins = true
+		corsCfg.AddAllowHeaders("Authorization")
+		g.Use(cors.New(corsCfg))
+		g.Use(gin.Logger())
+		g.Use(gin.Recovery())
+
 		zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
 		g.POST("/v1/chat/completions", func(c *gin.Context) {
 			var req openai.ChatCompletionRequest
@@ -46,7 +55,7 @@ func main() {
 				log.Println(err)
 				return
 			}
-			relay.ChatGlmStream2OpenAI(c, llm, result)
+			respTransformer.ChatGLMToOpenAIStream(c, llm, result)
 		})
 		g.Run("127.0.0.1:11451")
 	}()
