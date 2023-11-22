@@ -1,10 +1,11 @@
 package main
 
 import (
-	"limit.dev/unollm/relay/respTransformer"
 	"log"
 	"net"
 	"os"
+
+	"limit.dev/unollm/relay/respTransformer"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -50,7 +51,7 @@ func main() {
 					Content: m.Content,
 				})
 			}
-			llm, result, err := cli.ChatCompletionStreamingRequest(zpReq, req.Model)
+			llm, result, err := cli.ChatCompletionStreamingRequest(zpReq, "chatglm_turbo")
 			if err != nil {
 				log.Println(err)
 				return
