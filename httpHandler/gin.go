@@ -3,11 +3,10 @@ package httpHandler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
-	"limit.dev/unollm/provider/ChatGLM"
+	"strings"
 )
 
-
-func router(r *gin.Engine) {
+func RegisterRoute(r *gin.Engine) {
 	r.GET("/chat/completions", func(c *gin.Context) {
 		var req openai.ChatCompletionRequest
 		err := c.BindJSON(&req)
@@ -15,10 +14,26 @@ func router(r *gin.Engine) {
 			// TODO: log
 			return
 		}
-		switch req.Model {
-		case ChatGLM.ModelChatGLMPro, ChatGLM.ModelChatGLMStd,
-			ChatGLM.ModelChatGLMLite, ChatGLM.ModelTurbo:
+		if strings.HasPrefix(req.Model, "chatglm") {
 			ChatGLM_ChatCompletionHandler(c, req)
+			return
 		}
+		if strings.HasPrefix(req.Model, "chatgpt") {
+			ChatGPT_ChatCompletitionsHandler(c, req)
+			return
+		}
+	})
+	r.GET("/completions", func(c *gin.Context) {
+		var req openai.CompletionRequest
+		err := c.BindJSON(&req)
+		if err != nil {
+		}
+		if strings.HasPrefix(req.Model, "chatglm") {
+			// TODO
+		}
+		if strings.HasPrefix(req.Model, "chatgpt") {
+
+		}
+
 	})
 }
