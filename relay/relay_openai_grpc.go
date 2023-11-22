@@ -17,6 +17,7 @@ func ChatGPT2Grpc(resp any) (*model.LLMResponseSchema, error) {
 		return nil, status.Errorf(codes.Internal, "ChatGPTTranslateToRelay: resp type is not openai.ChatCompletionResponse")
 	}
 }
+
 func chatGPT2Grpc(resp openai.ChatCompletionResponse) (*model.LLMResponseSchema, error) {
 	if len(resp.Choices) == 0 {
 		return nil, status.Errorf(codes.Internal, "OpenAI choices is empty")

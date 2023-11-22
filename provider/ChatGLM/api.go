@@ -8,11 +8,13 @@ const (
 	ChatMessageRoleUser      = "user"
 	ChatMessageRoleAssistant = "assistant"
 
-	ModelChatGLMPro  = "chatglm_pro"
-	ModelChatGLMStd  = "chatglm_std"
-	ModelChatGLMLite = "chatglm_lite"
+	// Deprecated
+	// ModelChatGLMPro  = "chatglm_pro"
+	// ModelChatGLMStd  = "chatglm_std"
+	// ModelChatGLMLite = "chatglm_lite"
 
-	ModelTurbo = "chatglm_turbo"
+	ModelTurbo   = "chatglm_turbo"
+	CharacterGLM = "characterglm"
 )
 
 type ChatCompletionMessage struct {
@@ -25,12 +27,24 @@ type ChatCompletionRef struct {
 	SearchQuery string `json:"search_query"`
 }
 
+type CharacterGLMMeta struct {
+	// 用户信息
+	UserInfo string
+	// 角色信息
+	BotInfo string
+	// 角色名称
+	BotName string
+	// 用户名称
+	UserName string
+}
+
 // ChatCompletionRequest represents a request structure for chat completion API.
 type ChatCompletionRequest struct {
 	Prompt      []ChatCompletionMessage `json:"prompt"`
 	Temperature float32                 `json:"temperature,omitempty"`
 	TopP        float32                 `json:"top_p,omitempty"`
 	RequestId   string                  `json:"request_id"`
+	Meta        CharacterGLMMeta        `json:"meta"`
 	// in SSE mode, incremental means whether to return incremental result or add to previous result
 	Incremental bool              `json:"incremental"`
 	ReturnType  string            `json:"return_type,omitempty"`

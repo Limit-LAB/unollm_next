@@ -3,6 +3,7 @@ package relay
 import (
 	context "context"
 	"fmt"
+
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	"limit.dev/unollm/model"
@@ -36,6 +37,8 @@ func (UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.LLMReq
 func (UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv model.UnoLLMv1_StreamRequestLLMServer) error {
 	info := rs.GetLlmRequestInfo()
 	switch info.GetLlmApiType() {
+	case OPENAI_LLM_API:
+		return OpenAIChatCompletionStreamingRequest(rs, sv)
 	case CHATGLM_LLM_API:
 		return ChatGLMChatCompletionStreamingRequest(rs, sv)
 	}
