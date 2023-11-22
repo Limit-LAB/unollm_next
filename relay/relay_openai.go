@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"limit.dev/unollm/relay/reqTransformer"
+	"limit.dev/unollm/relay/respTransformer"
 
 	"github.com/sashabaranov/go-openai"
 	"google.golang.org/grpc/codes"
@@ -20,27 +22,17 @@ func OpenAIChatCompletionRequest(ctx context.Context, rs *model.LLMRequestSchema
 	config := openai.DefaultConfig(info.GetToken())
 	config.BaseURL = info.GetUrl()
 	client := openai.NewClientWithConfig(config)
-	messages := rs.GetMessages()
-	var openaiMessages []openai.ChatCompletionMessage
-	for _, m := range messages {
-		openaiMessages = append(openaiMessages, openai.ChatCompletionMessage{
-			Role:    m.GetRole(),
-			Content: m.GetContent(),
-		})
-	}
+
+	req := reqTransformer.ChatGPTGrpcChatCompletionReq(rs)
+
 	resp, err := client.CreateChatCompletion(
 		ctx,
-		openai.ChatCompletionRequest{
-			Model:       info.GetModel(),
-			Messages:    openaiMessages,
-			TopP:        float32(info.GetTopP()),
-			Temperature: float32(info.GetTemperature()),
-		},
+		req,
 	)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
-	return chatGPT2Grpc(resp)
+	return respTransformer.ChatGPTToGrpcCompletion(resp)
 }
 
 func OpenAIChatCompletionStreamingRequest(rs *model.LLMRequestSchema, sv model.UnoLLMv1_StreamRequestLLMServer) error {
@@ -48,26 +40,13 @@ func OpenAIChatCompletionStreamingRequest(rs *model.LLMRequestSchema, sv model.U
 	fmt.Println("OPENAI_LLM_API")
 	config := openai.DefaultConfig(info.GetToken())
 	config.BaseURL = info.GetUrl()
-	messages := rs.GetMessages()
 
 	client := openai.NewClientWithConfig(config)
 
 	ctx := context.Background()
-	var openaiMessages []openai.ChatCompletionMessage
-	for _, m := range messages {
-		openaiMessages = append(openaiMessages, openai.ChatCompletionMessage{
-			Role:    m.GetRole(),
-			Content: m.GetContent(),
-		})
-	}
 
-	req := openai.ChatCompletionRequest{
-		Model:       info.GetModel(),
-		Messages:    openaiMessages,
-		TopP:        float32(info.GetTopP()),
-		Temperature: float32(info.GetTemperature()),
-		Stream:      true,
-	}
+	req := reqTransformer.ChatGPTGrpcChatCompletionReq(rs)
+	req.Stream = true
 
 	resp, err := client.CreateChatCompletionStream(ctx, req)
 
