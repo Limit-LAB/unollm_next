@@ -1,4 +1,4 @@
-module limit.dev/unollm
+module go.limit.dev/unollm
 
 go 1.21.4
 
