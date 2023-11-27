@@ -6,9 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/sashabaranov/go-openai"
-	"io"
 	"go.limit.dev/unollm/provider/ChatGLM"
 	"go.limit.dev/unollm/relay/respTransformer"
+	"io"
 	"log"
 	"os"
 	"testing"
@@ -40,12 +40,12 @@ func mockServer() *gin.Engine {
 				Content: m.Content,
 			})
 		}
-		llm, result, err := cli.ChatCompletionStreamingRequest(zpReq, req.Model)
+		_r, err := cli.ChatCompletionStreamingRequest(zpReq, req.Model)
 		if err != nil {
 			log.Println(err)
 			return
 		}
-		respTransformer.ChatGLMToOpenAIStream(c, llm, result)
+		respTransformer.ChatGLMToOpenAIStream(c, _r)
 	})
 	return g
 }

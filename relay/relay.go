@@ -26,9 +26,9 @@ func (uno *UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.L
 	info := rs.GetLlmRequestInfo()
 	switch info.GetLlmApiType() {
 	case OPENAI_LLM_API:
-		return OpenAIChatCompletionRequest(ctx, rs)
+		return OpenAIChatCompletionRequestGrpc(ctx, rs)
 	case CHATGLM_LLM_API:
-		return ChatGLMChatCompletionRequest(ctx, rs)
+		return ChatGLMChatCompletionRequestGrpc(ctx, rs)
 	case AZURE_OPENAI_LLM_API:
 		fmt.Println("AZURE_OPENAI_LLM_API")
 		return nil, status.Errorf(codes.Unimplemented, "method BlockingRequestLLM not implemented")
@@ -45,7 +45,7 @@ func (uno *UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv mod
 	case OPENAI_LLM_API:
 		return OpenAIChatCompletionStreamingRequest(rs, sv)
 	case CHATGLM_LLM_API:
-		return ChatGLMChatCompletionStreamingRequest(rs, sv)
+		return ChatGLMChatCompletionStreamingRequestGrpc(rs, sv)
 	}
 	return status.Errorf(codes.Unimplemented, "method StreamRequestLLM not implemented")
 }

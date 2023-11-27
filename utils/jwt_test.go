@@ -23,10 +23,11 @@ func TestJWT(t *testing.T) {
 	}
 	cli := ChatGLM.NewClient(zhipuaiApiKey)
 
-	llm, res, err := cli.ChatCompletionStreamingRequest(body, ChatGLM.ModelTurbo)
+	_r, err := cli.ChatCompletionStreamingRequest(body, ChatGLM.ModelTurbo)
 	if err != nil {
 		log.Fatal(err)
 	}
+	llm, res := _r.LLM, _r.Finish
 
 	for {
 		select {

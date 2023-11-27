@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
-	"io"
 	"go.limit.dev/unollm/provider/ChatGLM"
 	"go.limit.dev/unollm/utils"
+	"io"
 	"strconv"
 	"time"
 )
@@ -35,7 +35,8 @@ func ChatGLMToOpenAICompletion(res ChatGLM.ChatCompletionResponse) openai.ChatCo
 	}
 }
 
-func ChatGLMToOpenAIStream(c *gin.Context, llm chan string, result chan ChatGLM.ChatCompletionStreamFinishResponse) {
+func ChatGLMToOpenAIStream(c *gin.Context, _r *ChatGLM.ChatCompletionStreamResponse) {
+	llm, result := _r.LLM, _r.Finish
 	utils.SetEventStreamHeaders(c)
 	c.Stream(func(w io.Writer) bool {
 		select {

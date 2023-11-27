@@ -43,7 +43,7 @@ func ChatGLM_ChatCompletionHandler(c *gin.Context, req openai.ChatCompletionRequ
 		c.JSON(200, respTransformer.ChatGLMToOpenAICompletion(rst))
 		return
 	}
-	llm, result, err := cli.ChatCompletionStreamingRequest(zpReq, req.Model)
+	resp, err := cli.ChatCompletionStreamingRequest(zpReq, req.Model)
 	defer safeClose(llm)
 	defer safeClose(result)
 
@@ -51,7 +51,7 @@ func ChatGLM_ChatCompletionHandler(c *gin.Context, req openai.ChatCompletionRequ
 		log.Println(err)
 		return
 	}
-	respTransformer.ChatGLMToOpenAIStream(c, llm, result)
+	respTransformer.ChatGLMToOpenAIStream(c, resp)
 }
 
 func safeClose[T any](ch chan<- T) {

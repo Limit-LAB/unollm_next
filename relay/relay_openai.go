@@ -15,8 +15,14 @@ import (
 )
 
 // TODO: read max_tokens, n, stop, frequency_penalty, presence_penalty from meta
-
-func OpenAIChatCompletionRequest(ctx context.Context, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
+func OpenAIChatCompletionRequest(cli *openai.Client, req openai.ChatCompletionRequest) (openai.ChatCompletionResponse, error) {
+	req.Stream = false
+	return cli.CreateChatCompletion(
+		context.Background(),
+		req,
+	)
+}
+func OpenAIChatCompletionRequestGrpc(ctx context.Context, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
 	info := rs.GetLlmRequestInfo()
 	fmt.Println("OPENAI_LLM_API")
 	config := openai.DefaultConfig(info.GetToken())
@@ -25,8 +31,8 @@ func OpenAIChatCompletionRequest(ctx context.Context, rs *model.LLMRequestSchema
 
 	req := reqTransformer.ChatGPTGrpcChatCompletionReq(rs)
 
-	resp, err := client.CreateChatCompletion(
-		ctx,
+	resp, err := OpenAIChatCompletionRequest(
+		client,
 		req,
 	)
 	if err != nil {
