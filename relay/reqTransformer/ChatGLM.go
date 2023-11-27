@@ -1,6 +1,7 @@
 package reqTransformer
 
 import (
+	"github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/provider/ChatGLM"
 )
@@ -30,4 +31,20 @@ func ChatGLMGrpcChatCompletionReq(rs *model.LLMRequestSchema) ChatGLM.ChatComple
 		})
 	}
 	return req
+}
+
+func ChatGLMFromOpenAIChatCompletionReq(req openai.ChatCompletionRequest) ChatGLM.ChatCompletionRequest {
+	zpReq := ChatGLM.ChatCompletionRequest{
+		Temperature: req.Temperature,
+		TopP:        req.TopP,
+		Incremental: req.Stream,
+	}
+
+	for _, m := range req.Messages {
+		zpReq.Prompt = append(zpReq.Prompt, ChatGLM.ChatCompletionMessage{
+			Role:    m.Role,
+			Content: m.Content,
+		})
+	}
+	return zpReq
 }

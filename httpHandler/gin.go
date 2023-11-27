@@ -6,12 +6,26 @@ import (
 	"strings"
 )
 
-func RegisterRoute(r *gin.Engine) {
-	r.GET("/chat/completions", func(c *gin.Context) {
+const InjectedChatGLMHeader = "X-Inject-ChatGLM-Auth"
+const InjectedChatGPTHeader = "X-Inject-ChatGPT-Auth"
+
+func RegisterRoute(r *gin.Engine, opt RegisterOpt) {
+	if opt.InjectChatGPTKey {
+		r.Use(func(c *gin.Context) {
+			c.Request.Header.Set(InjectedChatGPTHeader, opt.ChatGPTKey)
+		})
+	}
+	if opt.InjectChatGLMKey {
+		r.Use(func(c *gin.Context) {
+			c.Request.Header.Set(InjectedChatGLMHeader, opt.ChatGLMKey)
+		})
+	}
+
+	r.POST("/chat/completions", func(c *gin.Context) {
 		var req openai.ChatCompletionRequest
 		err := c.BindJSON(&req)
 		if err != nil {
-			// TODO: log
+			internalServerError(c, err)
 			return
 		}
 		if strings.HasPrefix(req.Model, "chatglm") {
@@ -23,17 +37,21 @@ func RegisterRoute(r *gin.Engine) {
 			return
 		}
 	})
-	r.GET("/completions", func(c *gin.Context) {
+	r.POST("/completions", func(c *gin.Context) {
 		var req openai.CompletionRequest
 		err := c.BindJSON(&req)
 		if err != nil {
+			internalServerError(c, err)
+			return
 		}
-		if strings.HasPrefix(req.Model, "chatglm") {
-			// TODO
-		}
-		if strings.HasPrefix(req.Model, "chatgpt") {
-
-		}
+		ChatGPT_CompletitionsHandler(c, req)
 
 	})
+}
+
+type RegisterOpt struct {
+	InjectChatGLMKey bool
+	ChatGLMKey       string
+	InjectChatGPTKey bool
+	ChatGPTKey       string
 }

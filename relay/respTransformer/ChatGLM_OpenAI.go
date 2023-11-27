@@ -43,7 +43,7 @@ func ChatGLMToOpenAIStream(c *gin.Context, _r *ChatGLM.ChatCompletionStreamRespo
 		case data := <-llm:
 			response := openai.ChatCompletionStreamResponse{
 				Object:  "chat.completion.chunk",
-				Model:   "chatglm",
+				Model:   ChatGLM.ModelTurbo,
 				Created: time.Now().Unix(),
 				Choices: []openai.ChatCompletionStreamChoice{
 					{

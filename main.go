@@ -2,7 +2,7 @@ package main
 
 import (
 	"go.limit.dev/unollm/grpcServer"
-	"go.limit.dev/unollm/relay/respTransformer"
+	"go.limit.dev/unollm/httpHandler"
 	"log"
 	"net"
 	"os"
@@ -10,10 +10,8 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/sashabaranov/go-openai"
 	"github.com/sirupsen/logrus"
 	"go.limit.dev/unollm/model"
-	"go.limit.dev/unollm/provider/ChatGLM"
 	"google.golang.org/grpc"
 )
 
@@ -34,33 +32,9 @@ func main() {
 		g.Use(gin.Recovery())
 
 		zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
-		g.POST("/v1/chat/completions", func(c *gin.Context) {
-			var req openai.ChatCompletionRequest
-			err := c.BindJSON(&req)
-			if err != nil {
-				log.Println(err)
-				return
-			}
-			cli := ChatGLM.NewClient(zhipuaiApiKey)
-
-			zpReq := ChatGLM.ChatCompletionRequest{
-				Temperature: req.Temperature,
-				TopP:        req.TopP,
-				Incremental: true,
-			}
-
-			for _, m := range req.Messages {
-				zpReq.Prompt = append(zpReq.Prompt, ChatGLM.ChatCompletionMessage{
-					Role:    m.Role,
-					Content: m.Content,
-				})
-			}
-			resp, err := cli.ChatCompletionStreamingRequest(zpReq, "chatglm_turbo")
-			if err != nil {
-				log.Println(err)
-				return
-			}
-			respTransformer.ChatGLMToOpenAIStream(c, resp)
+		httpHandler.RegisterRoute(g, httpHandler.RegisterOpt{
+			InjectChatGLMKey: true,
+			ChatGLMKey:       zhipuaiApiKey,
 		})
 		g.Run("127.0.0.1:11451")
 	}()
