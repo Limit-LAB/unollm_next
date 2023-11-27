@@ -1,6 +1,7 @@
 package main
 
 import (
+	"go.limit.dev/unollm/grpcServer"
 	"go.limit.dev/unollm/relay/respTransformer"
 	"log"
 	"net"
@@ -65,12 +66,12 @@ func main() {
 	}()
 
 	// start grpc server
-	grpcServer := grpc.NewServer()
-	lis, err := net.Listen("tcp", "127.0.0.1:19198")
+	svr := grpc.NewServer()
+	tcpList, err := net.Listen("tcp", "127.0.0.1:19198")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	service := grpcServer.UnoForwardServer{}
-	model.RegisterUnoLLMv1Server(grpcServer, &service)
-	grpcServer.Serve(lis)
+	model.RegisterUnoLLMv1Server(svr, &service)
+	svr.Serve(tcpList)
 }
