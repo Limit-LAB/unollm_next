@@ -20,5 +20,6 @@ func ChatGPTGrpcChatCompletionReq(rs *model.LLMRequestSchema) openai.ChatComplet
 		Messages:    openaiMessages,
 		TopP:        float32(info.GetTopP()),
 		Temperature: float32(info.GetTemperature()),
+		Stream:      true,
 	}
 }

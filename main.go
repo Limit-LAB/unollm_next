@@ -13,7 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/provider/ChatGLM"
-	"go.limit.dev/unollm/relay"
 	"google.golang.org/grpc"
 )
 
@@ -71,7 +70,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	service := relay.UnoForwardServer{}
+	service := grpcServer.UnoForwardServer{}
 	model.RegisterUnoLLMv1Server(grpcServer, &service)
 	grpcServer.Serve(lis)
 }

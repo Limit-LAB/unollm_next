@@ -1,14 +1,13 @@
-package relay_test
+package grpcServer_test
 
 import (
 	"context"
+	"go.limit.dev/unollm/grpcServer"
 	"os"
 	"testing"
 
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/utils"
-
-	"go.limit.dev/unollm/relay"
 
 	"github.com/joho/godotenv"
 )
@@ -23,7 +22,7 @@ func TestOpenAI(t *testing.T) {
 	})
 	openaiApiKey := os.Getenv("TEST_OPENAI_API")
 	req_info := model.LLMRequestInfo{
-		LlmApiType:  relay.OPENAI_LLM_API,
+		LlmApiType:  grpcServer.OPENAI_LLM_API,
 		Model:       "gpt-3.5-turbo",
 		Temperature: 0.9,
 		TopP:        0.9,
@@ -35,7 +34,7 @@ func TestOpenAI(t *testing.T) {
 		Messages:       messages,
 		LlmRequestInfo: &req_info,
 	}
-	mockServer := relay.UnoForwardServer{}
+	mockServer := grpcServer.UnoForwardServer{}
 	res, err := mockServer.BlockingRequestLLM(context.Background(), &req)
 	if err != nil {
 		t.Error(err)
@@ -53,7 +52,7 @@ func TestChatGLM(t *testing.T) {
 	})
 	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
 	req_info := model.LLMRequestInfo{
-		LlmApiType:  relay.CHATGLM_LLM_API,
+		LlmApiType:  grpcServer.CHATGLM_LLM_API,
 		Model:       "chatglm_turbo",
 		Temperature: 0.9,
 		TopP:        0.9,
@@ -65,7 +64,7 @@ func TestChatGLM(t *testing.T) {
 		Messages:       messages,
 		LlmRequestInfo: &req_info,
 	}
-	mockServer := relay.UnoForwardServer{}
+	mockServer := grpcServer.UnoForwardServer{}
 	res, err := mockServer.BlockingRequestLLM(context.Background(), &req)
 	if err != nil {
 		t.Error(err)
@@ -83,7 +82,7 @@ func TestChatGLMStreaming(t *testing.T) {
 	})
 	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
 	req_info := model.LLMRequestInfo{
-		LlmApiType:  relay.CHATGLM_LLM_API,
+		LlmApiType:  grpcServer.CHATGLM_LLM_API,
 		Model:       "chatglm_turbo",
 		Temperature: 0.9,
 		TopP:        0.9,
@@ -95,7 +94,7 @@ func TestChatGLMStreaming(t *testing.T) {
 		Messages:       messages,
 		LlmRequestInfo: &req_info,
 	}
-	mockServer := relay.UnoForwardServer{}
+	mockServer := grpcServer.UnoForwardServer{}
 	mockServerPipe := utils.MockServerStream{
 		Stream: make(chan *model.PartialLLMResponse, 1000),
 	}
@@ -123,7 +122,7 @@ func TestOpenAItreaming(t *testing.T) {
 	})
 	openaiApiKey := os.Getenv("TEST_OPENAI_API")
 	req_info := model.LLMRequestInfo{
-		LlmApiType:  relay.OPENAI_LLM_API,
+		LlmApiType:  grpcServer.OPENAI_LLM_API,
 		Model:       "gpt-3.5-turbo",
 		Temperature: 0.9,
 		TopP:        0.9,
@@ -135,7 +134,7 @@ func TestOpenAItreaming(t *testing.T) {
 		Messages:       messages,
 		LlmRequestInfo: &req_info,
 	}
-	mockServer := relay.UnoForwardServer{}
+	mockServer := grpcServer.UnoForwardServer{}
 	mockServerPipe := utils.MockServerStream{
 		Stream: make(chan *model.PartialLLMResponse, 1000),
 	}
