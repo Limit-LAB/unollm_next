@@ -11,10 +11,10 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/sashabaranov/go-openai"
 	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/provider/ChatGLM"
 	"go.limit.dev/unollm/relay"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -55,12 +55,12 @@ func main() {
 					Content: m.Content,
 				})
 			}
-			llm, result, err := cli.ChatCompletionStreamingRequest(zpReq, "chatglm_turbo")
+			resp, err := cli.ChatCompletionStreamingRequest(zpReq, "chatglm_turbo")
 			if err != nil {
 				log.Println(err)
 				return
 			}
-			respTransformer.ChatGLMToOpenAIStream(c, llm, result)
+			respTransformer.ChatGLMToOpenAIStream(c, resp)
 		})
 		g.Run("127.0.0.1:11451")
 	}()

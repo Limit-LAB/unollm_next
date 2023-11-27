@@ -29,7 +29,7 @@ func ChatGLMToGrpcCompletion(res ChatGLM.ChatCompletionResponse) (*model.LLMResp
 
 func ChatGLMToGrpcStream(_r *ChatGLM.ChatCompletionStreamResponse, sv model.UnoLLMv1_StreamRequestLLMServer) error {
 	defer _r.Close()
-	llm, result := _r.LLM, _r.Finish
+	llm, result := _r.OnRecvData, _r.OnFinish
 	for {
 		select {
 		case chunk := <-llm:

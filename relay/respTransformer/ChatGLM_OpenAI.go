@@ -36,7 +36,7 @@ func ChatGLMToOpenAICompletion(res ChatGLM.ChatCompletionResponse) openai.ChatCo
 }
 
 func ChatGLMToOpenAIStream(c *gin.Context, _r *ChatGLM.ChatCompletionStreamResponse) {
-	llm, result := _r.LLM, _r.Finish
+	llm, result := _r.OnRecvData, _r.OnFinish
 	utils.SetEventStreamHeaders(c)
 	c.Stream(func(w io.Writer) bool {
 		select {

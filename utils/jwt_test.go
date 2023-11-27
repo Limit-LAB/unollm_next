@@ -27,7 +27,7 @@ func TestJWT(t *testing.T) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	llm, res := _r.LLM, _r.Finish
+	llm, res := _r.OnRecvData, _r.OnFinish
 
 	for {
 		select {

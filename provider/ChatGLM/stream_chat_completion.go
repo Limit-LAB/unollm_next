@@ -9,19 +9,19 @@ import (
 )
 
 type ChatCompletionStreamResponse struct {
-	LLM    chan string
-	Finish chan ChatCompletionStreamFinish
+	OnRecvData chan string
+	OnFinish   chan ChatCompletionStreamFinish
 }
 
 func (e *ChatCompletionStreamResponse) Close() {
 	if e == nil {
 		return
 	}
-	if e.LLM != nil {
-		safeClose[string](e.LLM)
+	if e.OnRecvData != nil {
+		safeClose[string](e.OnRecvData)
 	}
-	if e.Finish != nil {
-		safeClose[ChatCompletionStreamFinish](e.Finish)
+	if e.OnFinish != nil {
+		safeClose[ChatCompletionStreamFinish](e.OnFinish)
 	}
 }
 
@@ -77,5 +77,5 @@ func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest, mode
 		}
 	}()
 
-	return &ChatCompletionStreamResponse{LLM: llmCh, Finish: resultCh}, nil
+	return &ChatCompletionStreamResponse{OnRecvData: llmCh, OnFinish: resultCh}, nil
 }
