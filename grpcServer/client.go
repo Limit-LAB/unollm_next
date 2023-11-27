@@ -8,7 +8,10 @@ import (
 
 func NewOpenAIClient(info *model.LLMRequestInfo) *openai.Client {
 	config := openai.DefaultConfig(info.GetToken())
-	config.BaseURL = info.GetUrl()
+	if info.GetUrl() != "" {
+		config.BaseURL = info.GetUrl()
+	}
+
 	return openai.NewClientWithConfig(config)
 }
 
