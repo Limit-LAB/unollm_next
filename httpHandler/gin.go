@@ -10,12 +10,12 @@ const InjectedChatGLMHeader = "X-Inject-ChatGLM-Auth"
 const InjectedChatGPTHeader = "X-Inject-ChatGPT-Auth"
 
 func RegisterRoute(r *gin.Engine, opt RegisterOpt) {
-	if opt.InjectChatGPTKey {
+	if opt.ChatGPTKey != "" {
 		r.Use(func(c *gin.Context) {
 			c.Request.Header.Set(InjectedChatGPTHeader, opt.ChatGPTKey)
 		})
 	}
-	if opt.InjectChatGLMKey {
+	if opt.ChatGLMKey != "" {
 		r.Use(func(c *gin.Context) {
 			c.Request.Header.Set(InjectedChatGLMHeader, opt.ChatGLMKey)
 		})
@@ -50,8 +50,6 @@ func RegisterRoute(r *gin.Engine, opt RegisterOpt) {
 }
 
 type RegisterOpt struct {
-	InjectChatGLMKey bool
-	ChatGLMKey       string
-	InjectChatGPTKey bool
-	ChatGPTKey       string
+	ChatGLMKey string
+	ChatGPTKey string
 }

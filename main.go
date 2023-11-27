@@ -10,7 +10,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/sirupsen/logrus"
 	"go.limit.dev/unollm/model"
 	"google.golang.org/grpc"
 )
@@ -18,10 +17,6 @@ import (
 func main() {
 	// start openai style server
 	go func() {
-		logger := logrus.New()
-		logger.Out = os.Stdout
-		logger.SetLevel(logrus.InfoLevel)
-
 		godotenv.Load("./.env")
 		g := gin.New()
 		g.Use(gin.Logger())
@@ -33,8 +28,7 @@ func main() {
 
 		zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
 		httpHandler.RegisterRoute(g, httpHandler.RegisterOpt{
-			InjectChatGLMKey: true,
-			ChatGLMKey:       zhipuaiApiKey,
+			ChatGLMKey: zhipuaiApiKey,
 		})
 		g.Run("127.0.0.1:11451")
 	}()
