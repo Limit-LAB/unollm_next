@@ -1,7 +1,7 @@
 package ChatGLM
 
 import (
-	"limit.dev/unollm/model"
+	"go.limit.dev/unollm/model"
 )
 
 func RequestFromLLMRequest(rs *model.LLMRequestSchema) ChatCompletionRequest {

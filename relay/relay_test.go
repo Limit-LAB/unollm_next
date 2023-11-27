@@ -5,10 +5,10 @@ import (
 	"os"
 	"testing"
 
-	"limit.dev/unollm/model"
-	"limit.dev/unollm/utils"
+	"go.limit.dev/unollm/model"
+	"go.limit.dev/unollm/utils"
 
-	"limit.dev/unollm/relay"
+	"go.limit.dev/unollm/relay"
 
 	"github.com/joho/godotenv"
 )

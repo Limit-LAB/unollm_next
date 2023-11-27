@@ -5,8 +5,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
 	"io"
-	"limit.dev/unollm/provider/ChatGLM"
-	"limit.dev/unollm/utils"
+	"go.limit.dev/unollm/provider/ChatGLM"
+	"go.limit.dev/unollm/utils"
 	"strconv"
 	"time"
 )

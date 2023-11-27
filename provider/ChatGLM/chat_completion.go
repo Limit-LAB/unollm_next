@@ -3,7 +3,7 @@ package ChatGLM
 import (
 	"bytes"
 	"encoding/json"
-	"limit.dev/unollm/utils"
+	"go.limit.dev/unollm/utils"
 	"net/http"
 	"time"
 )

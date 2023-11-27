@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
 	"io"
-	"limit.dev/unollm/utils"
+	"go.limit.dev/unollm/utils"
 	"net/http"
 	"strings"
 )

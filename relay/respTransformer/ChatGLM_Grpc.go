@@ -1,8 +1,8 @@
 package respTransformer
 
 import (
-	"limit.dev/unollm/model"
-	"limit.dev/unollm/provider/ChatGLM"
+	"go.limit.dev/unollm/model"
+	"go.limit.dev/unollm/provider/ChatGLM"
 	"strconv"
 )
 

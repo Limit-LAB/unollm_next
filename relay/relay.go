@@ -6,7 +6,7 @@ import (
 
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	"limit.dev/unollm/model"
+	"go.limit.dev/unollm/model"
 )
 
 type UnoForwardServer struct {

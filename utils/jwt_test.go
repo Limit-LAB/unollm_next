@@ -2,7 +2,7 @@ package utils_test
 
 import (
 	"github.com/joho/godotenv"
-	"limit.dev/unollm/provider/ChatGLM"
+	"go.limit.dev/unollm/provider/ChatGLM"
 	"log"
 	"os"
 	"testing"

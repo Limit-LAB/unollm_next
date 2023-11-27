@@ -1,7 +1,7 @@
 package main
 
 import (
-	"limit.dev/unollm/relay/respTransformer"
+	"go.limit.dev/unollm/relay/respTransformer"
 	"log"
 	"net"
 	"os"
@@ -12,9 +12,9 @@ import (
 	"github.com/sashabaranov/go-openai"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
-	"limit.dev/unollm/model"
-	"limit.dev/unollm/provider/ChatGLM"
-	"limit.dev/unollm/relay"
+	"go.limit.dev/unollm/model"
+	"go.limit.dev/unollm/provider/ChatGLM"
+	"go.limit.dev/unollm/relay"
 )
 
 func main() {

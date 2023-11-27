@@ -5,13 +5,13 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"limit.dev/unollm/relay/reqTransformer"
-	"limit.dev/unollm/relay/respTransformer"
+	"go.limit.dev/unollm/relay/reqTransformer"
+	"go.limit.dev/unollm/relay/respTransformer"
 
 	"github.com/sashabaranov/go-openai"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"limit.dev/unollm/model"
+	"go.limit.dev/unollm/model"
 )
 
 // TODO: read max_tokens, n, stop, frequency_penalty, presence_penalty from meta

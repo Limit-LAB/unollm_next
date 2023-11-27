@@ -3,9 +3,9 @@ package httpHandler
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
-	"limit.dev/unollm/provider/ChatGLM"
-	"limit.dev/unollm/relay/respTransformer"
-	"limit.dev/unollm/utils"
+	"go.limit.dev/unollm/provider/ChatGLM"
+	"go.limit.dev/unollm/relay/respTransformer"
+	"go.limit.dev/unollm/utils"
 	"log"
 	"net/http"
 )

@@ -7,10 +7,10 @@ package relay
 import (
 	"context"
 	"fmt"
-	"limit.dev/unollm/model"
-	"limit.dev/unollm/relay/respTransformer"
+	"go.limit.dev/unollm/model"
+	"go.limit.dev/unollm/relay/respTransformer"
 
-	"limit.dev/unollm/provider/ChatGLM"
+	"go.limit.dev/unollm/provider/ChatGLM"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

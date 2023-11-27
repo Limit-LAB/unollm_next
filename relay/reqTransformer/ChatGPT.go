@@ -2,7 +2,7 @@ package reqTransformer
 
 import (
 	"github.com/sashabaranov/go-openai"
-	"limit.dev/unollm/model"
+	"go.limit.dev/unollm/model"
 )
 
 func ChatGPTGrpcChatCompletionReq(rs *model.LLMRequestSchema) openai.ChatCompletionRequest {

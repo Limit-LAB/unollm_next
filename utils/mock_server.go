@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"google.golang.org/grpc/metadata"
-	"limit.dev/unollm/model"
+	"go.limit.dev/unollm/model"
 )
 
 type MockServerStream struct {

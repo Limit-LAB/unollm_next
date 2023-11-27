@@ -1,8 +1,8 @@
 package reqTransformer
 
 import (
-	"limit.dev/unollm/model"
-	"limit.dev/unollm/provider/ChatGLM"
+	"go.limit.dev/unollm/model"
+	"go.limit.dev/unollm/provider/ChatGLM"
 )
 
 func ChatGLMGrpcChatCompletionReq(rs *model.LLMRequestSchema) ChatGLM.ChatCompletionRequest {

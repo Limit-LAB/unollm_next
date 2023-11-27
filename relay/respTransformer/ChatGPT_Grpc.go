@@ -4,7 +4,7 @@ import (
 	"github.com/sashabaranov/go-openai"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"limit.dev/unollm/model"
+	"go.limit.dev/unollm/model"
 )
 
 func ChatGPTToGrpcCompletion(resp openai.ChatCompletionResponse) (*model.LLMResponseSchema, error) {
