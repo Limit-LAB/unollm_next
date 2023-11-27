@@ -44,17 +44,10 @@ func ChatGLM_ChatCompletionHandler(c *gin.Context, req openai.ChatCompletionRequ
 		return
 	}
 	resp, err := cli.ChatCompletionStreamingRequest(zpReq, req.Model)
-	defer safeClose(llm)
-	defer safeClose(result)
 
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	respTransformer.ChatGLMToOpenAIStream(c, resp)
-}
-
-func safeClose[T any](ch chan<- T) {
-	defer func() { recover() }()
-	close(ch)
 }
