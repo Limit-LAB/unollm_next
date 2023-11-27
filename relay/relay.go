@@ -1,12 +1,12 @@
 package relay
 
 import (
-	context "context"
+	"context"
 	"fmt"
 
-	codes "google.golang.org/grpc/codes"
-	status "google.golang.org/grpc/status"
 	"go.limit.dev/unollm/model"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type UnoForwardServer struct {
@@ -15,7 +15,7 @@ type UnoForwardServer struct {
 
 // mustEmbedUnimplementedUnoLLMv1Server implements model.UnoLLMv1Server.
 
-var _ (model.UnoLLMv1Server) = (*UnoForwardServer)(nil)
+var _ model.UnoLLMv1Server = (*UnoForwardServer)(nil)
 
 const OPENAI_LLM_API = "openai"
 const CHATGLM_LLM_API = "chatglm"

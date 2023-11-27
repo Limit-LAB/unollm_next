@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
-	"io"
 	"go.limit.dev/unollm/utils"
+	"io"
 	"net/http"
 	"strings"
 )
