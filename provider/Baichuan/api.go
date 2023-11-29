@@ -18,9 +18,9 @@ type BaichuanRequestBody struct {
 /**/
 
 type BaichuanBlockingResponseChoices struct {
-	Finish_reason string            `json:"finish_reason"`
-	Index         int               `json:"index"`
-	Message       []BaichuanMessage `json:"message"`
+	Finish_reason string          `json:"finish_reason"`
+	Index         int             `json:"index"`
+	Message       BaichuanMessage `json:"message"`
 }
 
 type BaichuanStreamResponseChoices struct {
@@ -37,10 +37,10 @@ type BaichuanResponseUsage struct {
 
 type BaichuanBlockingResponseBody struct {
 	Id      string                            `json:"id"`
-	Created int                               `json:"created"`
-	Choices []BaichuanBlockingResponseChoices `json:"choices"`
-	Model   string                            `json:"model"`
 	Object  string                            `json:"object"`
+	Created int                               `json:"created"`
+	Model   string                            `json:"model"`
+	Choices []BaichuanBlockingResponseChoices `json:"choices"`
 	Usage   BaichuanResponseUsage             `json:"usage"`
 }
 

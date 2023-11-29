@@ -5,9 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"go.limit.dev/unollm/utils"
 	"net/http"
 	"time"
+
+	"go.limit.dev/unollm/utils"
 )
 
 const jwtExpire = time.Duration(10000) * time.Second
@@ -17,17 +18,17 @@ var ErrNotSuccess = errors.New("request result not success")
 func (c *Client) ChatCompletion(body ChatCompletionRequest, modelName string) (result ChatCompletionResponse, err error) {
 	token, err := utils.CreateJWTToken(c.apiKey, jwtExpire)
 	if err != nil {
-		return
+		return ChatCompletionResponse{}, err
 	}
 
 	reqBody, err := json.Marshal(body)
 	if err != nil {
-		return
+		return ChatCompletionResponse{}, err
 	}
 
 	req, err := http.NewRequest("POST", c.base+modelName+"/invoke", bytes.NewReader(reqBody))
 	if err != nil {
-		return
+		return ChatCompletionResponse{}, err
 	}
 
 	req.Header.Set("Authorization", token)
@@ -35,18 +36,18 @@ func (c *Client) ChatCompletion(body ChatCompletionRequest, modelName string) (r
 
 	resp, err := c.hc.Do(req)
 	if err != nil {
-		return
+		return ChatCompletionResponse{}, err
 	}
 	defer resp.Body.Close()
 
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
-		return
+		return ChatCompletionResponse{}, err
 	}
 	if !result.Success {
 		err = fmt.Errorf("chatGLM response success is false Error code: %d, Error msg: %s", result.ErrorCode, result.ErrorMsg)
-		return
+		return ChatCompletionResponse{}, err
 	}
 
-	return
+	return result, nil
 }

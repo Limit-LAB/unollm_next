@@ -1,7 +1,6 @@
 package Baichuan
 
 import (
-	"fmt"
 	"os"
 	"testing"
 
@@ -12,7 +11,7 @@ func Test(t *testing.T) {
 	req := BaichuanRequestBody{
 		Model: "Baichuan2",
 		Messages: []BaichuanMessage{
-			BaichuanMessage{Role: "user", Content: "大家好啊"},
+			{Role: "user", Content: "大家好啊"},
 		},
 		Stream:      false,
 		Temperature: 0.5,
@@ -25,5 +24,8 @@ func Test(t *testing.T) {
 
 	c := NewClient(key)
 	res, err := c.ChatCompletion(req)
-	fmt.Print(res, err)
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Log(res, err)
 }
