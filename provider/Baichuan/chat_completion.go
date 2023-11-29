@@ -21,7 +21,6 @@ func (c *Client) ChatCompletion(body BaichuanRequestBody) (result BaichuanBlocki
 	req, err := http.NewRequest("POST", c.base+"/chat/completions", bytes.NewReader(reqBody))
 	if err != nil {
 		return BaichuanBlockingResponseBody{}, err
-
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+strings.Split(c.apiKey, ".")[0])
