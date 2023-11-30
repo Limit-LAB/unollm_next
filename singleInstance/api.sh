@@ -5,7 +5,7 @@ set -e
 rm -fr ./tmp
 mkdir -p ./tmp
 
-openapi-generator-cli generate -i ./UnoLLM.json -g go -o ./tmp --additional-properties=packageName=apimodel
+openapi-generator-cli generate -i ./UnoLLM.openapi.json -g go -o ./tmp --additional-properties=packageName=apimodel
 
 rm -fr ./model/apimodel
 mkdir -p ./model/apimodel

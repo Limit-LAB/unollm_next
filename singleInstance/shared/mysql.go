@@ -19,11 +19,12 @@ func migrate() error {
 
 func InitMySql() error {
 	var err error
-	_db, err = gorm.Open(mysql.Open(
-		GetCfg().SQL), &gorm.Config{
-		DisableForeignKeyConstraintWhenMigrating: true,
-		PrepareStmt:                              true,
-	})
+	_db, err = gorm.Open(
+		mysql.Open(GetCfg().SQL),
+		&gorm.Config{
+			DisableForeignKeyConstraintWhenMigrating: true,
+			PrepareStmt:                              true,
+		})
 	if err != nil {
 		return err
 	}

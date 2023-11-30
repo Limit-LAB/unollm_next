@@ -28,5 +28,5 @@ type UserDefinedKey struct {
 
 type MapOriginRelation struct {
 	MapID    uint `gorm:"primaryKey"`
-	OriginID uint `gorm:primaryKey`
+	OriginID uint `gorm:"primaryKey"`
 }

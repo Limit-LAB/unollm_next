@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/KevinZonda/GoX/pkg/panicx"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -9,9 +10,11 @@ import (
 	"go.limit.dev/unollm/singleInstance/svc"
 	"go.limit.dev/unollm/singleInstance/svc/keyStore"
 	"go.limit.dev/unollm/singleInstance/svc/user"
+	"os"
 )
 
 func main() {
+	fmt.Println(os.Getenv("PWD"))
 	initAll()
 	g := gin.New()
 	g.Use(gin.Logger())

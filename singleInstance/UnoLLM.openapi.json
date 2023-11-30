@@ -16,7 +16,7 @@
   "paths": {
     "/keyStore/addKey": {
       "post": {
-        "summary": "/addKey: 新增API KEY",
+        "summary": "新增API KEY",
         "x-apifox-folder": "UnoLLM//keyStore",
         "x-apifox-status": "developing",
         "deprecated": false,
@@ -106,7 +106,7 @@
     },
     "/keyStore/mapTo": {
       "post": {
-        "summary": "/mapTo: 映射APIKey到用户定义Key",
+        "summary": "映射APIKey到用户定义Key",
         "x-apifox-folder": "UnoLLM//keyStore",
         "x-apifox-status": "developing",
         "deprecated": false,
@@ -171,7 +171,7 @@
     },
     "/keyStore/keys": {
       "get": {
-        "summary": "/keys: 获取全部原始Key",
+        "summary": "获取全部原始Key",
         "x-apifox-folder": "UnoLLM//keyStore",
         "x-apifox-status": "developing",
         "deprecated": false,
@@ -254,7 +254,7 @@
     },
     "/keyStore/newApi": {
       "post": {
-        "summary": "/newApi: 新建用户定义的API Key",
+        "summary": "新建用户定义的API Key",
         "x-apifox-folder": "UnoLLM//keyStore",
         "x-apifox-status": "developing",
         "deprecated": false,
@@ -289,15 +289,103 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "properties": {},
-                  "x-apifox-ignore-properties": [],
-                  "x-apifox-orders": []
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "key": {
+                      "type": "string"
+                    }
+                  },
+                  "x-apifox-orders": [
+                    "id",
+                    "key"
+                  ],
+                  "required": [
+                    "id",
+                    "key"
+                  ],
+                  "x-apifox-ignore-properties": []
                 }
               }
             }
           }
         },
         "x-run-in-apifox": "https://apifox.com/web/project/3683578/apis/api-129605454-run",
+        "security": [
+          {
+            "apikey-header-Authorization": []
+          }
+        ]
+      }
+    },
+    "/keyStore/testTransformer": {
+      "post": {
+        "summary": "测试APIKey映射",
+        "x-apifox-folder": "UnoLLM//keyStore",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "UnoLLM//keyStore"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "provider": {
+                    "type": "string"
+                  }
+                },
+                "x-apifox-orders": [
+                  "key",
+                  "provider"
+                ],
+                "required": [
+                  "key",
+                  "provider"
+                ],
+                "x-apifox-ignore-properties": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "endpoint": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "key": {
+                      "type": "string"
+                    }
+                  },
+                  "x-apifox-orders": [
+                    "endpoint",
+                    "key"
+                  ],
+                  "required": [
+                    "key"
+                  ],
+                  "x-apifox-ignore-properties": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/3683578/apis/api-129605594-run",
         "security": [
           {
             "apikey-header-Authorization": []

@@ -1,16 +1,19 @@
 package keyStore
 
 import (
+	"github.com/gin-gonic/gin"
 	"go.limit.dev/unollm/httpHandler"
+	"go.limit.dev/unollm/singleInstance/model/apimodel"
 	"go.limit.dev/unollm/singleInstance/model/dbmodel"
 	"go.limit.dev/unollm/singleInstance/shared"
+	"go.limit.dev/unollm/singleInstance/utils"
 	"math/rand"
 )
 
 func KeyTransformer(keyIn string, provider string) (httpHandler.KeyTransformerResult, error) {
 	var userKey dbmodel.UserDefinedKey
 	err := shared.GetDB().
-		Where("key = ?", keyIn).
+		Where("`key` = ?", keyIn).
 		First(&userKey).Error
 	if err != nil {
 		return httpHandler.KeyTransformerResult{}, err
@@ -51,4 +54,21 @@ func KeyTransformer(keyIn string, provider string) (httpHandler.KeyTransformerRe
 		Key:      key.Key,
 		EndPoint: key.EndPoint,
 	}, nil
+}
+
+func (svc *KeyStoreSvc) testTransformer(c *gin.Context) {
+	req, aborted := utils.GinReqJson[apimodel.KeyStoreTestTransformerPostRequest](c)
+	if aborted {
+		return
+	}
+	rst, err := KeyTransformer(req.Key, req.Provider)
+	if err != nil {
+		c.AbortWithStatusJSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	resp := apimodel.NewKeyStoreTestTransformerPost200Response(rst.Key)
+	if rst.EndPoint != "" {
+		resp.SetEndpoint(rst.EndPoint)
+	}
+	c.JSON(200, resp)
 }

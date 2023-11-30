@@ -19,7 +19,7 @@ func (svc *KeyStoreSvc) RegisterRouter(g gin.IRouter) {
 	g.POST("/mapTo", svc.mapTo)
 	g.GET("/keys", svc.getKeys)
 	g.POST("/newApi", svc.newApi)
-
+	g.POST("/testTransformer", svc.testTransformer)
 }
 
 func fakeUID() uint {
@@ -34,17 +34,18 @@ func (svc *KeyStoreSvc) addKey(c *gin.Context) {
 
 	uid := fakeUID()
 
-	err := shared.GetDB().Create(&dbmodel.OriginKey{
+	key := dbmodel.OriginKey{
 		Owner:    uid,
 		Key:      req.Key,
 		Provider: dbmodel.KeyProvider(req.Provider),
 		EndPoint: req.GetEndpoint(),
-	}).Error
+	}
+	err := shared.GetDB().Create(&key).Error
 	if err != nil {
 		c.AbortWithStatusJSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"success": true})
+	c.JSON(200, apimodel.KeyStoreAddKeyPost200Response{Id: int32(key.ID)})
 }
 
 func (svc *KeyStoreSvc) getKeys(c *gin.Context) {
@@ -68,7 +69,7 @@ func (svc *KeyStoreSvc) getKeys(c *gin.Context) {
 			Endpoint: *ep,
 		})
 	}
-	c.JSON(200, gin.H{"success": true})
+	c.JSON(200, res)
 }
 
 func (svc *KeyStoreSvc) mapTo(c *gin.Context) {
@@ -102,14 +103,16 @@ func (svc *KeyStoreSvc) newApi(c *gin.Context) {
 	if key == "" {
 		key = uuid.NewString()
 	}
-	err := shared.GetDB().Create(&dbmodel.UserDefinedKey{
+	udk := dbmodel.UserDefinedKey{
 		Owner: fakeUID(),
 		Key:   key,
-	}).Error
+	}
+	err := shared.GetDB().Create(&udk).Error
 	if err != nil {
 		c.AbortWithStatusJSON(500, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(200, gin.H{"success": true, "key": key})
+
+	c.JSON(200, apimodel.NewKeyStoreNewApiPost200Response(int32(udk.ID), key))
 
 }
