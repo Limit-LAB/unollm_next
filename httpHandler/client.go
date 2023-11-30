@@ -7,26 +7,51 @@ import (
 	"strings"
 )
 
-func NewOpenAIClient(c *gin.Context) *openai.Client {
+func NewOpenAIClient(c *gin.Context, tx KeyTransformer) *openai.Client {
 	authHeader := getAuthHeader(c, InjectedChatGPTHeader)
 	if authHeader == "" {
 		return nil
 	}
 
+	endPoint := ""
+	if tx != nil {
+		rst, err := tx(authHeader, "chatgpt")
+		if err != nil {
+			return nil
+		}
+		if rst.EndPoint != "" {
+			endPoint = rst.EndPoint
+		}
+		authHeader = rst.Key
+	}
+	if headerEp := c.GetHeader("X-OpenAI-Endpoint"); headerEp != "" {
+		endPoint = headerEp
+	}
+
 	config := openai.DefaultConfig(authHeader)
-	endPoint := c.GetHeader("X-OpenAI-Endpoint")
 	if endPoint != "" {
 		config.BaseURL = endPoint
 	}
 	return openai.NewClientWithConfig(config)
 }
 
-func NewChatGLMClient(c *gin.Context) *ChatGLM.Client {
+func NewChatGLMClient(c *gin.Context, tx KeyTransformer) *ChatGLM.Client {
 	authHeader := getAuthHeader(c, InjectedChatGLMHeader)
 	if authHeader == "" {
 		return nil
 	}
-	return ChatGLM.NewClient(authHeader)
+	if tx == nil {
+		return ChatGLM.NewClient(authHeader)
+	}
+	rst, err := tx(authHeader, "chatglm")
+	if err != nil {
+		return nil
+	}
+	cli := ChatGLM.NewClient(rst.Key)
+	if rst.EndPoint != "" {
+		cli.SetBase(rst.EndPoint)
+	}
+	return cli
 }
 
 func getAuthHeader(c *gin.Context, headers ...string) string {
