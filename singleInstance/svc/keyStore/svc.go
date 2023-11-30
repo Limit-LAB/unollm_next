@@ -16,7 +16,7 @@ var ErrNoKey = errors.New("no key provided")
 func (svc *KeyStoreSvc) RegisterRouter(g gin.IRouter) {
 	g.POST("/addKey", svc.addKey)
 	g.POST("/mapTo", svc.mapTo)
-	g.DELETE("/mapTo", svc.delMapTo)
+	g.POST("/removeMapTo", svc.delMapTo)
 	g.GET("/keys", svc.getKeys)
 	g.POST("/newApi", svc.newApi)
 	g.POST("/testTransformer", svc.testTransformer)

@@ -14,6 +14,7 @@ func migrate() error {
 		&dbmodel.OriginKey{},
 		&dbmodel.UserDefinedKey{},
 		&dbmodel.User{},
+		&dbmodel.UserToken{},
 	)
 }
 

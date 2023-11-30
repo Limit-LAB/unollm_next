@@ -22,8 +22,8 @@ var _ MappedNullable = &KeyStoreKeysGet200ResponseInner{}
 type KeyStoreKeysGet200ResponseInner struct {
 	Id       int32          `json:"id"`
 	Key      string         `json:"key"`
-	Provider string         `json:"provider"`
 	Endpoint NullableString `json:"endpoint,omitempty"`
+	Provider string         `json:"provider"`
 }
 
 type _KeyStoreKeysGet200ResponseInner KeyStoreKeysGet200ResponseInner
@@ -96,30 +96,6 @@ func (o *KeyStoreKeysGet200ResponseInner) SetKey(v string) {
 	o.Key = v
 }
 
-// GetProvider returns the Provider field value
-func (o *KeyStoreKeysGet200ResponseInner) GetProvider() string {
-	if o == nil {
-		var ret string
-		return ret
-	}
-
-	return o.Provider
-}
-
-// GetProviderOk returns a tuple with the Provider field value
-// and a boolean to check if the value has been set.
-func (o *KeyStoreKeysGet200ResponseInner) GetProviderOk() (*string, bool) {
-	if o == nil {
-		return nil, false
-	}
-	return &o.Provider, true
-}
-
-// SetProvider sets field value
-func (o *KeyStoreKeysGet200ResponseInner) SetProvider(v string) {
-	o.Provider = v
-}
-
 // GetEndpoint returns the Endpoint field value if set, zero value otherwise (both if not set or set to explicit null).
 func (o *KeyStoreKeysGet200ResponseInner) GetEndpoint() string {
 	if o == nil || IsNil(o.Endpoint.Get()) {
@@ -163,6 +139,30 @@ func (o *KeyStoreKeysGet200ResponseInner) UnsetEndpoint() {
 	o.Endpoint.Unset()
 }
 
+// GetProvider returns the Provider field value
+func (o *KeyStoreKeysGet200ResponseInner) GetProvider() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Provider
+}
+
+// GetProviderOk returns a tuple with the Provider field value
+// and a boolean to check if the value has been set.
+func (o *KeyStoreKeysGet200ResponseInner) GetProviderOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Provider, true
+}
+
+// SetProvider sets field value
+func (o *KeyStoreKeysGet200ResponseInner) SetProvider(v string) {
+	o.Provider = v
+}
+
 func (o KeyStoreKeysGet200ResponseInner) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
@@ -175,10 +175,10 @@ func (o KeyStoreKeysGet200ResponseInner) ToMap() (map[string]interface{}, error)
 	toSerialize := map[string]interface{}{}
 	toSerialize["id"] = o.Id
 	toSerialize["key"] = o.Key
-	toSerialize["provider"] = o.Provider
 	if o.Endpoint.IsSet() {
 		toSerialize["endpoint"] = o.Endpoint.Get()
 	}
+	toSerialize["provider"] = o.Provider
 	return toSerialize, nil
 }
 
