@@ -8,6 +8,7 @@ import (
 	"go.limit.dev/unollm/singleInstance/shared"
 	"go.limit.dev/unollm/singleInstance/svc"
 	"go.limit.dev/unollm/singleInstance/svc/keyStore"
+	"go.limit.dev/unollm/singleInstance/svc/user"
 )
 
 func main() {
@@ -36,6 +37,7 @@ func registerRoute(g gin.IRouter) {
 	svc.RegisterSvc(g,
 		map[string]svc.Svc{
 			"keyStore/": &keyStore.KeyStoreSvc{},
+			"user/":     &user.UserSvc{},
 		},
 	)
 }

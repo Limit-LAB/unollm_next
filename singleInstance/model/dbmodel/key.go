@@ -1,6 +1,8 @@
-package apimodel
+package dbmodel
 
-import "gorm.io/gorm"
+import (
+	"gorm.io/gorm"
+)
 
 type OriginKey struct {
 	gorm.Model
@@ -18,7 +20,13 @@ const (
 	KeyProviderChatGPT KeyProvider = "chatgpt"
 )
 
-type KeyGroup struct {
+type UserDefinedKey struct {
 	gorm.Model
-	Owner uint `gorm:"index"`
+	Key   string `gorm:"unique,text,index"`
+	Owner uint   `gorm:"index"`
+}
+
+type MapOriginRelation struct {
+	MapID    uint `gorm:"primaryKey"`
+	OriginID uint `gorm:primaryKey`
 }

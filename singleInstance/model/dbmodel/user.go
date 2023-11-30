@@ -1,4 +1,4 @@
-package apimodel
+package dbmodel
 
 import "gorm.io/gorm"
 

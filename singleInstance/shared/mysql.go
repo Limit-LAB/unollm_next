@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"go.limit.dev/unollm/singleInstance/model/dbmodel"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -8,7 +9,12 @@ import (
 var _db *gorm.DB
 
 func migrate() error {
-	return _db.AutoMigrate()
+	return _db.AutoMigrate(
+		&dbmodel.MapOriginRelation{},
+		&dbmodel.OriginKey{},
+		&dbmodel.UserDefinedKey{},
+		&dbmodel.User{},
+	)
 }
 
 func InitMySql() error {
