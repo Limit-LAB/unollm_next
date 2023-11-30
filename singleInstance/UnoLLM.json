@@ -1,0 +1,305 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "UnoLLM",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "UnoLLM"
+    },
+    {
+      "name": "UnoLLM//keyStore"
+    }
+  ],
+  "paths": {
+    "/keyStore/addKey": {
+      "post": {
+        "summary": "/addKey: 新增API KEY",
+        "x-apifox-folder": "UnoLLM//keyStore",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "UnoLLM//keyStore"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "provider": {
+                    "type": "string",
+                    "description": "ChatGLM | ChatGPT",
+                    "enum": [
+                      "chatglm",
+                      "chatgpt"
+                    ],
+                    "x-apifox": {
+                      "enumDescriptions": {
+                        "chatglm": "",
+                        "chatgpt": ""
+                      }
+                    }
+                  },
+                  "endpoint": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "x-apifox-orders": [
+                  "key",
+                  "provider",
+                  "endpoint"
+                ],
+                "required": [
+                  "key",
+                  "provider"
+                ],
+                "x-apifox-ignore-properties": []
+              },
+              "example": {
+                "key": "mollit cupidatat ipsum est dolor",
+                "provider": "chatglm",
+                "endpoint": "officia"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    }
+                  },
+                  "x-apifox-orders": [
+                    "id"
+                  ],
+                  "required": [
+                    "id"
+                  ],
+                  "x-apifox-ignore-properties": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/3683578/apis/api-129605374-run",
+        "security": [
+          {
+            "apikey-header-Authorization": []
+          }
+        ]
+      }
+    },
+    "/keyStore/mapTo": {
+      "post": {
+        "summary": "/mapTo: 映射APIKey到用户定义Key",
+        "x-apifox-folder": "UnoLLM//keyStore",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "UnoLLM//keyStore"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "keys": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "APIKey的ID"
+                  },
+                  "mapTo": {
+                    "type": "integer",
+                    "description": "目标Key"
+                  }
+                },
+                "x-apifox-orders": [
+                  "keys",
+                  "mapTo"
+                ],
+                "required": [
+                  "keys",
+                  "mapTo"
+                ],
+                "x-apifox-ignore-properties": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/3683578/apis/api-129605378-run",
+        "security": [
+          {
+            "apikey-header-Authorization": []
+          }
+        ]
+      }
+    },
+    "/keyStore/keys": {
+      "get": {
+        "summary": "/keys: 获取全部原始Key",
+        "x-apifox-folder": "UnoLLM//keyStore",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "UnoLLM//keyStore"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "endpoint": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "x-apifox-orders": [
+                    "id",
+                    "key",
+                    "endpoint"
+                  ],
+                  "required": [
+                    "id",
+                    "key"
+                  ],
+                  "x-apifox-ignore-properties": []
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/3683578/apis/api-129605380-run",
+        "security": [
+          {
+            "apikey-header-Authorization": []
+          }
+        ]
+      }
+    },
+    "/keyStore/newApi": {
+      "post": {
+        "summary": "/newApi: 新建用户定义的API Key",
+        "x-apifox-folder": "UnoLLM//keyStore",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "UnoLLM//keyStore"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "x-apifox-orders": [
+                  "key"
+                ],
+                "x-apifox-ignore-properties": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/3683578/apis/api-129605454-run",
+        "security": [
+          {
+            "apikey-header-Authorization": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "apikey-header-Authorization": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    }
+  },
+  "servers": []
+}
