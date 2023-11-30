@@ -40,7 +40,7 @@ func (svc *KeyStoreSvc) addKey(c *gin.Context) {
 		Provider: dbmodel.KeyProvider(req.Provider),
 		EndPoint: req.GetEndpoint(),
 	}
-	err := shared.GetDB().Create(&key).Error
+	err := shared.GetDB().Save(&key).Error
 	if err != nil {
 		c.AbortWithStatusJSON(500, gin.H{"error": err.Error()})
 		return
@@ -86,7 +86,7 @@ func (svc *KeyStoreSvc) mapTo(c *gin.Context) {
 			MapID:    uint(req.MapTo),
 		})
 	}
-	err := shared.GetDB().Create(rels).Error
+	err := shared.GetDB().Save(rels).Error
 	if err != nil {
 		c.AbortWithStatusJSON(500, gin.H{"error": err.Error()})
 		return
@@ -107,7 +107,7 @@ func (svc *KeyStoreSvc) newApi(c *gin.Context) {
 		Owner: fakeUID(),
 		Key:   key,
 	}
-	err := shared.GetDB().Create(&udk).Error
+	err := shared.GetDB().Save(&udk).Error
 	if err != nil {
 		c.AbortWithStatusJSON(500, gin.H{"error": err.Error()})
 		return
