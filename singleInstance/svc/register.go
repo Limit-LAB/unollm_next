@@ -3,7 +3,7 @@ package svc
 import "github.com/gin-gonic/gin"
 
 type Svc interface {
-	RegisterRouter(g gin.IRouter, prefix string)
+	RegisterRouter(g gin.IRouter)
 }
 
 func RegisterSvc(g gin.IRouter, svcs map[string]Svc) {
@@ -11,6 +11,7 @@ func RegisterSvc(g gin.IRouter, svcs map[string]Svc) {
 		if svc == nil {
 			continue
 		}
-		svc.RegisterRouter(g, key)
+		ng := g.Group(key)
+		svc.RegisterRouter(ng)
 	}
 }

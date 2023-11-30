@@ -4,6 +4,5 @@ import "github.com/gin-gonic/gin"
 
 type UserSvc struct{}
 
-func (svc *UserSvc) RegisterRouter(g gin.IRouter, prefix string) {
-	_ = g.Group(prefix)
+func (svc *UserSvc) RegisterRouter(g gin.IRouter) {
 }

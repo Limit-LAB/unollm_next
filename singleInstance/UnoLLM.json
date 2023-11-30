@@ -180,50 +180,65 @@
           "UnoLLM//keyStore"
         ],
         "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "integer"
-                    },
-                    "key": {
-                      "type": "string"
-                    },
-                    "endpoint": {
-                      "type": "string",
-                      "nullable": true
-                    }
-                  },
-                  "x-apifox-orders": [
-                    "id",
-                    "key",
-                    "endpoint"
-                  ],
-                  "required": [
-                    "id",
-                    "key"
-                  ],
-                  "x-apifox-ignore-properties": []
-                }
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
             "description": "成功",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object",
-                  "properties": {},
-                  "x-apifox-ignore-properties": [],
-                  "x-apifox-orders": []
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "key": {
+                        "type": "string"
+                      },
+                      "endpoint": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "provider": {
+                        "type": "string",
+                        "enum": [
+                          "chatglm",
+                          "chatgpt"
+                        ],
+                        "x-apifox": {
+                          "enumDescriptions": {
+                            "chatglm": "",
+                            "chatgpt": ""
+                          }
+                        }
+                      }
+                    },
+                    "x-apifox-orders": [
+                      "id",
+                      "key",
+                      "endpoint",
+                      "provider"
+                    ],
+                    "required": [
+                      "id",
+                      "key",
+                      "provider"
+                    ],
+                    "x-apifox-ignore-properties": []
+                  }
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": [
+                      {
+                        "id": 0,
+                        "key": "string",
+                        "endpoint": "string"
+                      }
+                    ]
+                  }
                 }
               }
             }

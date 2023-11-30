@@ -15,39 +15,41 @@ import (
 	"fmt"
 )
 
-// checks if the KeyStoreKeysGetRequestInner type satisfies the MappedNullable interface at compile time
-var _ MappedNullable = &KeyStoreKeysGetRequestInner{}
+// checks if the KeyStoreKeysGet200ResponseInner type satisfies the MappedNullable interface at compile time
+var _ MappedNullable = &KeyStoreKeysGet200ResponseInner{}
 
-// KeyStoreKeysGetRequestInner struct for KeyStoreKeysGetRequestInner
-type KeyStoreKeysGetRequestInner struct {
+// KeyStoreKeysGet200ResponseInner struct for KeyStoreKeysGet200ResponseInner
+type KeyStoreKeysGet200ResponseInner struct {
 	Id       int32          `json:"id"`
 	Key      string         `json:"key"`
 	Endpoint NullableString `json:"endpoint,omitempty"`
+	Provider string         `json:"provider"`
 }
 
-type _KeyStoreKeysGetRequestInner KeyStoreKeysGetRequestInner
+type _KeyStoreKeysGet200ResponseInner KeyStoreKeysGet200ResponseInner
 
-// NewKeyStoreKeysGetRequestInner instantiates a new KeyStoreKeysGetRequestInner object
+// NewKeyStoreKeysGet200ResponseInner instantiates a new KeyStoreKeysGet200ResponseInner object
 // This constructor will assign default values to properties that have it defined,
 // and makes sure properties required by API are set, but the set of arguments
 // will change when the set of required properties is changed
-func NewKeyStoreKeysGetRequestInner(id int32, key string) *KeyStoreKeysGetRequestInner {
-	this := KeyStoreKeysGetRequestInner{}
+func NewKeyStoreKeysGet200ResponseInner(id int32, key string, provider string) *KeyStoreKeysGet200ResponseInner {
+	this := KeyStoreKeysGet200ResponseInner{}
 	this.Id = id
 	this.Key = key
+	this.Provider = provider
 	return &this
 }
 
-// NewKeyStoreKeysGetRequestInnerWithDefaults instantiates a new KeyStoreKeysGetRequestInner object
+// NewKeyStoreKeysGet200ResponseInnerWithDefaults instantiates a new KeyStoreKeysGet200ResponseInner object
 // This constructor will only assign default values to properties that have it defined,
 // but it doesn't guarantee that properties required by API are set
-func NewKeyStoreKeysGetRequestInnerWithDefaults() *KeyStoreKeysGetRequestInner {
-	this := KeyStoreKeysGetRequestInner{}
+func NewKeyStoreKeysGet200ResponseInnerWithDefaults() *KeyStoreKeysGet200ResponseInner {
+	this := KeyStoreKeysGet200ResponseInner{}
 	return &this
 }
 
 // GetId returns the Id field value
-func (o *KeyStoreKeysGetRequestInner) GetId() int32 {
+func (o *KeyStoreKeysGet200ResponseInner) GetId() int32 {
 	if o == nil {
 		var ret int32
 		return ret
@@ -58,7 +60,7 @@ func (o *KeyStoreKeysGetRequestInner) GetId() int32 {
 
 // GetIdOk returns a tuple with the Id field value
 // and a boolean to check if the value has been set.
-func (o *KeyStoreKeysGetRequestInner) GetIdOk() (*int32, bool) {
+func (o *KeyStoreKeysGet200ResponseInner) GetIdOk() (*int32, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -66,12 +68,12 @@ func (o *KeyStoreKeysGetRequestInner) GetIdOk() (*int32, bool) {
 }
 
 // SetId sets field value
-func (o *KeyStoreKeysGetRequestInner) SetId(v int32) {
+func (o *KeyStoreKeysGet200ResponseInner) SetId(v int32) {
 	o.Id = v
 }
 
 // GetKey returns the Key field value
-func (o *KeyStoreKeysGetRequestInner) GetKey() string {
+func (o *KeyStoreKeysGet200ResponseInner) GetKey() string {
 	if o == nil {
 		var ret string
 		return ret
@@ -82,7 +84,7 @@ func (o *KeyStoreKeysGetRequestInner) GetKey() string {
 
 // GetKeyOk returns a tuple with the Key field value
 // and a boolean to check if the value has been set.
-func (o *KeyStoreKeysGetRequestInner) GetKeyOk() (*string, bool) {
+func (o *KeyStoreKeysGet200ResponseInner) GetKeyOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -90,12 +92,12 @@ func (o *KeyStoreKeysGetRequestInner) GetKeyOk() (*string, bool) {
 }
 
 // SetKey sets field value
-func (o *KeyStoreKeysGetRequestInner) SetKey(v string) {
+func (o *KeyStoreKeysGet200ResponseInner) SetKey(v string) {
 	o.Key = v
 }
 
 // GetEndpoint returns the Endpoint field value if set, zero value otherwise (both if not set or set to explicit null).
-func (o *KeyStoreKeysGetRequestInner) GetEndpoint() string {
+func (o *KeyStoreKeysGet200ResponseInner) GetEndpoint() string {
 	if o == nil || IsNil(o.Endpoint.Get()) {
 		var ret string
 		return ret
@@ -106,7 +108,7 @@ func (o *KeyStoreKeysGetRequestInner) GetEndpoint() string {
 // GetEndpointOk returns a tuple with the Endpoint field value if set, nil otherwise
 // and a boolean to check if the value has been set.
 // NOTE: If the value is an explicit nil, `nil, true` will be returned
-func (o *KeyStoreKeysGetRequestInner) GetEndpointOk() (*string, bool) {
+func (o *KeyStoreKeysGet200ResponseInner) GetEndpointOk() (*string, bool) {
 	if o == nil {
 		return nil, false
 	}
@@ -114,7 +116,7 @@ func (o *KeyStoreKeysGetRequestInner) GetEndpointOk() (*string, bool) {
 }
 
 // HasEndpoint returns a boolean if a field has been set.
-func (o *KeyStoreKeysGetRequestInner) HasEndpoint() bool {
+func (o *KeyStoreKeysGet200ResponseInner) HasEndpoint() bool {
 	if o != nil && o.Endpoint.IsSet() {
 		return true
 	}
@@ -123,21 +125,45 @@ func (o *KeyStoreKeysGetRequestInner) HasEndpoint() bool {
 }
 
 // SetEndpoint gets a reference to the given NullableString and assigns it to the Endpoint field.
-func (o *KeyStoreKeysGetRequestInner) SetEndpoint(v string) {
+func (o *KeyStoreKeysGet200ResponseInner) SetEndpoint(v string) {
 	o.Endpoint.Set(&v)
 }
 
 // SetEndpointNil sets the value for Endpoint to be an explicit nil
-func (o *KeyStoreKeysGetRequestInner) SetEndpointNil() {
+func (o *KeyStoreKeysGet200ResponseInner) SetEndpointNil() {
 	o.Endpoint.Set(nil)
 }
 
 // UnsetEndpoint ensures that no value is present for Endpoint, not even an explicit nil
-func (o *KeyStoreKeysGetRequestInner) UnsetEndpoint() {
+func (o *KeyStoreKeysGet200ResponseInner) UnsetEndpoint() {
 	o.Endpoint.Unset()
 }
 
-func (o KeyStoreKeysGetRequestInner) MarshalJSON() ([]byte, error) {
+// GetProvider returns the Provider field value
+func (o *KeyStoreKeysGet200ResponseInner) GetProvider() string {
+	if o == nil {
+		var ret string
+		return ret
+	}
+
+	return o.Provider
+}
+
+// GetProviderOk returns a tuple with the Provider field value
+// and a boolean to check if the value has been set.
+func (o *KeyStoreKeysGet200ResponseInner) GetProviderOk() (*string, bool) {
+	if o == nil {
+		return nil, false
+	}
+	return &o.Provider, true
+}
+
+// SetProvider sets field value
+func (o *KeyStoreKeysGet200ResponseInner) SetProvider(v string) {
+	o.Provider = v
+}
+
+func (o KeyStoreKeysGet200ResponseInner) MarshalJSON() ([]byte, error) {
 	toSerialize, err := o.ToMap()
 	if err != nil {
 		return []byte{}, err
@@ -145,23 +171,25 @@ func (o KeyStoreKeysGetRequestInner) MarshalJSON() ([]byte, error) {
 	return json.Marshal(toSerialize)
 }
 
-func (o KeyStoreKeysGetRequestInner) ToMap() (map[string]interface{}, error) {
+func (o KeyStoreKeysGet200ResponseInner) ToMap() (map[string]interface{}, error) {
 	toSerialize := map[string]interface{}{}
 	toSerialize["id"] = o.Id
 	toSerialize["key"] = o.Key
 	if o.Endpoint.IsSet() {
 		toSerialize["endpoint"] = o.Endpoint.Get()
 	}
+	toSerialize["provider"] = o.Provider
 	return toSerialize, nil
 }
 
-func (o *KeyStoreKeysGetRequestInner) UnmarshalJSON(bytes []byte) (err error) {
+func (o *KeyStoreKeysGet200ResponseInner) UnmarshalJSON(bytes []byte) (err error) {
 	// This validates that all required properties are included in the JSON object
 	// by unmarshalling the object into a generic map with string keys and checking
 	// that every required field exists as a key in the generic map.
 	requiredProperties := []string{
 		"id",
 		"key",
+		"provider",
 	}
 
 	allProperties := make(map[string]interface{})
@@ -178,51 +206,51 @@ func (o *KeyStoreKeysGetRequestInner) UnmarshalJSON(bytes []byte) (err error) {
 		}
 	}
 
-	varKeyStoreKeysGetRequestInner := _KeyStoreKeysGetRequestInner{}
+	varKeyStoreKeysGet200ResponseInner := _KeyStoreKeysGet200ResponseInner{}
 
-	err = json.Unmarshal(bytes, &varKeyStoreKeysGetRequestInner)
+	err = json.Unmarshal(bytes, &varKeyStoreKeysGet200ResponseInner)
 
 	if err != nil {
 		return err
 	}
 
-	*o = KeyStoreKeysGetRequestInner(varKeyStoreKeysGetRequestInner)
+	*o = KeyStoreKeysGet200ResponseInner(varKeyStoreKeysGet200ResponseInner)
 
 	return err
 }
 
-type NullableKeyStoreKeysGetRequestInner struct {
-	value *KeyStoreKeysGetRequestInner
+type NullableKeyStoreKeysGet200ResponseInner struct {
+	value *KeyStoreKeysGet200ResponseInner
 	isSet bool
 }
 
-func (v NullableKeyStoreKeysGetRequestInner) Get() *KeyStoreKeysGetRequestInner {
+func (v NullableKeyStoreKeysGet200ResponseInner) Get() *KeyStoreKeysGet200ResponseInner {
 	return v.value
 }
 
-func (v *NullableKeyStoreKeysGetRequestInner) Set(val *KeyStoreKeysGetRequestInner) {
+func (v *NullableKeyStoreKeysGet200ResponseInner) Set(val *KeyStoreKeysGet200ResponseInner) {
 	v.value = val
 	v.isSet = true
 }
 
-func (v NullableKeyStoreKeysGetRequestInner) IsSet() bool {
+func (v NullableKeyStoreKeysGet200ResponseInner) IsSet() bool {
 	return v.isSet
 }
 
-func (v *NullableKeyStoreKeysGetRequestInner) Unset() {
+func (v *NullableKeyStoreKeysGet200ResponseInner) Unset() {
 	v.value = nil
 	v.isSet = false
 }
 
-func NewNullableKeyStoreKeysGetRequestInner(val *KeyStoreKeysGetRequestInner) *NullableKeyStoreKeysGetRequestInner {
-	return &NullableKeyStoreKeysGetRequestInner{value: val, isSet: true}
+func NewNullableKeyStoreKeysGet200ResponseInner(val *KeyStoreKeysGet200ResponseInner) *NullableKeyStoreKeysGet200ResponseInner {
+	return &NullableKeyStoreKeysGet200ResponseInner{value: val, isSet: true}
 }
 
-func (v NullableKeyStoreKeysGetRequestInner) MarshalJSON() ([]byte, error) {
+func (v NullableKeyStoreKeysGet200ResponseInner) MarshalJSON() ([]byte, error) {
 	return json.Marshal(v.value)
 }
 
-func (v *NullableKeyStoreKeysGetRequestInner) UnmarshalJSON(src []byte) error {
+func (v *NullableKeyStoreKeysGet200ResponseInner) UnmarshalJSON(src []byte) error {
 	v.isSet = true
 	return json.Unmarshal(src, &v.value)
 }
