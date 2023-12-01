@@ -6,6 +6,7 @@ import (
 	"go.limit.dev/unollm/singleInstance/model/apimodel"
 	"go.limit.dev/unollm/singleInstance/model/dbmodel"
 	"go.limit.dev/unollm/singleInstance/shared"
+	"go.limit.dev/unollm/singleInstance/svc/user_call"
 	"go.limit.dev/unollm/singleInstance/utils"
 )
 
@@ -14,6 +15,8 @@ type KeyStoreSvc struct{}
 var ErrNoKey = errors.New("no key provided")
 
 func (svc *KeyStoreSvc) RegisterRouter(g gin.IRouter) {
+	g.Use(user_call.MidGetUserInfoFromUserToken)
+
 	g.POST("/addKey", svc.addKey)
 	g.POST("/mapTo", svc.mapTo)
 	g.POST("/removeMapTo", svc.delMapTo)
@@ -23,8 +26,9 @@ func (svc *KeyStoreSvc) RegisterRouter(g gin.IRouter) {
 	g.GET("/userDefinedKeys", svc.listUserDefinedKeys)
 }
 
-func fakeUID() uint {
-	return 1
+func getUidFrom(c *gin.Context) uint {
+	user := user_call.GetUserInfoFromGinCtx(c)
+	return user.ID
 }
 
 func (svc *KeyStoreSvc) addKey(c *gin.Context) {
@@ -33,7 +37,7 @@ func (svc *KeyStoreSvc) addKey(c *gin.Context) {
 		return
 	}
 
-	uid := fakeUID()
+	uid := getUidFrom(c)
 
 	key := dbmodel.OriginKey{
 		Owner:    uid,
@@ -50,7 +54,7 @@ func (svc *KeyStoreSvc) addKey(c *gin.Context) {
 }
 
 func (svc *KeyStoreSvc) getKeys(c *gin.Context) {
-	uid := fakeUID()
+	uid := getUidFrom(c)
 	var keys []dbmodel.OriginKey
 	err := shared.GetDB().Where("owner = ?", uid).Find(&keys).Error
 	if err != nil {

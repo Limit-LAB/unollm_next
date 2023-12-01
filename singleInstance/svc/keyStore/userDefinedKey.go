@@ -19,7 +19,7 @@ func (svc *KeyStoreSvc) newApi(c *gin.Context) {
 		key = uuid.NewString()
 	}
 	udk := dbmodel.UserDefinedKey{
-		Owner: fakeUID(),
+		Owner: getUidFrom(c),
 		Key:   key,
 	}
 	err := shared.GetDB().Save(&udk).Error
@@ -28,12 +28,15 @@ func (svc *KeyStoreSvc) newApi(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, apimodel.NewKeyStoreNewApiPost200Response(int32(udk.ID), key))
+	c.JSON(200, gin.H{
+		"key": udk.Key,
+		"id":  int32(udk.ID),
+	})
 
 }
 
 func (svc *KeyStoreSvc) listUserDefinedKeys(c *gin.Context) {
-	uid := fakeUID()
+	uid := getUidFrom(c)
 	var keys []dbmodel.UserDefinedKey
 	err := shared.GetDB().Where("owner = ?", uid).Find(&keys).Error
 	if err != nil {
