@@ -22,7 +22,7 @@ const (
 
 type UserDefinedKey struct {
 	gorm.Model
-	Key   string `gorm:"unique,text,index"`
+	Key   string `gorm:"unique;text;index"`
 	Owner uint   `gorm:"index"`
 }
 
