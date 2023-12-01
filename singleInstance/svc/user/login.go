@@ -37,3 +37,13 @@ func login(c *gin.Context) {
 	}
 	c.JSON(200, apimodel.UserLoginPost200Response{Token: token.Token})
 }
+
+func logout(c *gin.Context) {
+	token := c.GetHeader("Authorization")
+	err := shared.GetDB().Where("`token` = ?", token).Delete(&dbmodel.UserToken{}).Error
+	if err != nil {
+		c.AbortWithStatusJSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(200, gin.H{})
+}
