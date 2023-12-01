@@ -11,5 +11,5 @@ rm -fr ./model/apimodel
 mkdir -p ./model/apimodel
 mv -f ./tmp/model_*.go ./model/apimodel
 mv -f ./tmp/utils.go ./model/apimodel
-#rm -rf ./tmp
+rm -rf ./tmp
 go fmt ./model/...
