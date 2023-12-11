@@ -3,6 +3,7 @@ package grpcServer
 import (
 	"context"
 	"fmt"
+
 	"github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/relay"
