@@ -1,18 +1,28 @@
 package main
 
 import (
-	"go.limit.dev/unollm/grpcServer"
-	"go.limit.dev/unollm/httpHandler"
+	"context"
 	"log"
+	"log/slog"
 	"net"
 	"os"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/joho/godotenv"
+	"go.limit.dev/unollm/grpcServer"
+	"go.limit.dev/unollm/httpHandler"
 	"go.limit.dev/unollm/model"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
+
+func InterceptorLogger(l *slog.Logger) logging.Logger {
+	return logging.LoggerFunc(func(ctx context.Context, lvl logging.Level, msg string, fields ...any) {
+		l.Log(ctx, slog.Level(lvl), msg, fields...)
+	})
+}
 
 func main() {
 	// start openai style server
@@ -30,12 +40,21 @@ func main() {
 		httpHandler.RegisterRoute(g, httpHandler.RegisterOpt{
 			ChatGLMKey: zhipuaiApiKey,
 		})
-		g.Run("127.0.0.1:11451")
+		g.Run("0.0.0.0:11451")
 	}()
 
+	logger := slog.New(slog.NewTextHandler(os.Stderr, nil))
+	opts := []logging.Option{
+		logging.WithLogOnEvents(logging.StartCall, logging.FinishCall),
+	}
+
 	// start grpc server
-	svr := grpc.NewServer()
-	tcpList, err := net.Listen("tcp", "127.0.0.1:19198")
+	svr := grpc.NewServer(grpc.ChainUnaryInterceptor(
+		logging.UnaryServerInterceptor(InterceptorLogger(logger), opts...),
+	))
+
+	reflection.Register(svr)
+	tcpList, err := net.Listen("tcp", "0.0.0.0:19198")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
