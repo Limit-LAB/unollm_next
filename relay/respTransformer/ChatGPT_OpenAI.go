@@ -12,6 +12,7 @@ import (
 // ChatGPTToOpenAIChatCompletionStream ChatComplete
 func ChatGPTToOpenAIChatCompletionStream(c *gin.Context, s *openai.ChatCompletionStream) {
 	utils.SetEventStreamHeaders(c)
+	defer s.Close()
 
 	c.Stream(func(w io.Writer) bool {
 		rsp, err := s.Recv()
@@ -31,6 +32,7 @@ func ChatGPTToOpenAIChatCompletionStream(c *gin.Context, s *openai.ChatCompletio
 
 func ChatGPTToOpenAICompletionStream(c *gin.Context, s *openai.CompletionStream) {
 	utils.SetEventStreamHeaders(c)
+	defer s.Close()
 
 	c.Stream(func(w io.Writer) bool {
 		rsp, err := s.Recv()
