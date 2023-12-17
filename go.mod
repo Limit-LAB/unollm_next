@@ -4,9 +4,11 @@ go 1.21.4
 
 require (
 	github.com/KevinZonda/GoX v0.0.15
+	github.com/Limit-LAB/go-gemini v0.0.5
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/google/uuid v1.3.1
+	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1
 	github.com/joho/godotenv v1.5.1
 	github.com/sashabaranov/go-openai v1.17.8
 	golang.org/x/crypto v0.12.0
@@ -27,7 +29,6 @@ require (
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.1 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
