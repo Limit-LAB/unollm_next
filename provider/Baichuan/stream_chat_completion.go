@@ -9,7 +9,7 @@ import (
 	"go.limit.dev/unollm/utils"
 )
 
-func (c *Client) ChatCompletionStreamingRequest(body BaichuanRequestBody) (chan BaichuanStreamResponseBody, error) {
+func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (chan StreamResponse, error) {
 	reqBody, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
@@ -31,7 +31,7 @@ func (c *Client) ChatCompletionStreamingRequest(body BaichuanRequestBody) (chan 
 
 	reader := utils.NewEventStreamReader(resp.Body, 4096)
 
-	res := make(chan BaichuanStreamResponseBody)
+	res := make(chan StreamResponse)
 
 	go func() error {
 		defer resp.Body.Close()
@@ -41,7 +41,7 @@ func (c *Client) ChatCompletionStreamingRequest(body BaichuanRequestBody) (chan 
 			if textJson == "[DONE]" {
 				break
 			}
-			var jjson BaichuanStreamResponseBody
+			var jjson StreamResponse
 			_err := json.NewDecoder(strings.NewReader(textJson)).Decode(&jjson)
 			if _err != nil {
 				return _err

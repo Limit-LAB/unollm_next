@@ -8,9 +8,9 @@ import (
 )
 
 func TestChatCompletion(t *testing.T) {
-	req := BaichuanRequestBody{
+	req := ChatCompletionRequest{
 		Model: "Baichuan2",
-		Messages: []BaichuanMessage{
+		Messages: []Message{
 			{Role: "user", Content: "大家好啊"},
 		},
 		Stream:      false,
