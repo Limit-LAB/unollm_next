@@ -14,11 +14,10 @@ func (c *Client) ChatCompletion(body BaichuanRequestBody) (result BaichuanBlocki
 
 	reqBody, err := json.Marshal(body)
 	if err != nil {
-		return BaichuanBlockingResponseBody{}, err
-
+		return
 	}
 
-	req, err := http.NewRequest("POST", c.base+"/chat/completions", bytes.NewReader(reqBody))
+	req, err := http.NewRequest("POST", c.baseUrl+"/chat/completions", bytes.NewReader(reqBody))
 	if err != nil {
 		return BaichuanBlockingResponseBody{}, err
 	}
@@ -27,7 +26,7 @@ func (c *Client) ChatCompletion(body BaichuanRequestBody) (result BaichuanBlocki
 
 	resp, err := c.hc.Do(req)
 	if err != nil {
-		return BaichuanBlockingResponseBody{}, err
+		return
 
 	}
 	defer resp.Body.Close()

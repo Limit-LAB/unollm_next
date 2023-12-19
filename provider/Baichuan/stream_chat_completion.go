@@ -3,7 +3,6 @@ package Baichuan
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -17,7 +16,7 @@ func (c *Client) ChatCompletionStreamingRequest(body BaichuanRequestBody) (chan 
 
 	}
 
-	req, err := http.NewRequest("POST", c.base+"/chat/completions", bytes.NewReader(reqBody))
+	req, err := http.NewRequest("POST", c.baseUrl+"/chat/completions", bytes.NewReader(reqBody))
 	if err != nil {
 		return nil, err
 	}
@@ -34,22 +33,23 @@ func (c *Client) ChatCompletionStreamingRequest(body BaichuanRequestBody) (chan 
 
 	res := make(chan BaichuanStreamResponseBody)
 
-	go func() {
+	go func() error {
 		defer resp.Body.Close()
 		for reader.Scanner.Scan() {
 			text := reader.Scanner.Text()
-			text_json := text[6:]
-			if text_json == "[DONE]" {
+			textJson := text[6:]
+			if textJson == "[DONE]" {
 				break
 			}
 			var jjson BaichuanStreamResponseBody
-			err := json.NewDecoder(strings.NewReader(text_json)).Decode(&jjson)
-			if err != nil {
-				panic("fuck")
+			_err := json.NewDecoder(strings.NewReader(textJson)).Decode(&jjson)
+			if _err != nil {
+				return _err
 			}
-			fmt.Println(jjson)
+			// fmt.Println(jjson)
 			res <- jjson
 		}
+		return nil
 	}()
 
 	return res, nil

@@ -5,19 +5,19 @@ import (
 )
 
 type Client struct {
-	base   string
-	hc     *http.Client
-	apiKey string
+	baseUrl string
+	hc      *http.Client
+	apiKey  string
 }
 
 func NewClient(apiKey string) *Client {
 	return &Client{
-		apiKey: apiKey,
-		base:   "https://api.baichuan-ai.com/v1",
-		hc:     &http.Client{},
+		apiKey:  apiKey,
+		baseUrl: "https://api.baichuan-ai.com/v1",
+		hc:      &http.Client{},
 	}
 }
 
 func (c *Client) SetBase(base string) {
-	c.base = base
+	c.baseUrl = base
 }
