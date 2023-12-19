@@ -1,8 +1,15 @@
 package Baichuan
 
+type RoleType string
+
+const (
+	RoleUser      RoleType = "user"
+	RoleAssistant RoleType = "assistant"
+)
+
 type Message struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
+	Role    RoleType `json:"role"`
+	Content string   `json:"content"`
 }
 
 type ChatCompletionRequest struct {
@@ -16,21 +23,21 @@ type ChatCompletionRequest struct {
 }
 
 type Choice struct {
-	Finish_reason string  `json:"finish_reason"`
-	Index         int     `json:"index"`
-	Message       Message `json:"message"`
+	FinishReason string  `json:"finish_reason"`
+	Index        int     `json:"index"`
+	Message      Message `json:"message"`
 }
 
 type StreamChoice struct {
-	Finish_reason string  `json:"finish_reason"`
-	Index         int     `json:"index"`
-	Delta         Message `json:"delta"`
+	FinishReason string  `json:"finish_reason"`
+	Index        int     `json:"index"`
+	Delta        Message `json:"delta"`
 }
 
 type Usage struct {
-	Completion_tokens int `json:"completion_tokens"`
-	Prompt_tokens     int `json:"prompt_tokens"`
-	Total_tokens      int `json:"total_tokens"`
+	CompletionTokens int `json:"completion_tokens"`
+	PromptTokens     int `json:"prompt_tokens"`
+	TotalTokens      int `json:"total_tokens"`
 }
 
 type ChatCompletionResponse struct {

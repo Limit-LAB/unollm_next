@@ -28,7 +28,7 @@ func TestStream(t *testing.T) {
 		t.Fatal(err)
 	}
 	for r := range res {
-		if r.Choices[0].Finish_reason == "stop" {
+		if r.Choices[0].FinishReason == "stop" {
 			break
 		}
 		t.Log(r)
