@@ -49,7 +49,8 @@ func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (cha
 			// fmt.Println(jjson)
 			res <- jjson
 		}
-		return nil
+		res <- StreamResponse{Model: "STOP"}
+		return reader.Scanner.Err()
 	}()
 
 	return res, nil
