@@ -34,12 +34,13 @@ func (uno *UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.L
 
 	case AZURE_OPENAI_LLM_API:
 		fmt.Println("AZURE_OPENAI_LLM_API")
-		return nil, status.Errorf(codes.Unimplemented, "method BlockingRequestLLM not implemented")
+		return nil, status.Errorf(codes.Unimplemented, "platform AZURE_OPENAI_LLM_API not implemented")
 	case BAICHUAN_LLM_API:
 		fmt.Println("BAICHUAN_LLM_API")
-		return nil, status.Errorf(codes.Unimplemented, "method BlockingRequestLLM not implemented")
+		return nil, status.Errorf(codes.Unimplemented, "platform BAICHUAN_LLM_API not implemented")
 	}
-	return nil, status.Errorf(codes.Unimplemented, "method BlockingRequestLLM not implemented")
+
+	return nil, status.Errorf(codes.Unimplemented, "LLM for platform %s not implemented", info.GetLlmApiType())
 }
 
 func (uno *UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv model.UnoLLMv1_StreamRequestLLMServer) error {
