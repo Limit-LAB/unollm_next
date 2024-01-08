@@ -2,6 +2,8 @@ github.com/KevinZonda/GoX v0.0.15 h1:u+G41/srg8c6bmI6Oqw9iBwYiSQk9FKp9fv/YBZadFk
 github.com/KevinZonda/GoX v0.0.15/go.mod h1:WHV3YUyG+ou3wuUgwO4SRhMiKxLTVK5inajmtR1MUXo=
 github.com/Limit-LAB/go-gemini v0.0.5 h1:LGYgw6jKPeLFDiNanplQoNfEJRpxZaubS1G+vovqjB4=
 github.com/Limit-LAB/go-gemini v0.0.5/go.mod h1:GFozl8Ugxjni4xZgKXPXYuctHiAHpZrCbduHcW5yii4=
+github.com/Limit-LAB/go-gemini v0.0.6 h1:67YVcM1dgV0HZkZ1AKjdmxGFn2OV5g3cUvLpICmIrh4=
+github.com/Limit-LAB/go-gemini v0.0.6/go.mod h1:GFozl8Ugxjni4xZgKXPXYuctHiAHpZrCbduHcW5yii4=
 github.com/bytedance/sonic v1.5.0/go.mod h1:ED5hyg4y6t3/9Ku1R6dU/4KyJ48DZ4jPhfY1O2AihPM=
 github.com/bytedance/sonic v1.9.1 h1:6iJ6NqdoxCDr6mbY8h18oSO+cShGSMRGCEo7F2h0x8s=
 github.com/bytedance/sonic v1.9.1/go.mod h1:i736AoUSYt75HyZLoJW9ERYxcy6eaN6h4BZXU064P/U=
