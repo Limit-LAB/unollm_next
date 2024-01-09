@@ -3,7 +3,6 @@ package grpcServer
 import (
 	"context"
 	"fmt"
-
 	"go.limit.dev/unollm/model"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -58,6 +57,9 @@ func (uno *UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv mod
 	case CHATGLM_LLM_API:
 		cli := NewChatGLMClient(info)
 		return ChatGLMChatCompletionStreaming(cli, rs, sv)
+	case GEMINI_LLM_API:
+		cli := NewGeminiClient(info)
+		return GeminiChatCompletionStreaming(cli, rs, sv)
 	}
 	return status.Errorf(codes.Unimplemented, "method StreamRequestLLM not implemented")
 }

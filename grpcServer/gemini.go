@@ -6,6 +6,7 @@ import (
 	"github.com/Limit-LAB/go-gemini/models"
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/relay/reqTransformer"
+	"go.limit.dev/unollm/relay/respTransformer"
 )
 
 func GeminiChatCompletion(cli *gemini.Client, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
@@ -50,4 +51,13 @@ func geminiTokenCount(cli *gemini.Client, contents []models.Content) (*int, erro
 		return nil, fmt.Errorf("gemini count token: %w", err)
 	}
 	return &rst.TotalTokens, nil
+}
+
+func GeminiChatCompletionStreaming(cli *gemini.Client, rs *model.LLMRequestSchema, sv model.UnoLLMv1_StreamRequestLLMServer) error {
+	req := reqTransformer.GeminiGrpcChatCompletionReq(rs)
+	generateContentStream, err := cli.GenerateContentStream(models.GeminiModel(rs.GetLlmRequestInfo().Model), &req)
+	if err != nil {
+		return fmt.Errorf("gemini generate content stream: %w", err)
+	}
+	return respTransformer.GeminiToGrpcStream(generateContentStream, sv)
 }
