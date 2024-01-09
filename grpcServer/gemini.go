@@ -14,7 +14,6 @@ func GeminiChatCompletion(cli *gemini.Client, rs *model.LLMRequestSchema) (*mode
 	if err != nil {
 		return nil, fmt.Errorf("gemini generate content: %w", err)
 	}
-	fmt.Printf("%+v", generatedContent)
 	message := ""
 	for _, item := range generatedContent.Candidates[0].Content.Parts {
 		if item.Text != nil {
