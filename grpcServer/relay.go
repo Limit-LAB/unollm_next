@@ -20,6 +20,7 @@ const OPENAI_LLM_API = "openai"
 const CHATGLM_LLM_API = "chatglm"
 const AZURE_OPENAI_LLM_API = "azure_openai"
 const BAICHUAN_LLM_API = "baichuan"
+const GEMINI_LLM_API = "gemini"
 
 func (uno *UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
 	info := rs.GetLlmRequestInfo()
@@ -31,6 +32,10 @@ func (uno *UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.L
 	case CHATGLM_LLM_API:
 		cli := NewChatGLMClient(info)
 		return ChatGLMChatCompletion(cli, rs)
+
+	case GEMINI_LLM_API:
+		cli := NewGeminiClient(info)
+		return GeminiChatCompletion(cli, rs)
 
 	case AZURE_OPENAI_LLM_API:
 		fmt.Println("AZURE_OPENAI_LLM_API")
@@ -52,6 +57,9 @@ func (uno *UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv mod
 	case CHATGLM_LLM_API:
 		cli := NewChatGLMClient(info)
 		return ChatGLMChatCompletionStreaming(cli, rs, sv)
+	case GEMINI_LLM_API:
+		cli := NewGeminiClient(info)
+		return GeminiChatCompletionStreaming(cli, rs, sv)
 	}
 	return status.Errorf(codes.Unimplemented, "method StreamRequestLLM not implemented")
 }
