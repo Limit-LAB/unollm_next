@@ -21,5 +21,9 @@ func NewChatGLMClient(info *model.LLMRequestInfo) *ChatGLM.Client {
 }
 
 func NewGeminiClient(info *model.LLMRequestInfo) *gemini.Client {
-	return gemini.NewClient(info.GetToken())
+	client := gemini.NewClient(info.GetToken())
+	if info.GetUrl() != "" {
+		client.SetBaseUrl(info.GetUrl())
+	}
+	return client
 }
