@@ -1,53 +1,58 @@
 package Baichuan
 
-type BaichuanMessage struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
+type RoleType string
+
+const (
+	RoleUser      RoleType = "user"
+	RoleAssistant RoleType = "assistant"
+)
+
+type Message struct {
+	Role    RoleType `json:"role"`
+	Content string   `json:"content"`
 }
 
-type BaichuanRequestBody struct {
-	Model       string            `json:"model"`
-	Messages    []BaichuanMessage `json:"messages"`
-	Stream      bool              `json:"stream,omitempty"`
-	Temperature float32           `json:"temperature,omitempty"`
-	TopP        float32           `json:"top_p,omitempty"`
-	TopK        int               `json:"top_k,omitempty"`
-	WithSearch  bool              `json:"with_search_enhance,omitempty"`
+type ChatCompletionRequest struct {
+	Model       string    `json:"model"`
+	Messages    []Message `json:"messages"`
+	Stream      bool      `json:"stream,omitempty"`
+	Temperature float32   `json:"temperature,omitempty"`
+	TopP        float32   `json:"top_p,omitempty"`
+	TopK        int       `json:"top_k,omitempty"`
+	WithSearch  bool      `json:"with_search_enhance,omitempty"`
 }
 
-/**/
-
-type BaichuanBlockingResponseChoices struct {
-	Finish_reason string          `json:"finish_reason"`
-	Index         int             `json:"index"`
-	Message       BaichuanMessage `json:"message"`
+type Choice struct {
+	FinishReason string  `json:"finish_reason"`
+	Index        int     `json:"index"`
+	Message      Message `json:"message"`
 }
 
-type BaichuanStreamResponseChoices struct {
-	Finish_reason string          `json:"finish_reason"`
-	Index         int             `json:"index"`
-	Delta         BaichuanMessage `json:"delta"`
+type StreamChoice struct {
+	FinishReason string  `json:"finish_reason"`
+	Index        int     `json:"index"`
+	Delta        Message `json:"delta"`
 }
 
-type BaichuanResponseUsage struct {
-	Completion_tokens int `json:"completion_tokens"`
-	Prompt_tokens     int `json:"prompt_tokens"`
-	Total_tokens      int `json:"total_tokens"`
+type Usage struct {
+	CompletionTokens int `json:"completion_tokens"`
+	PromptTokens     int `json:"prompt_tokens"`
+	TotalTokens      int `json:"total_tokens"`
 }
 
-type BaichuanBlockingResponseBody struct {
-	Id      string                            `json:"id"`
-	Object  string                            `json:"object"`
-	Created int                               `json:"created"`
-	Model   string                            `json:"model"`
-	Choices []BaichuanBlockingResponseChoices `json:"choices"`
-	Usage   BaichuanResponseUsage             `json:"usage"`
+type ChatCompletionResponse struct {
+	Id      string   `json:"id"`
+	Object  string   `json:"object"`
+	Created int      `json:"created"`
+	Model   string   `json:"model"`
+	Choices []Choice `json:"choices"`
+	Usage   Usage    `json:"usage"`
 }
 
-type BaichuanStreamResponseBody struct {
-	Id      string                          `json:"id"`
-	Created int                             `json:"created"`
-	Choices []BaichuanStreamResponseChoices `json:"choices"`
-	Model   string                          `json:"model"`
-	Object  string                          `json:"object"`
+type StreamResponse struct {
+	Id      string         `json:"id"`
+	Created int            `json:"created"`
+	Choices []StreamChoice `json:"choices"`
+	Model   string         `json:"model"`
+	Object  string         `json:"object"`
 }

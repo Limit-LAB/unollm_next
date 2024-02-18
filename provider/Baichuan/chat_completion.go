@@ -10,31 +10,30 @@ import (
 
 var ErrNotSuccess = errors.New("request result not success")
 
-func (c *Client) ChatCompletion(body BaichuanRequestBody) (result BaichuanBlockingResponseBody, err error) {
+func (c *Client) ChatCompletion(body ChatCompletionRequest) (result ChatCompletionResponse, err error) {
 
 	reqBody, err := json.Marshal(body)
 	if err != nil {
-		return BaichuanBlockingResponseBody{}, err
-
+		return
 	}
 
-	req, err := http.NewRequest("POST", c.base+"/chat/completions", bytes.NewReader(reqBody))
+	req, err := http.NewRequest("POST", c.baseUrl+"/chat/completions", bytes.NewReader(reqBody))
 	if err != nil {
-		return BaichuanBlockingResponseBody{}, err
+		return ChatCompletionResponse{}, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+strings.Split(c.apiKey, ".")[0])
 
 	resp, err := c.hc.Do(req)
 	if err != nil {
-		return BaichuanBlockingResponseBody{}, err
+		return
 
 	}
 	defer resp.Body.Close()
 
 	err = json.NewDecoder(resp.Body).Decode(&result)
 	if err != nil {
-		return BaichuanBlockingResponseBody{}, err
+		return ChatCompletionResponse{}, err
 
 	}
 

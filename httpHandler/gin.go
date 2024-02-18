@@ -29,11 +29,11 @@ func RegisterRoute(r *gin.Engine, opt RegisterOpt) {
 			return
 		}
 		if strings.HasPrefix(req.Model, "chatglm") {
-			ChatGLM_ChatCompletionHandler(c, req)
+			ChatGLM_ChatCompletionHandler(c, opt.KeyTransformer, req)
 			return
 		}
 		if strings.HasPrefix(req.Model, "chatgpt") {
-			ChatGPT_ChatCompletitionsHandler(c, req)
+			ChatGPT_ChatCompletitionsHandler(c, opt.KeyTransformer, req)
 			return
 		}
 	})
@@ -44,12 +44,20 @@ func RegisterRoute(r *gin.Engine, opt RegisterOpt) {
 			internalServerError(c, err)
 			return
 		}
-		ChatGPT_CompletitionsHandler(c, req)
+		ChatGPT_CompletitionsHandler(c, opt.KeyTransformer, req)
 
 	})
 }
 
 type RegisterOpt struct {
-	ChatGLMKey string
-	ChatGPTKey string
+	ChatGLMKey     string
+	ChatGPTKey     string
+	KeyTransformer KeyTransformer
 }
+
+type KeyTransformerResult struct {
+	Key      string
+	EndPoint string
+}
+
+type KeyTransformer func(key string, provider string) (KeyTransformerResult, error)

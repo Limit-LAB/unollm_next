@@ -9,8 +9,8 @@ import (
 	"go.limit.dev/unollm/relay/respTransformer"
 )
 
-func ChatGLM_ChatCompletionHandler(c *gin.Context, req openai.ChatCompletionRequest) {
-	cli := NewChatGLMClient(c)
+func ChatGLM_ChatCompletionHandler(c *gin.Context, tx KeyTransformer,req openai.ChatCompletionRequest) {
+	cli := NewChatGLMClient(c, tx)
 	if cli == nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"error": "no api key provided",

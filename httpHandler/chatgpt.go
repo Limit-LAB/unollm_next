@@ -8,8 +8,8 @@ import (
 	"log"
 )
 
-func ChatGPT_ChatCompletitionsHandler(c *gin.Context, req openai.ChatCompletionRequest) {
-	cli := NewOpenAIClient(c)
+func ChatGPT_ChatCompletitionsHandler(c *gin.Context, tx KeyTransformer, req openai.ChatCompletionRequest) {
+	cli := NewOpenAIClient(c, tx)
 	if cli == nil {
 		c.JSON(401, gin.H{
 			"error": "no api key provided",
@@ -35,8 +35,8 @@ func ChatGPT_ChatCompletitionsHandler(c *gin.Context, req openai.ChatCompletionR
 	respTransformer.ChatGPTToOpenAIChatCompletionStream(c, rsp)
 }
 
-func ChatGPT_CompletitionsHandler(c *gin.Context, req openai.CompletionRequest) {
-	cli := NewOpenAIClient(c)
+func ChatGPT_CompletitionsHandler(c *gin.Context, tx KeyTransformer, req openai.CompletionRequest) {
+	cli := NewOpenAIClient(c, tx)
 	if cli == nil {
 		c.JSON(401, gin.H{
 			"error": "no api key provided",

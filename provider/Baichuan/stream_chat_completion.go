@@ -10,14 +10,14 @@ import (
 	"go.limit.dev/unollm/utils"
 )
 
-func (c *Client) ChatCompletionStreamingRequest(body BaichuanRequestBody) (chan BaichuanStreamResponseBody, error) {
+func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (chan StreamResponse, error) {
 	reqBody, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 
 	}
 
-	req, err := http.NewRequest("POST", c.base+"/chat/completions", bytes.NewReader(reqBody))
+	req, err := http.NewRequest("POST", c.baseUrl+"/chat/completions", bytes.NewReader(reqBody))
 	if err != nil {
 		return nil, err
 	}
@@ -32,24 +32,26 @@ func (c *Client) ChatCompletionStreamingRequest(body BaichuanRequestBody) (chan 
 
 	reader := utils.NewEventStreamReader(resp.Body, 4096)
 
-	res := make(chan BaichuanStreamResponseBody)
+	res := make(chan StreamResponse)
 
-	go func() {
+	go func() error {
 		defer resp.Body.Close()
 		for reader.Scanner.Scan() {
 			text := reader.Scanner.Text()
-			text_json := text[6:]
-			if text_json == "[DONE]" {
+			textJson := text[6:]
+			if textJson == "[DONE]" {
 				break
 			}
-			var jjson BaichuanStreamResponseBody
-			err := json.NewDecoder(strings.NewReader(text_json)).Decode(&jjson)
-			if err != nil {
-				panic("fuck")
+			var jjson StreamResponse
+			_err := json.NewDecoder(strings.NewReader(textJson)).Decode(&jjson)
+			if _err != nil {
+				return _err
 			}
 			log.Println(jjson)
 			res <- jjson
 		}
+		res <- StreamResponse{Model: "STOP"}
+		return reader.Scanner.Err()
 	}()
 
 	return res, nil

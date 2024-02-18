@@ -1,0 +1,690 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "UnoLLM",
+    "description": "",
+    "version": "1.0.0"
+  },
+  "tags": [
+    {
+      "name": "/keyStore"
+    },
+    {
+      "name": "/user"
+    }
+  ],
+  "paths": {
+    "/keyStore/addKey": {
+      "post": {
+        "summary": "/addKey: 新增API KEY",
+        "x-apifox-folder": "",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "provider": {
+                    "type": "string",
+                    "description": "ChatGLM | ChatGPT",
+                    "enum": [
+                      "chatglm",
+                      "chatgpt"
+                    ],
+                    "x-apifox": {
+                      "enumDescriptions": {
+                        "chatglm": "",
+                        "chatgpt": ""
+                      }
+                    }
+                  },
+                  "endpoint": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "x-apifox-orders": [
+                  "key",
+                  "provider",
+                  "endpoint"
+                ],
+                "required": [
+                  "key",
+                  "provider"
+                ],
+                "x-apifox-ignore-properties": []
+              },
+              "example": {
+                "key": "mollit cupidatat ipsum est dolor",
+                "provider": "chatglm",
+                "endpoint": "officia"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    }
+                  },
+                  "x-apifox-orders": [
+                    "id"
+                  ],
+                  "required": [
+                    "id"
+                  ],
+                  "x-apifox-ignore-properties": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/3683578/apis/api-129605554-run",
+        "security": []
+      }
+    },
+    "/keyStore/mapTo": {
+      "post": {
+        "summary": "/mapTo: 映射APIKey到用户定义Key",
+        "x-apifox-folder": "",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "keys": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    },
+                    "description": "APIKey的ID"
+                  },
+                  "mapTo": {
+                    "type": "integer",
+                    "description": "目标Key"
+                  }
+                },
+                "x-apifox-orders": [
+                  "keys",
+                  "mapTo"
+                ],
+                "required": [
+                  "keys",
+                  "mapTo"
+                ],
+                "x-apifox-ignore-properties": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/3683578/apis/api-129605555-run",
+        "security": []
+      }
+    },
+    "/keyStore/keys": {
+      "get": {
+        "summary": "/keys: 获取全部原始Key",
+        "x-apifox-folder": "",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "integer"
+                      },
+                      "key": {
+                        "type": "string"
+                      },
+                      "endpoint": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "provider": {
+                        "type": "string",
+                        "enum": [
+                          "chatglm",
+                          "chatgpt"
+                        ],
+                        "x-apifox": {
+                          "enumDescriptions": {
+                            "chatglm": "",
+                            "chatgpt": ""
+                          }
+                        }
+                      }
+                    },
+                    "x-apifox-orders": [
+                      "id",
+                      "key",
+                      "endpoint",
+                      "provider"
+                    ],
+                    "required": [
+                      "id",
+                      "key",
+                      "provider"
+                    ],
+                    "x-apifox-ignore-properties": []
+                  }
+                },
+                "examples": {
+                  "1": {
+                    "summary": "成功示例",
+                    "value": [
+                      {
+                        "id": 0,
+                        "key": "string",
+                        "endpoint": "string"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/3683578/apis/api-129605556-run",
+        "security": []
+      }
+    },
+    "/keyStore/newApi": {
+      "post": {
+        "summary": "/newApi: 新建用户定义的API Key",
+        "x-apifox-folder": "",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "x-apifox-orders": [
+                  "key"
+                ],
+                "x-apifox-ignore-properties": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/3683578/apis/api-129605557-run",
+        "security": []
+      }
+    },
+    "/keyStore/testTransformer": {
+      "post": {
+        "summary": "测试APIKey映射",
+        "x-apifox-folder": "/keyStore",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "/keyStore"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "provider": {
+                    "type": "string"
+                  }
+                },
+                "x-apifox-orders": [
+                  "key",
+                  "provider"
+                ],
+                "required": [
+                  "key",
+                  "provider"
+                ],
+                "x-apifox-ignore-properties": []
+              },
+              "example": {
+                "key": "94a6fe9b-3022-4405-bc16-87f88f332863",
+                "provider": "65"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "endpoint": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "key": {
+                      "type": "string"
+                    }
+                  },
+                  "x-apifox-orders": [
+                    "endpoint",
+                    "key"
+                  ],
+                  "required": [
+                    "key"
+                  ],
+                  "x-apifox-ignore-properties": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/3683578/apis/api-129605594-run",
+        "security": [
+          {
+            "apikey-header-Authorization": []
+          }
+        ]
+      }
+    },
+    "/keyStore/userDefinedKeys": {
+      "get": {
+        "summary": "获取用户定义API Key表列",
+        "x-apifox-folder": "/keyStore",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "/keyStore"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "key": {
+                        "type": "string"
+                      }
+                    },
+                    "x-apifox-orders": [
+                      "key"
+                    ],
+                    "required": [
+                      "key"
+                    ],
+                    "x-apifox-ignore-properties": []
+                  }
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/3683578/apis/api-129605601-run",
+        "security": [
+          {
+            "apikey-header-Authorization": []
+          }
+        ]
+      }
+    },
+    "/keyStore/removeMapTo": {
+      "post": {
+        "summary": "删除现有映射",
+        "x-apifox-folder": "/keyStore",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "/keyStore"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MapTo"
+              },
+              "example": {
+                "keys": [
+                  1
+                ],
+                "mapTo": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/3683578/apis/api-129605605-run",
+        "security": [
+          {
+            "apikey-header-Authorization": []
+          }
+        ]
+      }
+    },
+    "/user/create": {
+      "post": {
+        "summary": "创建用户",
+        "x-apifox-folder": "/user",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "/user"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "x-apifox-orders": [
+                  "username",
+                  "password"
+                ],
+                "required": [
+                  "username",
+                  "password"
+                ],
+                "x-apifox-ignore-properties": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {},
+                  "x-apifox-ignore-properties": [],
+                  "x-apifox-orders": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/3683578/apis/api-129605838-run",
+        "security": []
+      }
+    },
+    "/user/login": {
+      "post": {
+        "summary": "登陆",
+        "x-apifox-folder": "/user",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "/user"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "x-apifox-orders": [
+                  "username",
+                  "password"
+                ],
+                "required": [
+                  "username",
+                  "password"
+                ],
+                "x-apifox-ignore-properties": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  },
+                  "x-apifox-orders": [
+                    "token"
+                  ],
+                  "required": [
+                    "token"
+                  ],
+                  "x-apifox-ignore-properties": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/3683578/apis/api-129605839-run",
+        "security": [
+          {
+            "apikey-header-Authorization": []
+          }
+        ]
+      }
+    },
+    "/user/logout": {
+      "get": {
+        "summary": "登出",
+        "x-apifox-folder": "/user",
+        "x-apifox-status": "developing",
+        "deprecated": false,
+        "description": "",
+        "tags": [
+          "/user"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "x-apifox-orders": [
+                  "username",
+                  "password"
+                ],
+                "required": [
+                  "username",
+                  "password"
+                ],
+                "x-apifox-ignore-properties": []
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  },
+                  "x-apifox-orders": [
+                    "token"
+                  ],
+                  "required": [
+                    "token"
+                  ],
+                  "x-apifox-ignore-properties": []
+                }
+              }
+            }
+          }
+        },
+        "x-run-in-apifox": "https://apifox.com/web/project/3683578/apis/api-129605849-run",
+        "security": [
+          {
+            "apikey-header-Authorization": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MapTo": {
+        "type": "object",
+        "properties": {
+          "keys": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Key ID"
+          },
+          "mapTo": {
+            "type": "integer",
+            "title": "Key ID"
+          }
+        },
+        "x-apifox-orders": [
+          "keys",
+          "mapTo"
+        ],
+        "required": [
+          "keys",
+          "mapTo"
+        ],
+        "x-apifox-ignore-properties": [],
+        "x-apifox-folder": ""
+      }
+    },
+    "securitySchemes": {
+      "apikey-header-Authorization": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    }
+  },
+  "servers": []
+}

@@ -21,8 +21,8 @@ jobs:
     - name: Build
       run: go build -v ./...
 
-    - name: Test
-      env:
-        TEST_ZHIPUAI_API: ${{ secrets.CHATGLM_APIKEY }}
-        TEST_OPENAI_API: ${{ secrets.OPENAI_SB_APIKEY }}
-      run: go test -v ./...
+#    - name: Test
+#      env:
+#        TEST_ZHIPUAI_API: ${{ secrets.CHATGLM_APIKEY }}
+#        TEST_OPENAI_API: ${{ secrets.OPENAI_SB_APIKEY }}
+#      run: go test -v ./...

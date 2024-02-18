@@ -8,9 +8,9 @@ import (
 )
 
 func TestStream(t *testing.T) {
-	req := BaichuanRequestBody{
+	req := ChatCompletionRequest{
 		Model: "Baichuan2",
-		Messages: []BaichuanMessage{
+		Messages: []Message{
 			{Role: "user", Content: "明天下大雨，我该不该打伞？"},
 		},
 		Stream:      true,
@@ -28,7 +28,7 @@ func TestStream(t *testing.T) {
 		t.Fatal(err)
 	}
 	for r := range res {
-		if r.Choices[0].Finish_reason == "stop" {
+		if r.Choices[0].FinishReason == "stop" {
 			break
 		}
 		t.Log(r)

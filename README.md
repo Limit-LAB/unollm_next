@@ -1,7 +1,9 @@
 # UnoLLM
 
-one API rule them all
+UnoLLM is a general LLM API conversion tool designed for Limit-LAB.
 
-## Grpc
-
-## OpenAI style http
+We currently support the following APIs:
+- OpenAI ChatGPT
+- Google Gemini
+- BaiChuan
+- ChatGLM (Zhipu AI)

@@ -13,3 +13,6 @@ out/
 *.dll
 *.so
 *.dylib
+
+config.json
+unollm

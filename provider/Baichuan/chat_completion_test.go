@@ -7,10 +7,10 @@ import (
 	"github.com/joho/godotenv"
 )
 
-func Test(t *testing.T) {
-	req := BaichuanRequestBody{
+func TestChatCompletion(t *testing.T) {
+	req := ChatCompletionRequest{
 		Model: "Baichuan2",
-		Messages: []BaichuanMessage{
+		Messages: []Message{
 			{Role: "user", Content: "大家好啊"},
 		},
 		Stream:      false,
