@@ -3,36 +3,21 @@ package ChatGLM
 import (
 	"bytes"
 	"encoding/json"
-	"go.limit.dev/unollm/utils"
+	"log"
 	"net/http"
 	"strings"
+
+	"go.limit.dev/unollm/utils"
 )
 
-type ChatCompletionStreamResponse struct {
-	OnRecvData chan string
-	OnFinish   chan ChatCompletionStreamFinish
+type ChatCompletionStreamingResponse struct {
+	ResponseChannle    chan ChatCompletionStreamResponse
+	FinishUsageChannle chan Usage
 }
 
-func (e *ChatCompletionStreamResponse) Close() {
-	if e == nil {
-		return
-	}
-	if e.OnRecvData != nil {
-		safeClose[string](e.OnRecvData)
-	}
-	if e.OnFinish != nil {
-		safeClose[ChatCompletionStreamFinish](e.OnFinish)
-	}
-}
+func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (*ChatCompletionStreamingResponse, error) {
+	body.Stream = true
 
-func safeClose[T any](ch chan T) {
-	defer func() { recover() }()
-	if ch != nil {
-		close(ch)
-	}
-}
-
-func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest, modelName string) (*ChatCompletionStreamResponse, error) {
 	token, err := utils.CreateJWTToken(c.apiKey, jwtExpire)
 	if err != nil {
 		return nil, err
@@ -43,7 +28,7 @@ func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest, mode
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", c.base+modelName+"/sse-invoke", bytes.NewReader(reqBody))
+	req, err := http.NewRequest("POST", c.base, bytes.NewReader(reqBody))
 	if err != nil {
 		return nil, err
 	}
@@ -59,23 +44,38 @@ func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest, mode
 
 	reader := utils.NewEventStreamReader(resp.Body, 4096)
 
-	llmCh := make(chan string)
-	resultCh := make(chan ChatCompletionStreamFinish, 1)
+	llmCh := make(chan ChatCompletionStreamResponse)
+	resultCh := make(chan Usage, 1)
 
 	go func() {
 		defer resp.Body.Close()
 		for reader.Scanner.Scan() {
 			kv := strings.Split(reader.Scanner.Text(), "\n")
-			switch kv[0] {
-			case "event:add":
-				llmCh <- kv[2][5:]
-			case "event:finish":
-				var usage ChatCompletionStreamFinish
-				json.NewDecoder(strings.NewReader(kv[3][5:])).Decode(&usage)
-				resultCh <- usage
+			if kv[0] == "data: [DONE]" {
+				break
+			}
+			if kv[0][0:6] != "data: " {
+				log.Println(kv[0])
+				resultCh <- Usage{}
+				return
+			}
+			json_string := kv[0][6:]
+			var result ChatCompletionStreamResponse
+			err := json.Unmarshal([]byte(json_string), &result)
+			if err != nil {
+				log.Println(err)
+				resultCh <- Usage{}
+				return
+			}
+			llmCh <- result
+			if result.Choices[0].FinishReason != "" {
+				resultCh <- result.Usage
 			}
 		}
 	}()
 
-	return &ChatCompletionStreamResponse{OnRecvData: llmCh, OnFinish: resultCh}, nil
+	return &ChatCompletionStreamingResponse{
+		ResponseChannle:    llmCh,
+		FinishUsageChannle: resultCh,
+	}, nil
 }

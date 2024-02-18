@@ -10,22 +10,12 @@ func ChatGLMGrpcChatCompletionReq(rs *model.LLMRequestSchema) ChatGLM.ChatComple
 	info := rs.GetLlmRequestInfo()
 	messages := rs.GetMessages()
 	req := ChatGLM.ChatCompletionRequest{
+		Model:       info.GetModel(),
 		Temperature: float32(info.GetTemperature()),
 		TopP:        float32(info.GetTopP()),
 	}
 	for _, m := range messages {
-		if m.GetRole() == "system" {
-			req.Prompt = append(req.Prompt, ChatGLM.ChatCompletionMessage{
-				Role:    ChatGLM.ChatMessageRoleUser,
-				Content: m.GetContent(),
-			})
-			req.Prompt = append(req.Prompt, ChatGLM.ChatCompletionMessage{
-				Role:    ChatGLM.ChatMessageRoleAssistant,
-				Content: "好的，我明白了。",
-			})
-			continue
-		}
-		req.Prompt = append(req.Prompt, ChatGLM.ChatCompletionMessage{
+		req.Messages = append(req.Messages, ChatGLM.ChatCompletionMessage{
 			Role:    m.GetRole(),
 			Content: m.GetContent(),
 		})
@@ -35,13 +25,13 @@ func ChatGLMGrpcChatCompletionReq(rs *model.LLMRequestSchema) ChatGLM.ChatComple
 
 func ChatGLMFromOpenAIChatCompletionReq(req openai.ChatCompletionRequest) ChatGLM.ChatCompletionRequest {
 	zpReq := ChatGLM.ChatCompletionRequest{
+		Model:       req.Model,
 		Temperature: req.Temperature,
 		TopP:        req.TopP,
-		Incremental: req.Stream,
 	}
 
 	for _, m := range req.Messages {
-		zpReq.Prompt = append(zpReq.Prompt, ChatGLM.ChatCompletionMessage{
+		zpReq.Messages = append(zpReq.Messages, ChatGLM.ChatCompletionMessage{
 			Role:    m.Role,
 			Content: m.Content,
 		})

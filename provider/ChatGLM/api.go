@@ -8,13 +8,9 @@ const (
 	ChatMessageRoleUser      = "user"
 	ChatMessageRoleAssistant = "assistant"
 
-	// Deprecated
-	// ModelChatGLMPro  = "chatglm_pro"
-	// ModelChatGLMStd  = "chatglm_std"
-	// ModelChatGLMLite = "chatglm_lite"
-
-	ModelTurbo   = "chatglm_turbo"
-	CharacterGLM = "characterglm"
+	ModelTurbo = "glm-3-turbo"
+	ModelGLM4  = "glm-4"
+	ModelGLM4V = "glm-4v"
 )
 
 type ChatCompletionMessage struct {
@@ -27,43 +23,38 @@ type ChatCompletionRef struct {
 	SearchQuery string `json:"search_query"`
 }
 
-type CharacterGLMMeta struct {
-	// 用户信息
-	UserInfo string
-	// 角色信息
-	BotInfo string
-	// 角色名称
-	BotName string
-	// 用户名称
-	UserName string
-}
-
 // ChatCompletionRequest represents a request structure for chat completion API.
 type ChatCompletionRequest struct {
-	Prompt      []ChatCompletionMessage `json:"prompt"`
+	Model       string                  `json:"model"`
+	Messages    []ChatCompletionMessage `json:"messages"`
 	Temperature float32                 `json:"temperature,omitempty"`
 	TopP        float32                 `json:"top_p,omitempty"`
-	RequestId   string                  `json:"request_id"`
-	Meta        CharacterGLMMeta        `json:"meta"`
-	// in SSE mode, incremental means whether to return incremental result or add to previous result
-	Incremental bool              `json:"incremental"`
-	ReturnType  string            `json:"return_type,omitempty"`
-	Ref         ChatCompletionRef `json:"ref"`
+	MaxTokens   int                     `json:"max_tokens,omitempty"`
+	RequestId   string                  `json:"request_id,omitempty"`
+	Stream      bool                    `json:"stream,omitempty"`
+	Stop        bool                    `json:"stop,omitempty"`
 }
 
 // ChatCompletionResponse represents a response structure for chat completion API.
 type ChatCompletionResponse struct {
-	Event string                      `json:"event"`
-	Data  *ChatCompletionResponseData `json:"data"`
-
-	ErrorCode int    `json:"code"`
-	ErrorMsg  string `json:"msg"`
-	Success   bool   `json:"success"`
+	Id      string                 `json:"id"`
+	Created int64                  `json:"created"`
+	Model   string                 `json:"model,omitempty"`
+	Choices []ChatCompletionChoice `json:"choices"`
+	Usage   Usage                  `json:"usage"`
 }
 
-type ChatCompletionStreamFinish struct {
-	Event string `json:"event"`
-	Usage Usage  `json:"usage"`
+type ChatCompletionStreamResponse struct {
+	Id      string                          `json:"id"`
+	Model   string                          `json:"model"`
+	Choices []ChatCompletionStreamingChoice `json:"choices"`
+	Usage   Usage                           `json:"usage,omitempty"`
+}
+
+type ChatCompletionStreamingChoice struct {
+	Index        int                   `json:"index"`
+	Delta        ChatCompletionMessage `json:"delta"`
+	FinishReason string                `json:"finish_reason,omitempty"`
 }
 
 type ChatCompletionResponseData struct {
@@ -73,8 +64,9 @@ type ChatCompletionResponseData struct {
 }
 
 type ChatCompletionChoice struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
+	FinishReason string                `json:"finish_reason,omitempty"`
+	Index        int                   `json:"index"`
+	Message      ChatCompletionMessage `json:"message"`
 }
 
 type Usage struct {

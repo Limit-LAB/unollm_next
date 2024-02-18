@@ -13,8 +13,9 @@ type Client struct {
 func NewClient(apiKey string) *Client {
 	return &Client{
 		apiKey: apiKey,
-		base:   "https://open.bigmodel.cn/api/paas/v3/model-api/",
-		hc:     &http.Client{},
+		// base:   "https://open.bigmodel.cn/api/paas/v3/model-api/",
+		base: "https://open.bigmodel.cn/api/paas/v4/chat/completions/",
+		hc:   &http.Client{},
 	}
 }
 

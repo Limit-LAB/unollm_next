@@ -2,7 +2,8 @@ package grpcServer
 
 import (
 	"context"
-	"fmt"
+	"log"
+
 	"go.limit.dev/unollm/model"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -33,10 +34,10 @@ func (uno *UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.L
 		return ChatGLMChatCompletion(cli, rs)
 
 	case AZURE_OPENAI_LLM_API:
-		fmt.Println("AZURE_OPENAI_LLM_API")
+		log.Println("AZURE_OPENAI_LLM_API")
 		return nil, status.Errorf(codes.Unimplemented, "method BlockingRequestLLM not implemented")
 	case BAICHUAN_LLM_API:
-		fmt.Println("BAICHUAN_LLM_API")
+		log.Println("BAICHUAN_LLM_API")
 		return nil, status.Errorf(codes.Unimplemented, "method BlockingRequestLLM not implemented")
 	}
 	return nil, status.Errorf(codes.Unimplemented, "method BlockingRequestLLM not implemented")

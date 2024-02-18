@@ -2,9 +2,11 @@ package grpcServer_test
 
 import (
 	"context"
-	"go.limit.dev/unollm/grpcServer"
+	"log"
 	"os"
 	"testing"
+
+	"go.limit.dev/unollm/grpcServer"
 
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/utils"
@@ -53,7 +55,7 @@ func TestChatGLM(t *testing.T) {
 	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
 	req_info := model.LLMRequestInfo{
 		LlmApiType:  grpcServer.CHATGLM_LLM_API,
-		Model:       "chatglm_turbo",
+		Model:       "glm-3-turbo",
 		Temperature: 0.9,
 		TopP:        0.9,
 		TopK:        1,
@@ -69,7 +71,7 @@ func TestChatGLM(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	t.Log("res: ", res)
+	log.Println("res: ", res)
 }
 
 func TestChatGLMStreaming(t *testing.T) {
@@ -83,7 +85,7 @@ func TestChatGLMStreaming(t *testing.T) {
 	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
 	req_info := model.LLMRequestInfo{
 		LlmApiType:  grpcServer.CHATGLM_LLM_API,
-		Model:       "chatglm_turbo",
+		Model:       "glm-3-turbo",
 		Temperature: 0.9,
 		TopP:        0.9,
 		TopK:        1,
@@ -104,9 +106,9 @@ func TestChatGLMStreaming(t *testing.T) {
 	}
 	for {
 		res := <-mockServerPipe.Stream
-		t.Log(res)
+		log.Println(res)
 		if res.LlmTokenCount != nil {
-			t.Log(res.LlmTokenCount)
+			log.Println(res.LlmTokenCount)
 			return
 		}
 	}

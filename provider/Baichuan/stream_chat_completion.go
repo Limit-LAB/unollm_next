@@ -3,7 +3,7 @@ package Baichuan
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 	"strings"
 
@@ -47,7 +47,7 @@ func (c *Client) ChatCompletionStreamingRequest(body BaichuanRequestBody) (chan 
 			if err != nil {
 				panic("fuck")
 			}
-			fmt.Println(jjson)
+			log.Println(jjson)
 			res <- jjson
 		}
 	}()
