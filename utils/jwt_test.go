@@ -14,7 +14,7 @@ func TestJWT(t *testing.T) {
 
 	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
 	body := ChatGLM.ChatCompletionRequest{
-		Model: ChatGLM.ModelTurbo,
+		Model: ChatGLM.ModelGLM3Turbo,
 		Messages: []ChatGLM.ChatCompletionMessage{
 			{
 				Role:    "user",
@@ -30,9 +30,9 @@ func TestJWT(t *testing.T) {
 	}
 	for {
 		select {
-		case chunk := <-res.ResponseChannle:
+		case chunk := <-res.ResponseCh:
 			log.Print(chunk.Choices[0].Delta.Content)
-		case result := <-res.FinishUsageChannle:
+		case result := <-res.FinishCh:
 			log.Print(result)
 			goto END
 		}

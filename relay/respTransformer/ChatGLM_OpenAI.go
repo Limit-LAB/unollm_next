@@ -2,28 +2,47 @@ package respTransformer
 
 import (
 	"encoding/json"
-	"io"
-	"time"
-
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/provider/ChatGLM"
 	"go.limit.dev/unollm/utils"
+	"io"
 )
 
-func ChatGLMToOpenAICompletion(res ChatGLM.ChatCompletionResponse) openai.ChatCompletionResponse {
-	content := res.Choices[0].Message.Content
-	return openai.ChatCompletionResponse{
-		ID: res.Id,
-		Choices: []openai.ChatCompletionChoice{
-			{
-				Index: 0,
-				Message: openai.ChatCompletionMessage{
-					Role:    res.Choices[0].Message.Role,
-					Content: content,
-				},
+func chatGlmChoicesToOpenAIChoices(choices []ChatGLM.ChatCompletionChoice) []openai.ChatCompletionChoice {
+	var openAIChoices []openai.ChatCompletionChoice
+	for _, choice := range choices {
+		openAIChoices = append(openAIChoices, openai.ChatCompletionChoice{
+			Index: choice.Index,
+			Message: openai.ChatCompletionMessage{
+				Role:    choice.Message.Role,
+				Content: choice.Message.Content,
 			},
-		},
+		})
+	}
+	return openAIChoices
+
+}
+
+func chatGlmDeltaChoicesToOpenAIChoices(choices []ChatGLM.ChatCompletionStreamingChoice) []openai.ChatCompletionStreamChoice {
+	var openAIChoices []openai.ChatCompletionStreamChoice
+	for _, choice := range choices {
+		openAIChoices = append(openAIChoices, openai.ChatCompletionStreamChoice{
+			Index: choice.Index,
+			Delta: openai.ChatCompletionStreamChoiceDelta{
+				Content: choice.Delta.Content,
+				Role:    choice.Delta.Role,
+			},
+		})
+	}
+	return openAIChoices
+
+}
+
+func ChatGLMToOpenAICompletion(res ChatGLM.ChatCompletionResponse) openai.ChatCompletionResponse {
+	return openai.ChatCompletionResponse{
+		ID:      res.Id,
+		Choices: chatGlmChoicesToOpenAIChoices(res.Choices),
 		Usage: openai.Usage{
 			PromptTokens:     res.Usage.PromptTokens,
 			TotalTokens:      res.Usage.TotalTokens,
@@ -33,7 +52,7 @@ func ChatGLMToOpenAICompletion(res ChatGLM.ChatCompletionResponse) openai.ChatCo
 }
 
 func ChatGLMToOpenAIStream(c *gin.Context, _r *ChatGLM.ChatCompletionStreamingResponse) {
-	llm, result := _r.ResponseChannle, _r.FinishUsageChannle
+	llm, result := _r.ResponseCh, _r.FinishCh
 	utils.SetEventStreamHeaders(c)
 	c.Stream(func(w io.Writer) bool {
 		select {
@@ -41,14 +60,8 @@ func ChatGLMToOpenAIStream(c *gin.Context, _r *ChatGLM.ChatCompletionStreamingRe
 			response := openai.ChatCompletionStreamResponse{
 				Object:  "chat.completion.chunk",
 				Model:   data.Model,
-				Created: time.Now().Unix(),
-				Choices: []openai.ChatCompletionStreamChoice{
-					{
-						Delta: openai.ChatCompletionStreamChoiceDelta{
-							Content: data.Choices[0].Delta.Content,
-						},
-					},
-				},
+				Created: data.Created,
+				Choices: chatGlmDeltaChoicesToOpenAIChoices(data.Choices),
 			}
 			jsonResponse, _ := json.Marshal(response)
 			c.Render(-1, utils.CustomEvent{Data: "data: " + string(jsonResponse)})

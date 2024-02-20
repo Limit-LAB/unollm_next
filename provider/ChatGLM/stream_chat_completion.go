@@ -9,8 +9,8 @@ import (
 )
 
 type ChatCompletionStreamingResponse struct {
-	ResponseChannle    chan ChatCompletionStreamResponse
-	FinishUsageChannle chan Usage
+	ResponseCh chan ChatCompletionStreamResponse
+	FinishCh   chan Usage
 }
 
 func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (*ChatCompletionStreamingResponse, error) {
@@ -29,8 +29,8 @@ func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (*Ch
 
 	reader := utils.NewEventStreamReader(resp.Body, 4096)
 
-	llmCh := make(chan ChatCompletionStreamResponse, c.RespBuf)
-	resultCh := make(chan Usage, 1)
+	respCh := make(chan ChatCompletionStreamResponse, c.RespBuf)
+	finishCh := make(chan Usage, 1)
 
 	go func() {
 		defer resp.Body.Close()
@@ -41,26 +41,26 @@ func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (*Ch
 			}
 			if kv[0][0:6] != "data: " {
 				log.Println(kv[0])
-				resultCh <- Usage{}
+				finishCh <- Usage{}
 				return
 			}
-			json_string := kv[0][6:]
+			jsonString := kv[0][6:]
 			var result ChatCompletionStreamResponse
-			err = json.Unmarshal([]byte(json_string), &result)
+			err = json.Unmarshal([]byte(jsonString), &result)
 			if err != nil {
 				log.Println(err)
-				resultCh <- Usage{}
+				finishCh <- Usage{}
 				return
 			}
-			llmCh <- result
-			if result.Choices[0].FinishReason != "" {
-				resultCh <- result.Usage
+			respCh <- result
+			if result.Choices[0].FinishReason != FinishReasonNone {
+				finishCh <- result.Usage
 			}
 		}
 	}()
 
 	return &ChatCompletionStreamingResponse{
-		ResponseChannle:    llmCh,
-		FinishUsageChannle: resultCh,
+		ResponseCh: respCh,
+		FinishCh:   finishCh,
 	}, nil
 }

@@ -2,6 +2,7 @@ package grpcServer_test
 
 import (
 	"context"
+	"go.limit.dev/unollm/provider/ChatGLM"
 	"log"
 	"os"
 	"testing"
@@ -55,7 +56,7 @@ func TestChatGLM(t *testing.T) {
 	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
 	req_info := model.LLMRequestInfo{
 		LlmApiType:  grpcServer.CHATGLM_LLM_API,
-		Model:       "glm-3-turbo",
+		Model:       ChatGLM.ModelGLM3Turbo,
 		Temperature: 0.9,
 		TopP:        0.9,
 		TopK:        1,
@@ -85,7 +86,7 @@ func TestChatGLMStreaming(t *testing.T) {
 	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
 	req_info := model.LLMRequestInfo{
 		LlmApiType:  grpcServer.CHATGLM_LLM_API,
-		Model:       "glm-3-turbo",
+		Model:       ChatGLM.ModelGLM3Turbo,
 		Temperature: 0.9,
 		TopP:        0.9,
 		TopK:        1,

@@ -5,9 +5,9 @@ import (
 )
 
 const (
-	ModelTurbo = "glm-3-turbo"
-	ModelGLM4  = "glm-4"
-	ModelGLM4V = "glm-4v"
+	ModelGLM3Turbo = "glm-3-turbo"
+	ModelGLM4      = "glm-4"
+	ModelGLM4V     = "glm-4v"
 )
 
 type ChatCompletionMessage struct {
@@ -24,12 +24,15 @@ type ChatCompletionRef struct {
 type ChatCompletionRequest struct {
 	Model       string                  `json:"model"`
 	Messages    []ChatCompletionMessage `json:"messages"`
+	DoSample    bool                    `json:"do_sample,omitempty"`
 	Temperature float32                 `json:"temperature,omitempty"`
 	TopP        float32                 `json:"top_p,omitempty"`
 	MaxTokens   int                     `json:"max_tokens,omitempty"`
 	RequestId   string                  `json:"request_id,omitempty"`
 	Stream      bool                    `json:"stream,omitempty"`
-	Stop        bool                    `json:"stop,omitempty"`
+	Stop        []string                `json:"stop,omitempty"`
+	Tools       []any                   `json:"tools,omitempty"`       // TODO: add tools
+	ToolChoice  any                     `json:"tool_choice,omitempty"` // TODO: add tool choice
 }
 
 // ChatCompletionResponse represents a response structure for chat completion API.
@@ -43,6 +46,7 @@ type ChatCompletionResponse struct {
 
 type ChatCompletionStreamResponse struct {
 	Id      string                          `json:"id"`
+	Created int64                           `json:"created"`
 	Model   string                          `json:"model"`
 	Choices []ChatCompletionStreamingChoice `json:"choices"`
 	Usage   Usage                           `json:"usage,omitempty"`
@@ -51,7 +55,7 @@ type ChatCompletionStreamResponse struct {
 type ChatCompletionStreamingChoice struct {
 	Index        int                   `json:"index"`
 	Delta        ChatCompletionMessage `json:"delta"`
-	FinishReason string                `json:"finish_reason,omitempty"`
+	FinishReason FinishReason          `json:"finish_reason,omitempty"`
 }
 
 type ChatCompletionResponseData struct {
@@ -65,6 +69,16 @@ type ChatCompletionChoice struct {
 	Index        int                   `json:"index"`
 	Message      ChatCompletionMessage `json:"message"`
 }
+
+type FinishReason string
+
+const (
+	FinishReasonMaxTokens FinishReason = "max_tokens"
+	FinishReasonNone      FinishReason = ""
+	FinishReasonStop      FinishReason = "stop"
+	FinishReasonLength    FinishReason = "length"
+	FinishReasonToolCalls FinishReason = "tool_calls"
+)
 
 type Usage struct {
 	PromptTokens     int `json:"prompt_tokens"`

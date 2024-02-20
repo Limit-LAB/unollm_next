@@ -28,6 +28,7 @@ func ChatGLMFromOpenAIChatCompletionReq(req openai.ChatCompletionRequest) ChatGL
 		Model:       req.Model,
 		Temperature: req.Temperature,
 		TopP:        req.TopP,
+		Stop:        req.Stop,
 	}
 
 	for _, m := range req.Messages {

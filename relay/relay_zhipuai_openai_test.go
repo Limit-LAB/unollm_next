@@ -63,7 +63,7 @@ func TestZhipuChatCompletionStream(t *testing.T) {
 	client := openai.NewClientWithConfig(config)
 	resp, err := client.CreateChatCompletionStream(context.Background(),
 		openai.ChatCompletionRequest{
-			Model: ChatGLM.ModelTurbo,
+			Model: ChatGLM.ModelGLM3Turbo,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    "user",

@@ -43,7 +43,7 @@ func BaiChuanToOpenAIStream(c *gin.Context, _r chan Baichuan.StreamResponse) err
 			}
 			response := openai.ChatCompletionStreamResponse{
 				Object:  "chat.completion.chunk",
-				Model:   ChatGLM.ModelTurbo,
+				Model:   ChatGLM.ModelGLM3Turbo,
 				Created: time.Now().Unix(),
 				Choices: []openai.ChatCompletionStreamChoice{
 					{
