@@ -42,8 +42,8 @@ func (uno *UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.L
 		log.Println("AZURE_OPENAI_LLM_API")
 		return nil, status.Errorf(codes.Unimplemented, "method BlockingRequestLLM not implemented")
 	case BAICHUAN_LLM_API:
-		log.Println("BAICHUAN_LLM_API")
-		return nil, status.Errorf(codes.Unimplemented, "method BlockingRequestLLM not implemented")
+		cli := NewBaichuanClient(info)
+		return BaichuanChatCompletion(cli, rs)
 	}
 
 	return nil, status.Errorf(codes.Unimplemented, "LLM for platform %s not implemented", info.GetLlmApiType())
@@ -61,6 +61,9 @@ func (uno *UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv mod
 	case GEMINI_LLM_API:
 		cli := NewGeminiClient(info)
 		return GeminiChatCompletionStreaming(cli, rs, sv)
+	case BAICHUAN_LLM_API:
+		cli := NewBaichuanClient(info)
+		return BaichuanChatCompletionStream(cli, rs, sv)
 	}
 	return status.Errorf(codes.Unimplemented, "method StreamRequestLLM not implemented")
 }
