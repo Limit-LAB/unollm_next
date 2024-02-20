@@ -1,10 +1,8 @@
 package ChatGLM
 
 import (
-	"bytes"
 	"encoding/json"
 	"log"
-	"net/http"
 	"strings"
 
 	"go.limit.dev/unollm/utils"
@@ -18,23 +16,10 @@ type ChatCompletionStreamingResponse struct {
 func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (*ChatCompletionStreamingResponse, error) {
 	body.Stream = true
 
-	token, err := utils.CreateJWTToken(c.apiKey, jwtExpire)
+	req, err := c.createRequest(body)
 	if err != nil {
 		return nil, err
 	}
-
-	reqBody, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", c.base, bytes.NewReader(reqBody))
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", token)
-	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "text/event-stream")
 
 	resp, err := c.hc.Do(req)
@@ -44,7 +29,7 @@ func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (*Ch
 
 	reader := utils.NewEventStreamReader(resp.Body, 4096)
 
-	llmCh := make(chan ChatCompletionStreamResponse)
+	llmCh := make(chan ChatCompletionStreamResponse, c.RespBuf)
 	resultCh := make(chan Usage, 1)
 
 	go func() {
@@ -61,7 +46,7 @@ func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (*Ch
 			}
 			json_string := kv[0][6:]
 			var result ChatCompletionStreamResponse
-			err := json.Unmarshal([]byte(json_string), &result)
+			err = json.Unmarshal([]byte(json_string), &result)
 			if err != nil {
 				log.Println(err)
 				resultCh <- Usage{}

@@ -5,9 +5,6 @@ import (
 )
 
 const (
-	ChatMessageRoleUser      = "user"
-	ChatMessageRoleAssistant = "assistant"
-
 	ModelTurbo = "glm-3-turbo"
 	ModelGLM4  = "glm-4"
 	ModelGLM4V = "glm-4v"
