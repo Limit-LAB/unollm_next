@@ -3,16 +3,17 @@ package relay_test
 import (
 	"context"
 	"errors"
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-	"github.com/sashabaranov/go-openai"
-	"go.limit.dev/unollm/provider/ChatGLM"
-	"go.limit.dev/unollm/relay/respTransformer"
 	"io"
 	"log"
 	"os"
 	"testing"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	"github.com/sashabaranov/go-openai"
+	"go.limit.dev/unollm/provider/ChatGLM"
+	"go.limit.dev/unollm/relay/respTransformer"
 )
 
 func mockServer() *gin.Engine {
@@ -29,18 +30,18 @@ func mockServer() *gin.Engine {
 		cli := ChatGLM.NewClient(zhipuaiApiKey)
 
 		zpReq := ChatGLM.ChatCompletionRequest{
+			Model:       req.Model,
 			Temperature: req.Temperature,
 			TopP:        req.TopP,
-			Incremental: true,
 		}
 
 		for _, m := range req.Messages {
-			zpReq.Prompt = append(zpReq.Prompt, ChatGLM.ChatCompletionMessage{
+			zpReq.Messages = append(zpReq.Messages, ChatGLM.ChatCompletionMessage{
 				Role:    m.Role,
 				Content: m.Content,
 			})
 		}
-		_r, err := cli.ChatCompletionStreamingRequest(zpReq, req.Model)
+		_r, err := cli.ChatCompletionStreamingRequest(zpReq)
 		if err != nil {
 			log.Println(err)
 			return
@@ -62,19 +63,11 @@ func TestZhipuChatCompletionStream(t *testing.T) {
 	client := openai.NewClientWithConfig(config)
 	resp, err := client.CreateChatCompletionStream(context.Background(),
 		openai.ChatCompletionRequest{
-			Model: ChatGLM.ModelTurbo,
+			Model: ChatGLM.ModelGLM3Turbo,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    "user",
 					Content: "假如今天下大雨，我是否需要带伞？",
-				},
-				{
-					Role:    "assistant",
-					Content: "需要",
-				},
-				{
-					Role:    "user",
-					Content: "1+1=?",
 				},
 			},
 		})
@@ -90,6 +83,6 @@ func TestZhipuChatCompletionStream(t *testing.T) {
 			t.Error(e)
 			break
 		}
-		t.Log(cv)
+		log.Println(cv.Choices[0].Delta.Content)
 	}
 }

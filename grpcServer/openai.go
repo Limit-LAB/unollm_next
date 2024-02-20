@@ -2,7 +2,7 @@ package grpcServer
 
 import (
 	"context"
-	"fmt"
+	"log"
 
 	"github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/model"
@@ -14,7 +14,7 @@ import (
 )
 
 func OpenAIChatCompletion(cli *openai.Client, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
-	fmt.Println("OPENAI_LLM_API")
+	log.Println("OPENAI_LLM_API")
 	req := reqTransformer.ChatGPTGrpcChatCompletionReq(rs)
 	resp, err := relay.OpenAIChatCompletionRequest(
 		cli,
@@ -27,7 +27,7 @@ func OpenAIChatCompletion(cli *openai.Client, rs *model.LLMRequestSchema) (*mode
 }
 
 func OpenAIChatCompletionStreaming(cli *openai.Client, rs *model.LLMRequestSchema, sv model.UnoLLMv1_StreamRequestLLMServer) error {
-	fmt.Println("OPENAI_LLM_API")
+	log.Println("OPENAI_LLM_API")
 
 	req := reqTransformer.ChatGPTGrpcChatCompletionReq(rs)
 	req.Stream = true

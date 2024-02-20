@@ -1,7 +1,8 @@
 package grpcServer
 
 import (
-	"fmt"
+	"log"
+
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/provider/ChatGLM"
 	"go.limit.dev/unollm/relay"
@@ -12,7 +13,7 @@ import (
 )
 
 func ChatGLMChatCompletion(cli *ChatGLM.Client, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
-	fmt.Println("CHATGLM_LLM_API")
+	log.Println("CHATGLM_LLM_API")
 
 	req := reqTransformer.ChatGLMGrpcChatCompletionReq(rs)
 
@@ -26,12 +27,12 @@ func ChatGLMChatCompletion(cli *ChatGLM.Client, rs *model.LLMRequestSchema) (*mo
 }
 
 func ChatGLMChatCompletionStreaming(cli *ChatGLM.Client, rs *model.LLMRequestSchema, sv model.UnoLLMv1_StreamRequestLLMServer) error {
-	fmt.Println("CHATGLM_LLM_API")
+	log.Println("CHATGLM_LLM_API")
 
 	req := reqTransformer.ChatGLMGrpcChatCompletionReq(rs)
-	req.Incremental = true
+	req.Stream = true
 
-	res, err := relay.ChatGLMChatCompletionStreamingRequest(cli, req) // , info.GetModel()
+	res, err := relay.ChatGLMChatCompletionStreamingRequest(cli, req)
 	if err != nil {
 		return status.Errorf(codes.Internal, err.Error())
 	}

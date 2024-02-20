@@ -1,55 +1,25 @@
 package ChatGLM
 
 import (
-	"bytes"
 	"encoding/json"
-	"go.limit.dev/unollm/utils"
-	"net/http"
+	"log"
 	"strings"
+
+	"go.limit.dev/unollm/utils"
 )
 
-type ChatCompletionStreamResponse struct {
-	OnRecvData chan string
-	OnFinish   chan ChatCompletionStreamFinish
+type ChatCompletionStreamingResponse struct {
+	ResponseCh chan ChatCompletionStreamResponse
+	FinishCh   chan Usage
 }
 
-func (e *ChatCompletionStreamResponse) Close() {
-	if e == nil {
-		return
-	}
-	if e.OnRecvData != nil {
-		safeClose[string](e.OnRecvData)
-	}
-	if e.OnFinish != nil {
-		safeClose[ChatCompletionStreamFinish](e.OnFinish)
-	}
-}
+func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (*ChatCompletionStreamingResponse, error) {
+	body.Stream = true
 
-func safeClose[T any](ch chan T) {
-	defer func() { recover() }()
-	if ch != nil {
-		close(ch)
-	}
-}
-
-func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest, modelName string) (*ChatCompletionStreamResponse, error) {
-	token, err := utils.CreateJWTToken(c.apiKey, jwtExpire)
+	req, err := c.createRequest(body)
 	if err != nil {
 		return nil, err
 	}
-
-	reqBody, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
-	}
-
-	req, err := http.NewRequest("POST", c.base+modelName+"/sse-invoke", bytes.NewReader(reqBody))
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Set("Authorization", token)
-	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "text/event-stream")
 
 	resp, err := c.hc.Do(req)
@@ -59,23 +29,38 @@ func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest, mode
 
 	reader := utils.NewEventStreamReader(resp.Body, 4096)
 
-	llmCh := make(chan string)
-	resultCh := make(chan ChatCompletionStreamFinish, 1)
+	respCh := make(chan ChatCompletionStreamResponse, c.RespBuf)
+	finishCh := make(chan Usage, 1)
 
 	go func() {
 		defer resp.Body.Close()
 		for reader.Scanner.Scan() {
 			kv := strings.Split(reader.Scanner.Text(), "\n")
-			switch kv[0] {
-			case "event:add":
-				llmCh <- kv[2][5:]
-			case "event:finish":
-				var usage ChatCompletionStreamFinish
-				json.NewDecoder(strings.NewReader(kv[3][5:])).Decode(&usage)
-				resultCh <- usage
+			if kv[0] == "data: [DONE]" {
+				break
+			}
+			if kv[0][0:6] != "data: " {
+				log.Println(kv[0])
+				finishCh <- Usage{}
+				return
+			}
+			jsonString := kv[0][6:]
+			var result ChatCompletionStreamResponse
+			err = json.Unmarshal([]byte(jsonString), &result)
+			if err != nil {
+				log.Println(err)
+				finishCh <- Usage{}
+				return
+			}
+			respCh <- result
+			if result.Choices[0].FinishReason != FinishReasonNone {
+				finishCh <- result.Usage
 			}
 		}
 	}()
 
-	return &ChatCompletionStreamResponse{OnRecvData: llmCh, OnFinish: resultCh}, nil
+	return &ChatCompletionStreamingResponse{
+		ResponseCh: respCh,
+		FinishCh:   finishCh,
+	}, nil
 }

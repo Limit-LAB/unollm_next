@@ -1,11 +1,12 @@
 package httpHandler
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/relay/reqTransformer"
 	"go.limit.dev/unollm/relay/respTransformer"
-	"net/http"
 )
 
 func ChatGLM_ChatCompletionHandler(c *gin.Context, tx KeyTransformer,req openai.ChatCompletionRequest) {
@@ -20,7 +21,7 @@ func ChatGLM_ChatCompletionHandler(c *gin.Context, tx KeyTransformer,req openai.
 
 	zpReq := reqTransformer.ChatGLMFromOpenAIChatCompletionReq(req)
 	if req.Stream {
-		resp, err := cli.ChatCompletionStreamingRequest(zpReq, req.Model)
+		resp, err := cli.ChatCompletionStreamingRequest(zpReq)
 
 		if err != nil {
 			internalServerError(c, err)
@@ -30,7 +31,7 @@ func ChatGLM_ChatCompletionHandler(c *gin.Context, tx KeyTransformer,req openai.
 		return
 	}
 
-	rst, err := cli.ChatCompletion(zpReq, req.Model)
+	rst, err := cli.ChatCompletion(zpReq)
 	if err != nil {
 		internalServerError(c, err)
 		return

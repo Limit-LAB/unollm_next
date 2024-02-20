@@ -3,11 +3,13 @@ package respTransformer
 import (
 	"errors"
 	"fmt"
+	"io"
+	"log"
+
 	"github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/model"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"io"
 )
 
 func ChatGPTToGrpcCompletion(resp openai.ChatCompletionResponse) (*model.LLMResponseSchema, error) {
@@ -37,7 +39,7 @@ func ChatGPTToGrpcStream(resp *openai.ChatCompletionStream, sv model.UnoLLMv1_St
 	for {
 		response, err := resp.Recv()
 		if errors.Is(err, io.EOF) {
-			fmt.Println("\nStream finished")
+			log.Println("\nStream finished")
 			sv.Send(&model.PartialLLMResponse{
 				Response: &model.PartialLLMResponse_Done{},
 				LlmTokenCount: &model.LLMTokenCount{

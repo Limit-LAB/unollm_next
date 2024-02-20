@@ -2,6 +2,7 @@ package respTransformer
 
 import (
 	"errors"
+
 	"github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/provider/ChatGLM"
@@ -31,8 +32,8 @@ func ChatCompletionGrpc(resp any) (*model.LLMResponseSchema, error) {
 
 func ChatCompletionStreamToGrpc(resp any, sv model.UnoLLMv1_StreamRequestLLMServer) error {
 	switch resp.(type) {
-	case *ChatGLM.ChatCompletionStreamResponse:
-		return ChatGLMToGrpcStream(resp.(*ChatGLM.ChatCompletionStreamResponse), sv)
+	case *ChatGLM.ChatCompletionStreamingResponse:
+		return ChatGLMToGrpcStream(resp.(*ChatGLM.ChatCompletionStreamingResponse), sv)
 	case *openai.ChatCompletionStream:
 		return ChatGPTToGrpcStream(resp.(*openai.ChatCompletionStream), sv)
 	default:
