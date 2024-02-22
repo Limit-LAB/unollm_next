@@ -93,3 +93,21 @@ func (u Usage) ToGrpc() model.LLMTokenCount {
 		CompletionToken: int64(u.CompletionTokens),
 	}
 }
+
+type EmbeddingRequest struct {
+	Input string `json:"input"`
+	Model string `json:"model"`
+}
+
+type EmbeddingResponseData struct {
+	Index     int       `json:"index"`
+	Object    string    `json:"object"`
+	Embedding []float32 `json:"embedding"`
+}
+
+type EmbeddingResponse struct {
+	Model  string                  `json:"model"`
+	Data   []EmbeddingResponseData `json:"data"`
+	Object string                  `json:"object"`
+	Usage  Usage                   `json:"usage"`
+}

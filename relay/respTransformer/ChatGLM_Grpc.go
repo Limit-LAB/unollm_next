@@ -49,3 +49,11 @@ func ChatGLMToGrpcStream(_r *ChatGLM.ChatCompletionStreamingResponse, sv model.U
 		}
 	}
 }
+
+func ChatGLMToGrpcEmbedding(req *model.EmbeddingRequest, res ChatGLM.EmbeddingResponse) (*model.EmbeddingResponse, error) {
+	return &model.EmbeddingResponse{
+		EmbeddingRequestInfo: req.GetEmbeddingRequestInfo(),
+		Dimension:            1024,
+		Vectors:              res.Data[0].Embedding,
+	}, nil
+}

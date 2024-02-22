@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v4.25.1
-// source: unollm.proto
+// source: model/unollm.proto
 
 package model
 
@@ -165,5 +165,91 @@ var UnoLLMv1_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "unollm.proto",
+	Metadata: "model/unollm.proto",
+}
+
+// UnoEmbeddingv1Client is the client API for UnoEmbeddingv1 service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type UnoEmbeddingv1Client interface {
+	EmbeddingRequestLLM(ctx context.Context, in *EmbeddingRequest, opts ...grpc.CallOption) (*EmbeddingResponse, error)
+}
+
+type unoEmbeddingv1Client struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewUnoEmbeddingv1Client(cc grpc.ClientConnInterface) UnoEmbeddingv1Client {
+	return &unoEmbeddingv1Client{cc}
+}
+
+func (c *unoEmbeddingv1Client) EmbeddingRequestLLM(ctx context.Context, in *EmbeddingRequest, opts ...grpc.CallOption) (*EmbeddingResponse, error) {
+	out := new(EmbeddingResponse)
+	err := c.cc.Invoke(ctx, "/unoLLM.UnoEmbeddingv1/EmbeddingRequestLLM", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// UnoEmbeddingv1Server is the server API for UnoEmbeddingv1 service.
+// All implementations must embed UnimplementedUnoEmbeddingv1Server
+// for forward compatibility
+type UnoEmbeddingv1Server interface {
+	EmbeddingRequestLLM(context.Context, *EmbeddingRequest) (*EmbeddingResponse, error)
+	mustEmbedUnimplementedUnoEmbeddingv1Server()
+}
+
+// UnimplementedUnoEmbeddingv1Server must be embedded to have forward compatible implementations.
+type UnimplementedUnoEmbeddingv1Server struct {
+}
+
+func (UnimplementedUnoEmbeddingv1Server) EmbeddingRequestLLM(context.Context, *EmbeddingRequest) (*EmbeddingResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method EmbeddingRequestLLM not implemented")
+}
+func (UnimplementedUnoEmbeddingv1Server) mustEmbedUnimplementedUnoEmbeddingv1Server() {}
+
+// UnsafeUnoEmbeddingv1Server may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to UnoEmbeddingv1Server will
+// result in compilation errors.
+type UnsafeUnoEmbeddingv1Server interface {
+	mustEmbedUnimplementedUnoEmbeddingv1Server()
+}
+
+func RegisterUnoEmbeddingv1Server(s grpc.ServiceRegistrar, srv UnoEmbeddingv1Server) {
+	s.RegisterService(&UnoEmbeddingv1_ServiceDesc, srv)
+}
+
+func _UnoEmbeddingv1_EmbeddingRequestLLM_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EmbeddingRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UnoEmbeddingv1Server).EmbeddingRequestLLM(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/unoLLM.UnoEmbeddingv1/EmbeddingRequestLLM",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UnoEmbeddingv1Server).EmbeddingRequestLLM(ctx, req.(*EmbeddingRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// UnoEmbeddingv1_ServiceDesc is the grpc.ServiceDesc for UnoEmbeddingv1 service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var UnoEmbeddingv1_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "unoLLM.UnoEmbeddingv1",
+	HandlerType: (*UnoEmbeddingv1Server)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "EmbeddingRequestLLM",
+			Handler:    _UnoEmbeddingv1_EmbeddingRequestLLM_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "model/unollm.proto",
 }

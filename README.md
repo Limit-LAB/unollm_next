@@ -7,3 +7,7 @@ We currently support the following APIs:
 - Google Gemini
 - BaiChuan
 - ChatGLM (Zhipu AI)
+
+## Grpc
+
+## OpenAI style http

@@ -1,11 +1,12 @@
 package httpHandler
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/relay"
 	"go.limit.dev/unollm/relay/respTransformer"
-	"log"
 )
 
 func ChatGPT_ChatCompletitionsHandler(c *gin.Context, tx KeyTransformer, req openai.ChatCompletionRequest) {
@@ -62,11 +63,34 @@ func ChatGPT_CompletitionsHandler(c *gin.Context, tx KeyTransformer, req openai.
 	respTransformer.ChatGPTToOpenAICompletionStream(c, rsp)
 }
 
+func ChatGPT_EmbeddingHandler(c *gin.Context, req OpenAIEmbeddingRequest) {
+	cli := NewOpenAIClient(c)
+	if cli == nil {
+		c.JSON(401, gin.H{
+			"error": "no api key provided",
+		})
+		c.Abort()
+		return
+	}
+
+	rsp, err := relay.OpenAIEmbeddingRequest(cli, openai.EmbeddingRequest{
+		Input:          req.Input,
+		Model:          17,
+		User:           "",
+		EncodingFormat: openai.EmbeddingEncodingFormatFloat,
+	})
+
+	if err != nil {
+		internalServerError(c, err)
+		return
+	}
+	c.JSON(200, rsp)
+}
+
 func internalServerError(c *gin.Context, err error) {
 	c.JSON(500, gin.H{
 		"error": err.Error(),
 	})
 	log.Println(err)
 	c.Abort()
-	return
 }

@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package unoLLM;
-option go_package = "model/v1;model";
+option go_package = "./model";
 
 message LLMTokenCount {
   int64 total_token = 1;
@@ -50,4 +50,27 @@ message PartialLLMResponse {
 service UnoLLMv1 {
     rpc BlockingRequestLLM(LLMRequestSchema) returns (LLMResponseSchema) {}
     rpc StreamRequestLLM(LLMRequestSchema) returns (stream PartialLLMResponse) {}
+}
+
+
+message EmbeddingResponse {
+  EmbeddingRequestInfo embedding_request_info = 1;
+  int32 dimension = 2;
+  repeated float vectors = 3;
+}
+
+message EmbeddingRequestInfo {
+  string llm_api_type = 1;
+  string model = 2;
+  string url = 3;
+  string token = 4;
+}
+
+message EmbeddingRequest {
+  EmbeddingRequestInfo embedding_request_info = 1;
+  string text = 2;
+}
+
+service UnoEmbeddingv1 {
+  rpc EmbeddingRequestLLM(EmbeddingRequest) returns (EmbeddingResponse) {}
 }

@@ -2,6 +2,7 @@ package relay
 
 import (
 	"context"
+
 	"github.com/sashabaranov/go-openai"
 )
 
@@ -33,6 +34,13 @@ func OpenAIChatCompletionStream(cli *openai.Client, req openai.ChatCompletionReq
 func OpenAICompletionStream(cli *openai.Client, req openai.CompletionRequest) (*openai.CompletionStream, error) {
 	req.Stream = true
 	return cli.CreateCompletionStream(
+		context.Background(),
+		req,
+	)
+}
+
+func OpenAIEmbeddingRequest(cli *openai.Client, req openai.EmbeddingRequest) (openai.EmbeddingResponse, error) {
+	return cli.CreateEmbeddings(
 		context.Background(),
 		req,
 	)

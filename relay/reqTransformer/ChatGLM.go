@@ -25,7 +25,8 @@ func ChatGLMGrpcChatCompletionReq(rs *model.LLMRequestSchema) ChatGLM.ChatComple
 
 func ChatGLMFromOpenAIChatCompletionReq(req openai.ChatCompletionRequest) ChatGLM.ChatCompletionRequest {
 	zpReq := ChatGLM.ChatCompletionRequest{
-		Model:       req.Model,
+		// model: chatglm::{model}
+		Model:       req.Model[9:],
 		Temperature: req.Temperature,
 		TopP:        req.TopP,
 		Stop:        req.Stop,
@@ -38,4 +39,11 @@ func ChatGLMFromOpenAIChatCompletionReq(req openai.ChatCompletionRequest) ChatGL
 		})
 	}
 	return zpReq
+}
+
+func ChatGLMGrpcEmbeddingReq(req *model.EmbeddingRequest) ChatGLM.EmbeddingRequest {
+	return ChatGLM.EmbeddingRequest{
+		Input: req.GetText(),
+		Model: req.GetEmbeddingRequestInfo().GetModel(),
+	}
 }

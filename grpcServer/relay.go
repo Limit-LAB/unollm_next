@@ -13,6 +13,10 @@ type UnoForwardServer struct {
 	model.UnimplementedUnoLLMv1Server
 }
 
+type UnoEmbeddingForwardServer struct {
+	model.UnimplementedUnoEmbeddingv1Server
+}
+
 // mustEmbedUnimplementedUnoLLMv1Server implements model.UnoLLMv1Server.
 
 var _ model.UnoLLMv1Server = (*UnoForwardServer)(nil)
@@ -66,4 +70,19 @@ func (uno *UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv mod
 		return BaichuanChatCompletionStream(cli, rs, sv)
 	}
 	return status.Errorf(codes.Unimplemented, "method StreamRequestLLM not implemented")
+}
+
+func (uno *UnoEmbeddingForwardServer) EmbeddingRequestLLM(ctx context.Context, req *model.EmbeddingRequest) (res *model.EmbeddingResponse, err error) {
+	info := req.GetEmbeddingRequestInfo()
+	switch info.GetLlmApiType() {
+	case CHATGLM_LLM_API:
+		cli := NewChatGLMClient(&model.LLMRequestInfo{
+			LlmApiType: info.GetLlmApiType(),
+			Model:      info.GetModel(),
+			Url:        info.GetUrl(),
+			Token:      info.GetToken(),
+		})
+		return ChatGLMEmbeddingRequest(cli, req)
+	}
+	return nil, status.Errorf(codes.Unimplemented, "method EmbeddingRequestLLM not implemented")
 }

@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
+	"go.limit.dev/unollm/provider/ChatGLM"
 	"go.limit.dev/unollm/relay/reqTransformer"
 	"go.limit.dev/unollm/relay/respTransformer"
 )
@@ -37,6 +38,19 @@ func ChatGLM_ChatCompletionHandler(c *gin.Context, tx KeyTransformer,req openai.
 		return
 	}
 	c.JSON(200, respTransformer.ChatGLMToOpenAICompletion(rst))
-	return
+}
 
+func ChatGLM_EmbeddingHandler(c *gin.Context, req OpenAIEmbeddingRequest) {
+	cli := NewChatGLMClient(c)
+	res, err := cli.EmbeddingRequest(
+		ChatGLM.EmbeddingRequest{
+			Input: req.Input,
+			Model: req.Model[9:],
+		},
+	)
+	if err != nil {
+		internalServerError(c, err)
+		return
+	}
+	c.JSON(200, res)
 }

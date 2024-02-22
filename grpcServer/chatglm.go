@@ -38,3 +38,16 @@ func ChatGLMChatCompletionStreaming(cli *ChatGLM.Client, rs *model.LLMRequestSch
 	}
 	return respTransformer.ChatGLMToGrpcStream(res, sv)
 }
+
+func ChatGLMEmbeddingRequest(cli *ChatGLM.Client, req *model.EmbeddingRequest) (*model.EmbeddingResponse, error) {
+	log.Println("CHATGLM_LLM_API")
+
+	reqBody := reqTransformer.ChatGLMGrpcEmbeddingReq(req)
+
+	res, err := cli.EmbeddingRequest(reqBody)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	return respTransformer.ChatGLMToGrpcEmbedding(req, res)
+}

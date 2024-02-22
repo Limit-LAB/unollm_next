@@ -30,7 +30,7 @@ func mockServer() *gin.Engine {
 		cli := ChatGLM.NewClient(zhipuaiApiKey)
 
 		zpReq := ChatGLM.ChatCompletionRequest{
-			Model:       req.Model,
+			Model:       req.Model[9:],
 			Temperature: req.Temperature,
 			TopP:        req.TopP,
 		}
