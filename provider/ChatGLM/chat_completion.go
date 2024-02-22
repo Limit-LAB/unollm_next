@@ -8,8 +8,12 @@ import (
 
 const jwtExpire = time.Duration(10000) * time.Second
 
+func (c *Client) url(tail string) string {
+	return c.base + tail
+}
+
 func (c *Client) ChatCompletion(body ChatCompletionRequest) (result ChatCompletionResponse, err error) {
-	req, err := c.createRequest(body)
+	req, err := c.createRequest(c.url("chat/completions/"), body)
 	if err != nil {
 		return result, err
 	}

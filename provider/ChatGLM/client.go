@@ -18,7 +18,7 @@ func NewClient(apiKey string) *Client {
 	return &Client{
 		apiKey: apiKey,
 		// base:   "https://open.bigmodel.cn/api/paas/v3/model-api/",
-		base:    "https://open.bigmodel.cn/api/paas/v4/chat/completions/",
+		base:    "https://open.bigmodel.cn/api/paas/v4/",
 		hc:      &http.Client{},
 		RespBuf: 5,
 	}
@@ -28,7 +28,7 @@ func (c *Client) SetBase(base string) {
 	c.base = base
 }
 
-func (c *Client) createRequest(body any) (*http.Request, error) {
+func (c *Client) createRequest(url string, body any) (*http.Request, error) {
 	token, err := utils.CreateJWTToken(c.apiKey, jwtExpire)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func (c *Client) createRequest(body any) (*http.Request, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("POST", c.base, bytes.NewReader(reqBody))
+	req, err := http.NewRequest("POST", url, bytes.NewReader(reqBody))
 	if err != nil {
 		return nil, err
 	}

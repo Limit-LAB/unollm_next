@@ -16,7 +16,7 @@ type ChatCompletionStreamingResponse struct {
 func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (*ChatCompletionStreamingResponse, error) {
 	body.Stream = true
 
-	req, err := c.createRequest(body)
+	req, err := c.createRequest(c.url("chat/completions/"), body)
 	if err != nil {
 		return nil, err
 	}
