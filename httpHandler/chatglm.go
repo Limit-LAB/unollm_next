@@ -1,6 +1,7 @@
 package httpHandler
 
 import (
+	"go.limit.dev/unollm/relay"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -10,7 +11,7 @@ import (
 	"go.limit.dev/unollm/relay/respTransformer"
 )
 
-func ChatGLM_ChatCompletionHandler(c *gin.Context, tx KeyTransformer,req openai.ChatCompletionRequest) {
+func ChatGLM_ChatCompletionHandler(c *gin.Context, tx KeyTransformer, req openai.ChatCompletionRequest) {
 	cli := NewChatGLMClient(c, tx)
 	if cli == nil {
 		c.JSON(http.StatusUnauthorized, gin.H{
@@ -40,12 +41,12 @@ func ChatGLM_ChatCompletionHandler(c *gin.Context, tx KeyTransformer,req openai.
 	c.JSON(200, respTransformer.ChatGLMToOpenAICompletion(rst))
 }
 
-func ChatGLM_EmbeddingHandler(c *gin.Context, req OpenAIEmbeddingRequest) {
-	cli := NewChatGLMClient(c)
+func ChatGLM_EmbeddingHandler(c *gin.Context, tx KeyTransformer, req relay.CommonEmbdReq) {
+	cli := NewChatGLMClient(c, tx)
 	res, err := cli.EmbeddingRequest(
 		ChatGLM.EmbeddingRequest{
 			Input: req.Input,
-			Model: req.Model[9:],
+			Model: req.Model,
 		},
 	)
 	if err != nil {

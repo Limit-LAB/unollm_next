@@ -1,19 +1,16 @@
 package httpHandler
 
 import (
-	"strings"
-
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
+	"go.limit.dev/unollm/relay"
 )
 
 const InjectedChatGLMHeader = "X-Inject-ChatGLM-Auth"
 const InjectedChatGPTHeader = "X-Inject-ChatGPT-Auth"
 
-type OpenAIEmbeddingRequest struct {
-	Input          string `json:"input"`
-	Model          string `json:"model"`
-	EncodingFormap string `json:"encoding_format"`
+func getProvider(m string) string {
+	return "openai"
 }
 
 func RegisterRoute(r *gin.Engine, opt RegisterOpt) {
@@ -30,25 +27,20 @@ func RegisterRoute(r *gin.Engine, opt RegisterOpt) {
 
 	r.POST("/chat/completions", func(c *gin.Context) {
 		var req openai.ChatCompletionRequest
-		err := c.BindJSON(&req)
-		if err != nil {
-			internalServerError(c, err)
+		if autoErr(c, c.BindJSON(&req)) {
 			return
 		}
 		// TODO: Model Compatitable
-		if strings.HasPrefix(req.Model, "chatglm") {
-			ChatGLM_ChatCompletionHandler(c, opt.KeyTransformer, req)
-			return
-		}
-		if strings.HasPrefix(req.Model, "chatgpt") {
+		switch getProvider(req.Model) {
+		case "openai":
 			ChatGPT_ChatCompletitionsHandler(c, opt.KeyTransformer, req)
+		case "chatglm":
+			ChatGLM_ChatCompletionHandler(c, opt.KeyTransformer, req)
 		}
 	})
 	r.POST("/completions", func(c *gin.Context) {
 		var req openai.CompletionRequest
-		err := c.BindJSON(&req)
-		if err != nil {
-			internalServerError(c, err)
+		if autoErr(c, c.BindJSON(&req)) {
 			return
 		}
 		ChatGPT_CompletitionsHandler(c, opt.KeyTransformer, req)
@@ -56,17 +48,20 @@ func RegisterRoute(r *gin.Engine, opt RegisterOpt) {
 	})
 
 	r.POST("/embeddings", func(c *gin.Context) {
-		var req OpenAIEmbeddingRequest
-		err := c.BindJSON(&req)
-		if err != nil {
-			internalServerError(c, err)
+		var req relay.CommonEmbdReq
+		if autoErr(c, c.BindJSON(&req)) {
 			return
 		}
-		if strings.HasPrefix(req.Model, "chatglm::") {
-			ChatGLM_EmbeddingHandler(c, req)
-		}
-		if strings.HasPrefix(req.Model, "chatgpt::") {
-			ChatGPT_EmbeddingHandler(c, req)
+		switch getProvider(req.Model) {
+		case "openai":
+			var _req openai.EmbeddingRequest
+			if autoErr(c, c.BindJSON(&_req)) {
+				return
+			}
+			ChatGPT_EmbeddingHandler(c, opt.KeyTransformer, _req)
+
+		case "chatglm":
+			ChatGLM_EmbeddingHandler(c, opt.KeyTransformer, req)
 		}
 	})
 

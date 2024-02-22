@@ -16,8 +16,7 @@ func ChatGPTGrpcChatCompletionReq(rs *model.LLMRequestSchema) openai.ChatComplet
 		})
 	}
 	return openai.ChatCompletionRequest{
-		// model: chatgpt::{model}
-		Model:       info.GetModel()[9:],
+		Model:       info.GetModel(),
 		Messages:    openaiMessages,
 		TopP:        float32(info.GetTopP()),
 		Temperature: float32(info.GetTemperature()),

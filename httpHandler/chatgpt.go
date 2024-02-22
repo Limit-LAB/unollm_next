@@ -63,8 +63,8 @@ func ChatGPT_CompletitionsHandler(c *gin.Context, tx KeyTransformer, req openai.
 	respTransformer.ChatGPTToOpenAICompletionStream(c, rsp)
 }
 
-func ChatGPT_EmbeddingHandler(c *gin.Context, req OpenAIEmbeddingRequest) {
-	cli := NewOpenAIClient(c)
+func ChatGPT_EmbeddingHandler(c *gin.Context, tx KeyTransformer, req openai.EmbeddingRequest) {
+	cli := NewOpenAIClient(c, tx)
 	if cli == nil {
 		c.JSON(401, gin.H{
 			"error": "no api key provided",
@@ -73,18 +73,21 @@ func ChatGPT_EmbeddingHandler(c *gin.Context, req OpenAIEmbeddingRequest) {
 		return
 	}
 
-	rsp, err := relay.OpenAIEmbeddingRequest(cli, openai.EmbeddingRequest{
-		Input:          req.Input,
-		Model:          17,
-		User:           "",
-		EncodingFormat: openai.EmbeddingEncodingFormatFloat,
-	})
+	rsp, err := relay.OpenAIEmbeddingRequest(cli, req)
 
 	if err != nil {
 		internalServerError(c, err)
 		return
 	}
 	c.JSON(200, rsp)
+}
+
+func autoErr(c *gin.Context, err error) bool {
+	if err != nil {
+		internalServerError(c, err)
+		return true
+	}
+	return false
 }
 
 func internalServerError(c *gin.Context, err error) {

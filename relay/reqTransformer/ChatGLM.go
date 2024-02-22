@@ -25,8 +25,7 @@ func ChatGLMGrpcChatCompletionReq(rs *model.LLMRequestSchema) ChatGLM.ChatComple
 
 func ChatGLMFromOpenAIChatCompletionReq(req openai.ChatCompletionRequest) ChatGLM.ChatCompletionRequest {
 	zpReq := ChatGLM.ChatCompletionRequest{
-		// model: chatglm::{model}
-		Model:       req.Model[9:],
+		Model:       req.Model,
 		Temperature: req.Temperature,
 		TopP:        req.TopP,
 		Stop:        req.Stop,
