@@ -8,19 +8,33 @@ import (
 	"github.com/sashabaranov/go-openai"
 )
 
-// FIXME: runtime downloading tiktoken model, switch to offline tiktoken_loader instead
-// OpenAI Cookbook: https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb
-func NumTokensFromMessages(messages []openai.ChatCompletionMessage) (numTokens int) {
-	tkm, err := tiktoken.EncodingForModel("gpt-3.5-turbo-0613")
+var tkm *tiktoken.Tiktoken
+
+func init() {
+	var err error
+
+	// FIXME: runtime downloading tiktoken model, switch to offline tiktoken_loader instead
+	// But its has Cache.
+	// Offline token : https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken
+	tkm, err = tiktoken.EncodingForModel(tkm_model)
 	if err != nil {
-		err = fmt.Errorf("encoding for model: %v", err)
+		err = fmt.Errorf("encoding for model failed: %v", err)
 		log.Println(err)
-		return
+	}
+}
+
+const (
+	tkm_tokenPerMessage = 3
+	tkm_tokenPerName    = 1
+	tkm_model           = "gpt-3.5-turbo-0613"
+)
+
+// OpenAI Cookbook: https://github.com/openai/openai-cookbook/blob/main/examples/How_to_count_tokens_with_tiktoken.ipynb
+func GetOpenAITokenCount(messages []openai.ChatCompletionMessage) (numTokens int) {
+	if tkm == nil {
+		return -1
 	}
 
-	var tokensPerMessage, tokensPerName int
-	tokensPerMessage = 3
-	tokensPerName = 1
 	// ignore old models
 	// switch model {
 	// case "gpt-3.5-turbo-0613",
@@ -37,10 +51,10 @@ func NumTokensFromMessages(messages []openai.ChatCompletionMessage) (numTokens i
 	// default:
 	// 	if strings.Contains(model, "gpt-3.5-turbo") {
 	// 		log.Println("warning: gpt-3.5-turbo may update over time. Returning num tokens assuming gpt-3.5-turbo-0613.")
-	// 		return NumTokensFromMessages(messages, "gpt-3.5-turbo-0613")
+	// 		return GetOpenAITokenCount(messages, "gpt-3.5-turbo-0613")
 	// 	} else if strings.Contains(model, "gpt-4") {
 	// 		log.Println("warning: gpt-4 may update over time. Returning num tokens assuming gpt-4-0613.")
-	// 		return NumTokensFromMessages(messages, "gpt-4-0613")
+	// 		return GetOpenAITokenCount(messages, "gpt-4-0613")
 	// 	} else {
 	// 		err = fmt.Errorf("num_tokens_from_messages() is not implemented for model %s. See https://github.com/openai/openai-python/blob/main/chatml.md for information on how messages are converted to tokens.", model)
 	// 		log.Println(err)
@@ -49,12 +63,12 @@ func NumTokensFromMessages(messages []openai.ChatCompletionMessage) (numTokens i
 	// }
 
 	for _, message := range messages {
-		numTokens += tokensPerMessage
+		numTokens += tkm_tokenPerMessage
 		numTokens += len(tkm.Encode(message.Content, nil, nil))
 		numTokens += len(tkm.Encode(message.Role, nil, nil))
 		numTokens += len(tkm.Encode(message.Name, nil, nil))
 		if message.Name != "" {
-			numTokens += tokensPerName
+			numTokens += tkm_tokenPerName
 		}
 	}
 	numTokens += 3 // every reply is primed with <|start|>assistant<|message|>

@@ -32,7 +32,7 @@ func OpenAIChatCompletionStreaming(cli *openai.Client, rs *model.LLMRequestSchem
 
 	req := reqTransformer.ChatGPTGrpcChatCompletionReq(rs)
 	req.Stream = true
-	promptUsage := utils.NumTokensFromMessages(req.Messages)
+	promptUsage := utils.GetOpenAITokenCount(req.Messages)
 	resp, err := cli.CreateChatCompletionStream(context.Background(), req)
 
 	if err != nil {
