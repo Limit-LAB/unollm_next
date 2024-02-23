@@ -2,7 +2,10 @@ package utils
 
 import (
 	"fmt"
+	"io"
 	"log"
+	"net/http"
+	"os"
 
 	"github.com/pkoukk/tiktoken-go"
 	"github.com/sashabaranov/go-openai"
@@ -12,15 +15,64 @@ var tkm *tiktoken.Tiktoken
 
 func init() {
 	var err error
-
-	// FIXME: runtime downloading tiktoken model, switch to offline tiktoken_loader instead
-	// But its has Cache.
-	// Offline token : https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken
-	tkm, err = tiktoken.EncodingForModel(tkm_model)
+	tkm, err = loadCl00k()
 	if err != nil {
 		err = fmt.Errorf("encoding for model failed: %v", err)
 		log.Println(err)
 	}
+}
+
+func downloadOrCache(url string, path string) error {
+	if _, err := os.Stat(path); err == nil {
+		return nil
+	}
+	http.Get(url)
+	out, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	resp, err := http.Get(url)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	_, err = io.Copy(out, resp.Body)
+	return err
+}
+
+// GPT3 & GPT4 use CL100K encoding
+func loadCl00k() (*tiktoken.Tiktoken, error) {
+	bpeLoader := tiktoken.NewDefaultBpeLoader()
+	path := "./cl100k_base.tiktoken"
+	err := downloadOrCache("https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken", path)
+	ranks, err := bpeLoader.LoadTiktokenBpe(path)
+	if err != nil {
+		return nil, err
+	}
+	special_tokens := map[string]int{
+		tiktoken.ENDOFTEXT:   100257,
+		tiktoken.FIM_PREFIX:  100258,
+		tiktoken.FIM_MIDDLE:  100259,
+		tiktoken.FIM_SUFFIX:  100260,
+		tiktoken.ENDOFPROMPT: 100276,
+	}
+	enc := &tiktoken.Encoding{
+		Name:           tiktoken.MODEL_CL100K_BASE,
+		PatStr:         `(?i:'s|'t|'re|'ve|'m|'ll|'d)|[^\r\n\p{L}\p{N}]?\p{L}+|\p{N}{1,3}| ?[^\s\p{L}\p{N}]+[\r\n]*|\s*[\r\n]+|\s+(?!\S)|\s+`,
+		MergeableRanks: ranks,
+		SpecialTokens:  special_tokens,
+	}
+	pbe, err := tiktoken.NewCoreBPE(enc.MergeableRanks, enc.SpecialTokens, enc.PatStr)
+	if err != nil {
+		return nil, err
+	}
+	specialTokensSet := map[string]any{}
+	for k := range enc.SpecialTokens {
+		specialTokensSet[k] = true
+	}
+	return tiktoken.NewTiktoken(pbe, enc, specialTokensSet), nil
 }
 
 const (
