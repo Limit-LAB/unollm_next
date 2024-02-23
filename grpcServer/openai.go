@@ -9,6 +9,7 @@ import (
 	"go.limit.dev/unollm/relay"
 	"go.limit.dev/unollm/relay/reqTransformer"
 	"go.limit.dev/unollm/relay/respTransformer"
+	"go.limit.dev/unollm/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -31,12 +32,12 @@ func OpenAIChatCompletionStreaming(cli *openai.Client, rs *model.LLMRequestSchem
 
 	req := reqTransformer.ChatGPTGrpcChatCompletionReq(rs)
 	req.Stream = true
-
+	promptUsage := utils.NumTokensFromMessages(req.Messages)
 	resp, err := cli.CreateChatCompletionStream(context.Background(), req)
 
 	if err != nil {
 		return err
 	}
 
-	return respTransformer.ChatGPTToGrpcStream(resp, sv)
+	return respTransformer.ChatGPTToGrpcStream(promptUsage, resp, sv)
 }
