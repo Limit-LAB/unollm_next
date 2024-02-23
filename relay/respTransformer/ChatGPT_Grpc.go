@@ -33,7 +33,7 @@ func ChatGPTToGrpcCompletion(resp openai.ChatCompletionResponse) (*model.LLMResp
 	return &retResp, nil
 }
 
-func ChatGPTToGrpcStream(resp *openai.ChatCompletionStream, sv model.UnoLLMv1_StreamRequestLLMServer) error {
+func ChatGPTToGrpcStream(promptTokens int, resp *openai.ChatCompletionStream, sv model.UnoLLMv1_StreamRequestLLMServer) error {
 	defer resp.Close()
 	i := 0
 	for {
@@ -43,7 +43,9 @@ func ChatGPTToGrpcStream(resp *openai.ChatCompletionStream, sv model.UnoLLMv1_St
 			sv.Send(&model.PartialLLMResponse{
 				Response: &model.PartialLLMResponse_Done{},
 				LlmTokenCount: &model.LLMTokenCount{
+					PromptToken:     int64(promptTokens),
 					CompletionToken: int64(i),
+					TotalToken:      int64(promptTokens + i),
 				},
 			})
 			return nil
