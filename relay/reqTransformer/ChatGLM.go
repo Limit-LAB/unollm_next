@@ -9,11 +9,32 @@ import (
 func ChatGLMGrpcChatCompletionReq(rs *model.LLMRequestSchema) ChatGLM.ChatCompletionRequest {
 	info := rs.GetLlmRequestInfo()
 	messages := rs.GetMessages()
+
+	toolChoice := "none"
+	if info.UseFunctionCalling {
+		toolChoice = "auto"
+	}
+
+	tools := make([]ChatGLM.GLMTool, len(info.Functions))
+	for i, f := range info.Functions {
+		tools[i] = ChatGLM.GLMTool{
+			Type: "function",
+			Function: ChatGLM.GLMFunction{
+				Name:        f.Name,
+				Description: f.Description,
+				Parameters:  f.Parameters,
+			},
+		}
+	}
+
 	req := ChatGLM.ChatCompletionRequest{
 		Model:       info.GetModel(),
 		Temperature: float32(info.GetTemperature()),
 		TopP:        float32(info.GetTopP()),
+		Tools:       tools,
+		ToolChoice:  toolChoice,
 	}
+
 	for _, m := range messages {
 		req.Messages = append(req.Messages, ChatGLM.ChatCompletionMessage{
 			Role:    m.GetRole(),
@@ -24,11 +45,32 @@ func ChatGLMGrpcChatCompletionReq(rs *model.LLMRequestSchema) ChatGLM.ChatComple
 }
 
 func ChatGLMFromOpenAIChatCompletionReq(req openai.ChatCompletionRequest) ChatGLM.ChatCompletionRequest {
+	tools := make([]ChatGLM.GLMTool, len(req.Tools))
+	for i, f := range req.Tools {
+		functions := ChatGLM.GLMFunction{
+			Name:        f.Function.Name,
+			Description: f.Function.Description,
+			Parameters:  f.Function.Parameters,
+		}
+
+		tools[i] = ChatGLM.GLMTool{
+			Type:     "function",
+			Function: functions,
+		}
+	}
+
+	toolChoice, ok := req.ToolChoice.(string)
+	if !ok {
+		toolChoice = "auto"
+	}
+
 	zpReq := ChatGLM.ChatCompletionRequest{
 		Model:       req.Model,
 		Temperature: req.Temperature,
 		TopP:        req.TopP,
 		Stop:        req.Stop,
+		ToolChoice:  toolChoice,
+		Tools:       tools,
 	}
 
 	for _, m := range req.Messages {

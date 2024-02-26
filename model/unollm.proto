@@ -12,6 +12,23 @@ message LLMTokenCount {
 message LLMChatCompletionMessage {
   string role = 1;
   string content = 2;
+  optional string tool_call_id = 3;
+}
+
+
+message FunctionCallingParameter {
+  string type = 1;
+  string description = 2;
+  repeated string enums = 3;
+}
+
+message Function {
+  string name = 1;
+  string description = 2;
+  
+  map<string, FunctionCallingParameter> parameters = 3;
+  
+  repeated string requireds = 4;
 }
 
 message LLMRequestInfo {
@@ -23,6 +40,8 @@ message LLMRequestInfo {
   string url = 6;
   string token = 7;
   map<string, string> metainfo = 8;
+  repeated Function functions = 9;
+  bool use_function_calling = 10;
 }
 
 message LLMRequestSchema {
@@ -30,26 +49,34 @@ message LLMRequestSchema {
   LLMRequestInfo llm_request_info = 2;
 }
 
-message LLMResponseSchema {
-  LLMChatCompletionMessage message = 1;
-  LLMTokenCount llm_token_count = 2;
-}
-
-
 message Done {
 }
 
-message PartialLLMResponse {
-    oneof response {
-        string content = 1;
-        Done done = 2;
-    }
-    optional LLMTokenCount llm_token_count = 3;
+message ToolCall {
+  string id = 1;
+  string name = 2;
+  string arguments = 3;
 }
 
+message PartialLLMResponse {
+  oneof response {
+    string content = 1;
+    Done done = 2;
+  }
+  repeated ToolCall tool_calls = 3;
+  optional LLMTokenCount llm_token_count = 4;
+}
+
+message LLMResponseSchema {
+  LLMChatCompletionMessage message = 1;
+  LLMTokenCount llm_token_count = 2;
+  repeated ToolCall tool_calls = 3;
+}
+
+
 service UnoLLMv1 {
-    rpc BlockingRequestLLM(LLMRequestSchema) returns (LLMResponseSchema) {}
-    rpc StreamRequestLLM(LLMRequestSchema) returns (stream PartialLLMResponse) {}
+  rpc BlockingRequestLLM(LLMRequestSchema) returns (LLMResponseSchema) {}
+  rpc StreamRequestLLM(LLMRequestSchema) returns (stream PartialLLMResponse) {}
 }
 
 

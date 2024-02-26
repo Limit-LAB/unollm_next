@@ -36,6 +36,7 @@ func BaiChuanGrpcChatCompletionReq(rs *model.LLMRequestSchema) Baichuan.ChatComp
 
 func BaiChuanFromOpenAIChatCompletionReq(req openai.ChatCompletionRequest) Baichuan.ChatCompletionRequest {
 	zpReq := Baichuan.ChatCompletionRequest{
+		Model:       req.Model,
 		Temperature: req.Temperature,
 		TopP:        req.TopP,
 		Stream:      req.Stream,

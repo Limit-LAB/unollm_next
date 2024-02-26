@@ -17,8 +17,19 @@ func ChatGLMToGrpcCompletion(res ChatGLM.ChatCompletionResponse) (*model.LLMResp
 		PromptToken:     int64(res.Usage.PromptTokens),
 		CompletionToken: int64(res.Usage.CompletionTokens),
 	}
+
+	toolCalls := make([]*model.ToolCall, len(res.Choices[0].Message.ToolCalls))
+	for i, _ := range res.Choices[0].Message.ToolCalls {
+		toolcall := model.ToolCall{
+			Id:        res.Choices[0].Message.ToolCalls[i].Id,
+			Name:      res.Choices[0].Message.ToolCalls[i].Function.Name,
+			Arguments: res.Choices[0].Message.ToolCalls[i].Function.Arguments,
+		}
+		toolCalls[i] = &toolcall
+	}
 	retResp := model.LLMResponseSchema{
 		Message:       &retMessage,
+		ToolCalls:     toolCalls,
 		LlmTokenCount: &count,
 	}
 	return &retResp, nil
@@ -29,7 +40,18 @@ func ChatGLMToGrpcStream(_r *ChatGLM.ChatCompletionStreamingResponse, sv model.U
 	for {
 		select {
 		case chunk := <-llm:
+			toolCalls := make([]*model.ToolCall, len(chunk.Choices[0].Delta.ToolCalls))
+			for i, _ := range chunk.Choices[0].Delta.ToolCalls {
+				toolcall := model.ToolCall{
+					Id:        chunk.Choices[0].Delta.ToolCalls[i].Id,
+					Name:      chunk.Choices[0].Delta.ToolCalls[i].Function.Name,
+					Arguments: chunk.Choices[0].Delta.ToolCalls[i].Function.Arguments,
+				}
+				toolCalls[i] = &toolcall
+			}
+
 			resp := model.PartialLLMResponse{
+				ToolCalls: toolCalls,
 				Response: &model.PartialLLMResponse_Content{
 					Content: chunk.Choices[0].Delta.Content,
 				},

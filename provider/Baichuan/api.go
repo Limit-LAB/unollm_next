@@ -3,8 +3,11 @@ package Baichuan
 type RoleType string
 
 const (
-	RoleUser      RoleType = "user"
-	RoleAssistant RoleType = "assistant"
+	RoleUser           RoleType = "user"
+	RoleAssistant      RoleType = "assistant"
+	Baichuan2Turbo     string   = "Baichuan2-Turbo"
+	Baichuan2Turbo192K string   = "Baichuan2-Turbo-192k"
+	Baichuan3          string   = "Baichuan3"
 )
 
 type Message struct {

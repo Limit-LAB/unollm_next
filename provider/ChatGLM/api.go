@@ -11,8 +11,20 @@ const (
 )
 
 type ChatCompletionMessage struct {
-	Role    string `json:"role"`
-	Content string `json:"content"`
+	Role      string        `json:"role"`
+	Content   string        `json:"content"`
+	ToolCalls []GLMToolCall `json:"tool_calls,omitempty"`
+}
+
+type GLMToolCall struct {
+	Id       string          `json:"id"`
+	Type     string          `json:"type"`
+	Function GLMFunctionCall `json:"function"`
+}
+
+type GLMFunctionCall struct {
+	Name      string `json:"name"`
+	Arguments string `json:"arguments"`
 }
 
 type ChatCompletionRef struct {
@@ -31,8 +43,26 @@ type ChatCompletionRequest struct {
 	RequestId   string                  `json:"request_id,omitempty"`
 	Stream      bool                    `json:"stream,omitempty"`
 	Stop        []string                `json:"stop,omitempty"`
-	Tools       []any                   `json:"tools,omitempty"`       // TODO: add tools
-	ToolChoice  any                     `json:"tool_choice,omitempty"` // TODO: add tool choice
+	Tools       []GLMTool               `json:"tools,omitempty"`
+	ToolChoice  string                  `json:"tool_choice,omitempty"`
+}
+
+type GLMTool struct {
+	// only "function" "retrieval" "web_search"
+	Type      string       `json:"type"`
+	Function  GLMFunction  `json:"function,omitempty"`
+	Retrieval any          `json:"retrieval,omitempty"`
+	WebSearch GLMWebSearch `json:"web_search,omitempty"`
+}
+
+type GLMFunction struct {
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Parameters  any    `json:"parameters"`
+}
+type GLMWebSearch struct {
+	Enable      bool   `json:"enable"`
+	SearchQuery string `json:"search_query"`
 }
 
 // ChatCompletionResponse represents a response structure for chat completion API.

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"strings"
 )
 
 var ErrNotSuccess = errors.New("request result not success")
@@ -22,7 +21,7 @@ func (c *Client) ChatCompletion(body ChatCompletionRequest) (result ChatCompleti
 		return ChatCompletionResponse{}, err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+strings.Split(c.apiKey, ".")[0])
+	req.Header.Set("Authorization", "Bearer "+c.apiKey)
 
 	resp, err := c.hc.Do(req)
 	if err != nil {

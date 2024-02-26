@@ -2,11 +2,12 @@ package respTransformer
 
 import (
 	"encoding/json"
+	"io"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/provider/ChatGLM"
 	"go.limit.dev/unollm/utils"
-	"io"
 )
 
 func chatGlmChoicesToOpenAIChoices(choices []ChatGLM.ChatCompletionChoice) []openai.ChatCompletionChoice {
@@ -27,12 +28,22 @@ func chatGlmChoicesToOpenAIChoices(choices []ChatGLM.ChatCompletionChoice) []ope
 func chatGlmDeltaChoicesToOpenAIChoices(choices []ChatGLM.ChatCompletionStreamingChoice) []openai.ChatCompletionStreamChoice {
 	var openAIChoices []openai.ChatCompletionStreamChoice
 	for _, choice := range choices {
+		toolCalls := make([]openai.ToolCall, len(choice.Delta.ToolCalls))
+		for i, f := range choice.Delta.ToolCalls {
+			toolCalls[i].ID = f.Id
+			toolCalls[i].Type = openai.ToolType(f.Type)
+			toolCalls[i].Function.Arguments = f.Function.Arguments
+			toolCalls[i].Function.Name = f.Function.Name
+		}
+
 		openAIChoices = append(openAIChoices, openai.ChatCompletionStreamChoice{
 			Index: choice.Index,
 			Delta: openai.ChatCompletionStreamChoiceDelta{
-				Content: choice.Delta.Content,
-				Role:    choice.Delta.Role,
+				Content:   choice.Delta.Content,
+				Role:      choice.Delta.Role,
+				ToolCalls: toolCalls,
 			},
+			FinishReason: openai.FinishReason(choice.FinishReason),
 		})
 	}
 	return openAIChoices

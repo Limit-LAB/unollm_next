@@ -26,9 +26,19 @@ func ChatGPTToGrpcCompletion(resp openai.ChatCompletionResponse) (*model.LLMResp
 		PromptToken:     int64(resp.Usage.PromptTokens),
 		CompletionToken: int64(resp.Usage.CompletionTokens),
 	}
+	toolCalls := make([]*model.ToolCall, len(resp.Choices[0].Message.ToolCalls))
+	for i, _ := range resp.Choices[0].Message.ToolCalls {
+		toolcall := model.ToolCall{
+			Id:        resp.Choices[0].Message.ToolCalls[i].ID,
+			Name:      resp.Choices[0].Message.ToolCalls[i].Function.Name,
+			Arguments: resp.Choices[0].Message.ToolCalls[i].Function.Arguments,
+		}
+		toolCalls[i] = &toolcall
+	}
 	retResp := model.LLMResponseSchema{
 		Message:       &retMessage,
 		LlmTokenCount: &count,
+		ToolCalls:     toolCalls,
 	}
 	return &retResp, nil
 }
@@ -60,6 +70,16 @@ func ChatGPTToGrpcStream(promptTokens int, resp *openai.ChatCompletionStream, sv
 			message := response.Choices[0].Delta.Content
 			fmt.Printf("\nStream message %d: %s\n", i, message)
 			i++
+
+			toolCalls := make([]*model.ToolCall, len(response.Choices[0].Delta.ToolCalls))
+			for i, _ := range response.Choices[0].Delta.ToolCalls {
+				toolcall := model.ToolCall{
+					Id:        response.Choices[0].Delta.ToolCalls[i].ID,
+					Name:      response.Choices[0].Delta.ToolCalls[i].Function.Name,
+					Arguments: response.Choices[0].Delta.ToolCalls[i].Function.Arguments,
+				}
+				toolCalls[i] = &toolcall
+			}
 			pr := model.PartialLLMResponse{
 				Response: &model.PartialLLMResponse_Content{
 					Content: message,

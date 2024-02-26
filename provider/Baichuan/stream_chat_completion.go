@@ -22,7 +22,7 @@ func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (cha
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", "Bearer "+strings.Split(c.apiKey, ".")[0])
+	req.Header.Set("Authorization", "Bearer "+c.apiKey)
 
 	resp, err := c.hc.Do(req)
 	if err != nil {
@@ -38,6 +38,11 @@ func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (cha
 		defer resp.Body.Close()
 		for reader.Scanner.Scan() {
 			text := reader.Scanner.Text()
+			if strings.Contains(text, "error") {
+				// log.Fatal(text)
+				log.Println(text)
+				break
+			}
 			textJson := text[6:]
 			if textJson == "[DONE]" {
 				break

@@ -1,6 +1,9 @@
 package httpHandler
 
 import (
+	"log"
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/relay"
@@ -8,9 +11,20 @@ import (
 
 const InjectedChatGLMHeader = "X-Inject-ChatGLM-Auth"
 const InjectedChatGPTHeader = "X-Inject-ChatGPT-Auth"
+const InjectedBaichuanHeader = "X-Inject-Baichuan-Auth"
 
 func getProvider(m string) string {
-	return "openai"
+	if strings.Contains(m, "glm") {
+		return "chatglm"
+	}
+	if strings.Contains(m, "Baichuan") {
+		return "baichuan"
+	}
+	if strings.Contains(m, "gpt") {
+		return "openai"
+	}
+	log.Fatal("Could not get provider", m)
+	return ""
 }
 
 func RegisterRoute(r *gin.Engine, opt RegisterOpt) {
@@ -36,6 +50,8 @@ func RegisterRoute(r *gin.Engine, opt RegisterOpt) {
 			ChatGPT_ChatCompletitionsHandler(c, opt.KeyTransformer, req)
 		case "chatglm":
 			ChatGLM_ChatCompletionHandler(c, opt.KeyTransformer, req)
+		case "baichuan":
+			Baichuan_ChatCompletionHandler(c, opt.KeyTransformer, req)
 		}
 	})
 	r.POST("/completions", func(c *gin.Context) {

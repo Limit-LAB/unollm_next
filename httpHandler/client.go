@@ -1,10 +1,12 @@
 package httpHandler
 
 import (
+	"strings"
+
 	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
+	"go.limit.dev/unollm/provider/Baichuan"
 	"go.limit.dev/unollm/provider/ChatGLM"
-	"strings"
 )
 
 func NewOpenAIClient(c *gin.Context, tx KeyTransformer) *openai.Client {
@@ -48,6 +50,25 @@ func NewChatGLMClient(c *gin.Context, tx KeyTransformer) *ChatGLM.Client {
 		return nil
 	}
 	cli := ChatGLM.NewClient(rst.Key)
+	if rst.EndPoint != "" {
+		cli.SetBase(rst.EndPoint)
+	}
+	return cli
+}
+
+func NewBaichuanClient(c *gin.Context, tx KeyTransformer) *Baichuan.Client {
+	authHeader := getAuthHeader(c, InjectedBaichuanHeader)
+	if authHeader == "" {
+		return nil
+	}
+	if tx == nil {
+		return Baichuan.NewClient(authHeader)
+	}
+	rst, err := tx(authHeader, "chatglm")
+	if err != nil {
+		return nil
+	}
+	cli := Baichuan.NewClient(rst.Key)
 	if rst.EndPoint != "" {
 		cli.SetBase(rst.EndPoint)
 	}
