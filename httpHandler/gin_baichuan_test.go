@@ -67,58 +67,58 @@ func TestBaichuanBlocking(t *testing.T) {
 	log.Printf("%#v\n", resp.Choices[0])
 }
 
-// func TestBaichuanFunctionCalling(t *testing.T) {
-// 	godotenv.Load("../.env")
+func TestBaichuanFunctionCalling(t *testing.T) {
+	godotenv.Load("../.env")
 
-// 	client := GetClient(os.Getenv("TEST_ZHIPUAI_API"))
+	client := GetClient(os.Getenv("TEST_BAICHUAN_API"))
 
-// 	resp, err := client.CreateChatCompletionStream(context.Background(),
-// 		openai.ChatCompletionRequest{
-// 			Model: Baichuan.ModelGLM3Turbo,
-// 			Messages: []openai.ChatCompletionMessage{
-// 				{
-// 					Role:    "user",
-// 					Content: "今天北京天气怎么样？",
-// 				},
-// 			},
-// 			ToolChoice: "auto",
-// 			Tools: []openai.Tool{
-// 				{
-// 					Type: openai.ToolType("function"),
-// 					Function: openai.FunctionDefinition{
-// 						Name:        "get_weather",
-// 						Description: "Get the weather of a location",
-// 						Parameters: map[string]any{
-// 							"type": "object",
-// 							"properties": map[string]any{
-// 								"location": map[string]any{
-// 									"type":        "string",
-// 									"description": "The city and state, e.g. San Francisco, CA",
-// 								},
-// 								"unit": map[string]any{
-// 									"type": "string",
-// 									"enum": []string{"celsius", "fahrenheit"},
-// 								},
-// 							},
-// 							"required": []string{"location"},
-// 						},
-// 					},
-// 				},
-// 			},
-// 		},
-// 	)
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
-// 	for {
-// 		cv, e := resp.Recv()
-// 		if e != nil {
-// 			if errors.Is(e, io.EOF) {
-// 				break
-// 			}
-// 			t.Error(e)
-// 			break
-// 		}
-// 		log.Printf("%#v\n", cv.Choices[0].Delta.FunctionCall)
-// 	}
-// }
+	resp, err := client.CreateChatCompletionStream(context.Background(),
+		openai.ChatCompletionRequest{
+			Model: Baichuan.Baichuan2Turbo,
+			Messages: []openai.ChatCompletionMessage{
+				{
+					Role:    "user",
+					Content: "今天北京天气怎么样？",
+				},
+			},
+			ToolChoice: "auto",
+			Tools: []openai.Tool{
+				{
+					Type: openai.ToolType("function"),
+					Function: openai.FunctionDefinition{
+						Name:        "get_weather",
+						Description: "Get the weather of a location",
+						Parameters: map[string]any{
+							"type": "object",
+							"properties": map[string]any{
+								"location": map[string]any{
+									"type":        "string",
+									"description": "The city and state, e.g. San Francisco, CA",
+								},
+								"unit": map[string]any{
+									"type": "string",
+									"enum": []string{"celsius", "fahrenheit"},
+								},
+							},
+							"required": []string{"location"},
+						},
+					},
+				},
+			},
+		},
+	)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for {
+		cv, e := resp.Recv()
+		if e != nil {
+			if errors.Is(e, io.EOF) {
+				break
+			}
+			t.Error(e)
+			break
+		}
+		log.Printf("%#v\n", cv.Choices[0].Delta)
+	}
+}
