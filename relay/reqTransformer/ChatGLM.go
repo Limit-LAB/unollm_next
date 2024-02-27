@@ -22,8 +22,21 @@ func ChatGLMGrpcChatCompletionReq(rs *model.LLMRequestSchema) ChatGLM.ChatComple
 			Function: ChatGLM.GLMFunction{
 				Name:        f.Name,
 				Description: f.Description,
-				Parameters:  f.Parameters,
+				Parameters: map[string]any{
+					"type":       "object",
+					"properties": map[string]any{},
+					"required":   f.Requireds,
+				},
 			},
+		}
+		for j := 0; j < len(f.Parameters); j++ {
+			tools[i].Function.Parameters.(map[string]any)["properties"].(map[string]any)[f.Parameters[j].Name] = map[string]any{
+				"type":        f.Parameters[j].Type,
+				"description": f.Parameters[j].Description,
+			}
+			if len(f.Parameters[j].Enums) != 0 {
+				tools[i].Function.Parameters.(map[string]any)["properties"].(map[string]any)[f.Parameters[j].Name].(map[string]any)["enum"] = f.Parameters[j].Enums
+			}
 		}
 	}
 

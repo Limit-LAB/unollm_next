@@ -10,6 +10,7 @@ func BaiChuanGrpcChatCompletionReq(rs *model.LLMRequestSchema) Baichuan.ChatComp
 	info := rs.GetLlmRequestInfo()
 	messages := rs.GetMessages()
 	req := Baichuan.ChatCompletionRequest{
+		Model:       info.Model,
 		Temperature: float32(info.GetTemperature()),
 		TopP:        float32(info.GetTopP()),
 		TopK:        int(info.GetTopK()),

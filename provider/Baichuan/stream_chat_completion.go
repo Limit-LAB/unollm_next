@@ -39,7 +39,6 @@ func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (cha
 		for reader.Scanner.Scan() {
 			text := reader.Scanner.Text()
 			if strings.Contains(text, "error") {
-				// log.Fatal(text)
 				log.Println(text)
 				break
 			}
@@ -52,7 +51,6 @@ func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (cha
 			if _err != nil {
 				return _err
 			}
-			log.Println(jjson)
 			res <- jjson
 		}
 		res <- StreamResponse{Model: "STOP"}

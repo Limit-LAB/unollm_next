@@ -2,48 +2,16 @@ package grpcServer_test
 
 import (
 	"context"
-	"go.limit.dev/unollm/provider/ChatGLM"
 	"log"
 	"os"
 	"testing"
 
-	"go.limit.dev/unollm/grpcServer"
-
-	"go.limit.dev/unollm/model"
-	"go.limit.dev/unollm/utils"
-
 	"github.com/joho/godotenv"
+	"go.limit.dev/unollm/grpcServer"
+	"go.limit.dev/unollm/model"
+	"go.limit.dev/unollm/provider/ChatGLM"
+	"go.limit.dev/unollm/utils"
 )
-
-func TestOpenAI(t *testing.T) {
-	godotenv.Load("../.env")
-
-	messages := make([]*model.LLMChatCompletionMessage, 0)
-	messages = append(messages, &model.LLMChatCompletionMessage{
-		Role:    "user",
-		Content: "假如今天下大雨，我是否需要带伞？",
-	})
-	openaiApiKey := os.Getenv("TEST_OPENAI_API")
-	req_info := model.LLMRequestInfo{
-		LlmApiType:  grpcServer.OPENAI_LLM_API,
-		Model:       "gpt-3.5-turbo",
-		Temperature: 0.9,
-		TopP:        0.9,
-		TopK:        1,
-		Url:         "https://api.openai-sb.com/v1",
-		Token:       openaiApiKey,
-	}
-	req := model.LLMRequestSchema{
-		Messages:       messages,
-		LlmRequestInfo: &req_info,
-	}
-	mockServer := grpcServer.UnoForwardServer{}
-	res, err := mockServer.BlockingRequestLLM(context.Background(), &req)
-	if err != nil {
-		t.Error(err)
-	}
-	t.Log("res: ", res)
-}
 
 func TestChatGLM(t *testing.T) {
 	godotenv.Load("../.env")
@@ -115,42 +83,51 @@ func TestChatGLMStreaming(t *testing.T) {
 	}
 }
 
-func TestOpenAItreaming(t *testing.T) {
+func TestChatGLMFunctionCalling(t *testing.T) {
 	godotenv.Load("../.env")
 
 	messages := make([]*model.LLMChatCompletionMessage, 0)
 	messages = append(messages, &model.LLMChatCompletionMessage{
 		Role:    "user",
-		Content: "假如今天下大雨，我是否需要带伞？",
+		Content: "北京现在什么天气？",
 	})
-	openaiApiKey := os.Getenv("TEST_OPENAI_API")
+	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
 	req_info := model.LLMRequestInfo{
-		LlmApiType:  grpcServer.OPENAI_LLM_API,
-		Model:       "gpt-3.5-turbo",
+		LlmApiType:  grpcServer.CHATGLM_LLM_API,
+		Model:       ChatGLM.ModelGLM3Turbo,
 		Temperature: 0.9,
 		TopP:        0.9,
 		TopK:        1,
-		Url:         "https://api.openai-sb.com/v1",
-		Token:       openaiApiKey,
+		Url:         "",
+		Token:       zhipuaiApiKey,
+		Functions: []*model.Function{
+			{
+				Name:        "get_weather",
+				Description: "Get the weather of a location",
+				Parameters: []*model.FunctionCallingParameter{
+					{
+						Name:        "location",
+						Type:        "string",
+						Description: "The city and state, e.g. San Francisco, CA",
+					},
+					{
+						Name:  "unit",
+						Enums: []string{"celsius", "fahrenheit"},
+					},
+				},
+				Requireds: []string{"location"},
+			},
+		},
+		UseFunctionCalling: true,
 	}
 	req := model.LLMRequestSchema{
 		Messages:       messages,
 		LlmRequestInfo: &req_info,
 	}
 	mockServer := grpcServer.UnoForwardServer{}
-	mockServerPipe := utils.MockServerStream{
-		Stream: make(chan *model.PartialLLMResponse, 1000),
-	}
-	err := mockServer.StreamRequestLLM(&req, &mockServerPipe)
+	res, err := mockServer.BlockingRequestLLM(context.Background(), &req)
 	if err != nil {
 		t.Error(err)
 	}
-	for {
-		res := <-mockServerPipe.Stream
-		t.Log(res)
-		if res.LlmTokenCount != nil {
-			t.Log(res.LlmTokenCount)
-			return
-		}
-	}
+	log.Printf("res: %#v\n", res.ToolCalls[0])
 }

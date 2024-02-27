@@ -36,8 +36,17 @@ func BaiChuanToGrpcStream(_r chan Baichuan.StreamResponse, sv model.UnoLLMv1_Str
 		content := model.PartialLLMResponse_Content{
 			Content: chunk.Choices[0].Delta.Content,
 		}
+		var tc *model.LLMTokenCount
+		if chunk.Usage != nil {
+			tc = &model.LLMTokenCount{
+				TotalToken:      int64(chunk.Usage.TotalTokens),
+				PromptToken:     int64(chunk.Usage.PromptTokens),
+				CompletionToken: int64(chunk.Usage.CompletionTokens),
+			}
+		}
 		sv.Send(&model.PartialLLMResponse{
-			Response: &content,
+			Response:      &content,
+			LlmTokenCount: tc,
 		})
 	}
 }

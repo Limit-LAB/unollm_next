@@ -58,4 +58,5 @@ type StreamResponse struct {
 	Choices []StreamChoice `json:"choices"`
 	Model   string         `json:"model"`
 	Object  string         `json:"object"`
+	Usage   *Usage         `json:"usage,omitempty"`
 }

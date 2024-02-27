@@ -119,6 +119,6 @@ func TestChatGLMFunctionCalling(t *testing.T) {
 			t.Error(e)
 			break
 		}
-		log.Printf("%#v\n", cv.Choices[0].Delta.FunctionCall)
+		log.Printf("%#v\n", cv.Choices[0].Delta.ToolCalls)
 	}
 }

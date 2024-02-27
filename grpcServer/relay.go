@@ -45,6 +45,7 @@ func (uno *UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.L
 	case AZURE_OPENAI_LLM_API:
 		log.Println("AZURE_OPENAI_LLM_API")
 		return nil, status.Errorf(codes.Unimplemented, "method BlockingRequestLLM not implemented")
+
 	case BAICHUAN_LLM_API:
 		cli := NewBaichuanClient(info)
 		return BaichuanChatCompletion(cli, rs)

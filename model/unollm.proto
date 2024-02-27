@@ -17,17 +17,17 @@ message LLMChatCompletionMessage {
 
 
 message FunctionCallingParameter {
-  string type = 1;
-  string description = 2;
-  repeated string enums = 3;
+  string name = 1;
+  string type = 2;
+  string description = 3;
+  repeated string enums = 4;
 }
 
 message Function {
   string name = 1;
   string description = 2;
   
-  map<string, FunctionCallingParameter> parameters = 3;
-  
+  repeated FunctionCallingParameter parameters = 3;
   repeated string requireds = 4;
 }
 
