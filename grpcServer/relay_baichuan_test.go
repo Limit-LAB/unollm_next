@@ -82,3 +82,53 @@ func TestBaichuanStreaming(t *testing.T) {
 		}
 	}
 }
+
+func TestBaichuanFunctionCalling(t *testing.T) {
+	godotenv.Load("../.env")
+
+	messages := make([]*model.LLMChatCompletionMessage, 0)
+	messages = append(messages, &model.LLMChatCompletionMessage{
+		Role:    "user",
+		Content: "北京现在什么天气？",
+	})
+	baichuanApiKey := os.Getenv("TEST_BAICHUAN_API")
+	req_info := model.LLMRequestInfo{
+		LlmApiType:  grpcServer.BAICHUAN_LLM_API,
+		Model:       Baichuan.Baichuan2Turbo,
+		Temperature: 0.9,
+		TopP:        0.9,
+		TopK:        1,
+		Url:         "",
+		Token:       baichuanApiKey,
+		Functions: []*model.Function{
+			{
+				Name:        "get_weather",
+				Description: "Get the weather of a location",
+				Parameters: []*model.FunctionCallingParameter{
+					{
+						Name:        "location",
+						Type:        "string",
+						Description: "The city and state, e.g. San Francisco, CA",
+					},
+					{
+						Name:  "unit",
+						Type:  "string",
+						Enums: []string{"celsius", "fahrenheit"},
+					},
+				},
+				Requireds: []string{"location", "unit"},
+			},
+		},
+		UseFunctionCalling: true,
+	}
+	req := model.LLMRequestSchema{
+		Messages:       messages,
+		LlmRequestInfo: &req_info,
+	}
+	mockServer := grpcServer.UnoForwardServer{}
+	res, err := mockServer.BlockingRequestLLM(context.Background(), &req)
+	if err != nil {
+		t.Error(err)
+	}
+	log.Printf("res: %#v\n", res.ToolCalls[0])
+}

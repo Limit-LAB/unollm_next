@@ -48,6 +48,14 @@ func (uno *UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.L
 
 	case BAICHUAN_LLM_API:
 		cli := NewBaichuanClient(info)
+		if functionCallingRequestMake(rs) {
+			res, err := BaichuanChatCompletion(cli, rs)
+			if err != nil {
+				return nil, status.Errorf(codes.Internal, err.Error())
+			}
+			functionCallingResponseHandle(res)
+			return res, nil
+		}
 		return BaichuanChatCompletion(cli, rs)
 	}
 
@@ -68,6 +76,15 @@ func (uno *UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv mod
 		return GeminiChatCompletionStreaming(cli, rs, sv)
 	case BAICHUAN_LLM_API:
 		cli := NewBaichuanClient(info)
+		if functionCallingRequestMake(rs) {
+			res, err := BaichuanChatCompletion(cli, rs)
+			if err != nil {
+				return status.Errorf(codes.Internal, err.Error())
+			}
+			functionCallingResponseHandle(res)
+			functionCallingResponseToStream(res, sv)
+			return nil
+		}
 		return BaichuanChatCompletionStream(cli, rs, sv)
 	}
 	return status.Errorf(codes.Unimplemented, "method StreamRequestLLM not implemented")
