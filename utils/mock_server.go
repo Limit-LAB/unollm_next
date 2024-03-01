@@ -2,7 +2,6 @@ package utils
 
 import (
 	"context"
-	"log"
 
 	"go.limit.dev/unollm/model"
 	"google.golang.org/grpc/metadata"
@@ -16,7 +15,6 @@ type MockServerStream struct {
 }
 
 func (m *MockServerStream) Send(res *model.PartialLLMResponse) error {
-	log.Println(res)
 	m.Stream <- res
 	return nil
 }

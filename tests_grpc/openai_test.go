@@ -1,4 +1,4 @@
-package grpcServer_test
+package tests_grpc_test
 
 import (
 	"context"
@@ -131,4 +131,23 @@ func TestOpenAIFunctionCalling(t *testing.T) {
 		t.Fatal(err)
 	}
 	log.Printf("res: %#v\n", res.ToolCalls[0])
+}
+
+func TestOpenAIEmbedding(t *testing.T) {
+	godotenv.Load("../.env")
+	OPENAIApiKey := os.Getenv("TEST_OPENAI_API")
+	mockServer := grpcServer.UnoEmbeddingForwardServer{}
+	res, err := mockServer.EmbeddingRequestLLM(context.Background(), &model.EmbeddingRequest{
+		EmbeddingRequestInfo: &model.EmbeddingRequestInfo{
+			LlmApiType: grpcServer.OPENAI_LLM_API,
+			Model:      openai.AdaEmbeddingV2.String(),
+			Url:        "https://api.openai-sb.com/v1",
+			Token:      OPENAIApiKey,
+		},
+		Text: "我阐述你的梦",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	log.Printf("res: %#v\n", res)
 }

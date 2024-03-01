@@ -1,4 +1,4 @@
-package httpHandler_test
+package tests_http_test
 
 import (
 	"context"
@@ -10,17 +10,18 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/sashabaranov/go-openai"
-	"go.limit.dev/unollm/provider/Baichuan"
+	"go.limit.dev/unollm/provider/ChatGLM"
+	tests_http "go.limit.dev/unollm/tests_http"
 )
 
-func TestBaichuanStreaming(t *testing.T) {
+func TestChatGLMStreaming(t *testing.T) {
 	godotenv.Load("../.env")
 
-	client := GetClient(os.Getenv("TEST_BAICHUAN_API"))
+	client := tests_http.GetClient(os.Getenv("TEST_ZHIPUAI_API"))
 
 	resp, err := client.CreateChatCompletionStream(context.Background(),
 		openai.ChatCompletionRequest{
-			Model: Baichuan.Baichuan2Turbo,
+			Model: ChatGLM.ModelGLM3Turbo,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    "user",
@@ -45,14 +46,14 @@ func TestBaichuanStreaming(t *testing.T) {
 	}
 }
 
-func TestBaichuanBlocking(t *testing.T) {
+func TestChatGLMBlocking(t *testing.T) {
 	godotenv.Load("../.env")
 
-	client := GetClient(os.Getenv("TEST_BAICHUAN_API"))
+	client := tests_http.GetClient(os.Getenv("TEST_ZHIPUAI_API"))
 
 	resp, err := client.CreateChatCompletion(context.Background(),
 		openai.ChatCompletionRequest{
-			Model: Baichuan.Baichuan2Turbo,
+			Model: ChatGLM.ModelGLM3Turbo,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    "user",
@@ -67,18 +68,18 @@ func TestBaichuanBlocking(t *testing.T) {
 	log.Printf("%#v\n", resp.Choices[0])
 }
 
-func TestBaichuanFunctionCalling(t *testing.T) {
+func TestChatGLMFunctionCalling(t *testing.T) {
 	godotenv.Load("../.env")
 
-	client := GetClient(os.Getenv("TEST_BAICHUAN_API"))
+	client := tests_http.GetClient(os.Getenv("TEST_ZHIPUAI_API"))
 
 	resp, err := client.CreateChatCompletionStream(context.Background(),
 		openai.ChatCompletionRequest{
-			Model: Baichuan.Baichuan2Turbo,
+			Model: ChatGLM.ModelGLM3Turbo,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    "user",
-					Content: "今天北京天气怎么样？",
+					Content: "请返回北京和天津的天气情况。",
 				},
 			},
 			ToolChoice: "auto",
@@ -119,6 +120,6 @@ func TestBaichuanFunctionCalling(t *testing.T) {
 			t.Error(e)
 			break
 		}
-		log.Printf("%#v\n", cv.Choices[0].Delta)
+		log.Printf("%#v\n", cv.Choices[0].Delta.ToolCalls)
 	}
 }

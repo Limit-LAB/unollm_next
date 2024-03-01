@@ -7,6 +7,78 @@ import (
 	"go.limit.dev/unollm/model"
 )
 
+func ChatGPTToGrpcRequest(api string, model_type string, token string, req openai.ChatCompletionRequest) (*model.LLMRequestSchema, error) {
+	messages := make([]*model.LLMChatCompletionMessage, len(req.Messages))
+	for i, _ := range req.Messages {
+		messages[i] = &model.LLMChatCompletionMessage{
+			Role:    req.Messages[i].Role,
+			Content: req.Messages[i].Content,
+		}
+	}
+	tools := make([]*model.Function, len(req.Tools))
+	for i, _ := range req.Tools {
+		openai_params, ok := req.Tools[i].Function.Parameters.(map[string]any)
+		if !ok {
+			openai_params = make(map[string]any)
+		}
+		requireds, ok := openai_params["requireds"].([]string)
+		if !ok {
+			requireds = make([]string, 0)
+		}
+		openai_params_properties, ok := openai_params["properties"].(map[string]any)
+		if !ok {
+			openai_params_properties = make(map[string]any)
+		}
+		params := make([]*model.FunctionCallingParameter, 0)
+		for k, v := range openai_params_properties {
+			m, ok := v.(map[string]any)
+			if !ok {
+				continue
+			}
+			ty, ok := m["type"].(string)
+			param := model.FunctionCallingParameter{}
+			param.Name = k
+			if ok {
+				param.Type = ty
+			}
+			desc, ok := m["description"].(string)
+			if ok {
+				param.Description = desc
+			}
+			enum, ok := m["enum"].([]string)
+			if ok {
+				param.Enums = enum
+			}
+			params = append(params, &param)
+		}
+
+		tools[i] = &model.Function{
+			Name:        req.Tools[i].Function.Name,
+			Description: req.Tools[i].Function.Description,
+			Parameters:  params,
+			Requireds:   requireds,
+		}
+	}
+	usefc := true
+	if req.ToolChoice == "none" {
+		usefc = false
+	}
+	return &model.LLMRequestSchema{
+		Messages: messages,
+		LlmRequestInfo: &model.LLMRequestInfo{
+			LlmApiType:         api,
+			Model:              model_type,
+			Temperature:        float64(req.Temperature),
+			TopP:               float64(req.TopP),
+			TopK:               float64(0),
+			Url:                "TODO: URL",
+			Token:              token,
+			UseFunctionCalling: usefc,
+			Functions:          tools,
+		},
+	}, nil
+}
+
 func ChatGPTGrpcChatCompletionReq(rs *model.LLMRequestSchema) openai.ChatCompletionRequest {
 	info := rs.GetLlmRequestInfo()
 	messages := rs.GetMessages()

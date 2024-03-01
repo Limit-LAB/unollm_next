@@ -1,4 +1,4 @@
-package grpcServer_test
+package tests_grpc_test
 
 import (
 	"context"
@@ -9,11 +9,11 @@ import (
 	"github.com/joho/godotenv"
 	"go.limit.dev/unollm/grpcServer"
 	"go.limit.dev/unollm/model"
-	"go.limit.dev/unollm/provider/Baichuan"
+	"go.limit.dev/unollm/provider/ChatGLM"
 	"go.limit.dev/unollm/utils"
 )
 
-func TestBaichuanAI(t *testing.T) {
+func TestChatGLM(t *testing.T) {
 	godotenv.Load("../.env")
 
 	messages := make([]*model.LLMChatCompletionMessage, 0)
@@ -21,15 +21,15 @@ func TestBaichuanAI(t *testing.T) {
 		Role:    "user",
 		Content: "假如今天下大雨，我是否需要带伞？",
 	})
-	BaichuanApiKey := os.Getenv("TEST_BAICHUAN_API")
+	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
 	req_info := model.LLMRequestInfo{
-		LlmApiType:  grpcServer.BAICHUAN_LLM_API,
-		Model:       Baichuan.Baichuan2Turbo,
+		LlmApiType:  grpcServer.CHATGLM_LLM_API,
+		Model:       ChatGLM.ModelGLM3Turbo,
 		Temperature: 0.9,
 		TopP:        0.9,
 		TopK:        1,
 		Url:         "",
-		Token:       BaichuanApiKey,
+		Token:       zhipuaiApiKey,
 	}
 	req := model.LLMRequestSchema{
 		Messages:       messages,
@@ -43,7 +43,7 @@ func TestBaichuanAI(t *testing.T) {
 	log.Println("res: ", res)
 }
 
-func TestBaichuanStreaming(t *testing.T) {
+func TestChatGLMStreaming(t *testing.T) {
 	godotenv.Load("../.env")
 
 	messages := make([]*model.LLMChatCompletionMessage, 0)
@@ -51,15 +51,15 @@ func TestBaichuanStreaming(t *testing.T) {
 		Role:    "user",
 		Content: "假如今天下大雨，我是否需要带伞？",
 	})
-	BaichuanApiKey := os.Getenv("TEST_BAICHUAN_API")
+	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
 	req_info := model.LLMRequestInfo{
-		LlmApiType:  grpcServer.BAICHUAN_LLM_API,
-		Model:       Baichuan.Baichuan2Turbo,
+		LlmApiType:  grpcServer.CHATGLM_LLM_API,
+		Model:       ChatGLM.ModelGLM3Turbo,
 		Temperature: 0.9,
 		TopP:        0.9,
 		TopK:        1,
 		Url:         "",
-		Token:       BaichuanApiKey,
+		Token:       zhipuaiApiKey,
 	}
 	req := model.LLMRequestSchema{
 		Messages:       messages,
@@ -83,23 +83,23 @@ func TestBaichuanStreaming(t *testing.T) {
 	}
 }
 
-func TestBaichuanFunctionCalling(t *testing.T) {
+func TestChatGLMFunctionCalling(t *testing.T) {
 	godotenv.Load("../.env")
 
 	messages := make([]*model.LLMChatCompletionMessage, 0)
 	messages = append(messages, &model.LLMChatCompletionMessage{
 		Role:    "user",
-		Content: "北京现在什么天气？",
+		Content: "北京今天天气怎么样？现在有几个朋友在北京？",
 	})
-	baichuanApiKey := os.Getenv("TEST_BAICHUAN_API")
+	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
 	req_info := model.LLMRequestInfo{
-		LlmApiType:  grpcServer.BAICHUAN_LLM_API,
-		Model:       Baichuan.Baichuan2Turbo,
+		LlmApiType:  grpcServer.CHATGLM_LLM_API,
+		Model:       ChatGLM.ModelGLM3Turbo,
 		Temperature: 0.9,
 		TopP:        0.9,
 		TopK:        1,
 		Url:         "",
-		Token:       baichuanApiKey,
+		Token:       zhipuaiApiKey,
 		Functions: []*model.Function{
 			{
 				Name:        "get_weather",
@@ -112,11 +112,22 @@ func TestBaichuanFunctionCalling(t *testing.T) {
 					},
 					{
 						Name:  "unit",
-						Type:  "string",
 						Enums: []string{"celsius", "fahrenheit"},
 					},
 				},
-				Requireds: []string{"location", "unit"},
+				Requireds: []string{"location"},
+			},
+			{
+				Name:        "get_friends_in_location",
+				Description: "Get the weather of a location",
+				Parameters: []*model.FunctionCallingParameter{
+					{
+						Name:        "location",
+						Type:        "string",
+						Description: "The city and state, e.g. San Francisco, CA",
+					},
+				},
+				Requireds: []string{"location"},
 			},
 		},
 		UseFunctionCalling: true,

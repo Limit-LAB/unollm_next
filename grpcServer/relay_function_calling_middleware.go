@@ -2,25 +2,21 @@ package grpcServer
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
-	"regexp"
-	"strconv"
+	"time"
 
 	"github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/model"
+	"go.limit.dev/unollm/provider/ChatGLM"
 )
 
-func getParams(regEx, url string) (paramsMap map[string]string) {
-	var compRegEx = regexp.MustCompile(regEx)
-	match := compRegEx.FindStringSubmatch(url)
+type Callings struct {
+}
 
-	paramsMap = make(map[string]string)
-	for i, name := range compRegEx.SubexpNames() {
-		if i > 0 && i <= len(match) {
-			paramsMap[name] = match[i]
-		}
-	}
-	return paramsMap
+func getParams(url string) (params []ChatGLM.GLMFunctionCall, err error) {
+	err = json.Unmarshal([]byte(url), &params)
+	return
 }
 
 func functionCallingRequestMake(req *model.LLMRequestSchema) bool {
@@ -69,10 +65,8 @@ func functionCallingRequestMake(req *model.LLMRequestSchema) bool {
 		prefix += `
 **you can ONLY use tools provided.**
 if you deside to use tools, you MUST answer with following json format:
-` + "```\n{\n	\"function\": {\n        \"name\": \"the name of the function\",\n        \"arguments\": \"the string of json object of the parameters you think is the best to use\"\n    }\n}\n```" +
+` + "```[\n{\n        \"name\": \"the name of the function\",\n        \"arguments\": \"the string of json object of the parameters you think is the best to use\"\n    }\n, /* function 2, function 3, etc...*/ ]```" +
 			`if you decided to call functions, you **ONLY** need to answer raw json
-
-the question of user is: 
 `
 		prefix += userPrompt
 		req.Messages[len(req.Messages)-1].Content = prefix
@@ -82,38 +76,20 @@ the question of user is:
 }
 
 func functionCallingResponseHandle(resp *model.LLMResponseSchema) {
-	var err error
-	var function_calling_args string
-
-	function_calling := getParams(`\{[ \n]*"function"[ \n]*:[ \n]*\{[ \n]*"name"[ \n]*:[ \n]*(?P<NAME>".*")[ \n]*,[ \n]*"arguments"[ \n]*:[ \n]*(?P<ARGS>".*")`, resp.Message.Content)
+	function_calling, err := getParams(resp.Message.Content)
+	if err != nil {
+		log.Fatal(err)
+	}
 	log.Printf("%#v\n", function_calling)
-	function_calling_name, ok := function_calling["NAME"]
-	__content := resp.Message.Content
-	if !ok {
-		goto ERROR_HANDLING
-	}
-	function_calling_name, err = strconv.Unquote(function_calling_name)
-	if err != nil {
-		goto ERROR_HANDLING
-	}
-	function_calling_args, ok = function_calling["ARGS"]
-	if !ok {
-		goto ERROR_HANDLING
-	}
-	function_calling_args, err = strconv.Unquote(function_calling_args)
-	if err != nil {
-		goto ERROR_HANDLING
-	}
 	resp.Message.Content = ""
-	resp.ToolCalls = []*model.ToolCall{
-		{
-			Name:      function_calling_name,
-			Arguments: function_calling_args,
-		},
+	resp.ToolCalls = []*model.ToolCall{}
+	for _, f := range function_calling {
+		resp.ToolCalls = append(resp.ToolCalls, &model.ToolCall{
+			Id:        fmt.Sprintf("unollm_adapter_%d", time.Now().Unix()),
+			Name:      f.Name,
+			Arguments: f.Arguments,
+		})
 	}
-	return
-ERROR_HANDLING:
-	log.Println("function calling error, getting response", __content)
 }
 
 func functionCallingResponseToStream(resp *model.LLMResponseSchema, sv model.UnoLLMv1_StreamRequestLLMServer) {
@@ -125,5 +101,4 @@ func functionCallingResponseToStream(resp *model.LLMResponseSchema, sv model.Uno
 		Response:      &model.PartialLLMResponse_Done{},
 		LlmTokenCount: resp.LlmTokenCount,
 	})
-	return
 }

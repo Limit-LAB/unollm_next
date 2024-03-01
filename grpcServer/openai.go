@@ -45,3 +45,29 @@ func OpenAIChatCompletionStreaming(cli *openai.Client, rs *model.LLMRequestSchem
 
 	return respTransformer.ChatGPTToGrpcStream(promptUsage, resp, sv)
 }
+
+type myEmbeddingRequest struct {
+	Text string
+}
+
+func (emr myEmbeddingRequest) Convert() openai.EmbeddingRequest {
+
+	return openai.EmbeddingRequest{
+		Input:          emr.Text,
+		Model:          17,
+		EncodingFormat: openai.EmbeddingEncodingFormatFloat,
+	}
+}
+
+func OpenAIEmbeddingRequest(cli *openai.Client, req *model.EmbeddingRequest) (*model.EmbeddingResponse, error) {
+	log.Println("OPENAI_LLM_API")
+
+	res, err := cli.CreateEmbeddings(context.Background(), myEmbeddingRequest{
+		Text: req.Text,
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	return respTransformer.OpenAIToGrpcEmbedding(res)
+}

@@ -14,5 +14,7 @@ out/
 *.so
 *.dylib
 
+*.tiktoken
+
 config.json
 unollm

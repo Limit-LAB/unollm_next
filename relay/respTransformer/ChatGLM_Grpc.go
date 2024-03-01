@@ -77,5 +77,9 @@ func ChatGLMToGrpcEmbedding(req *model.EmbeddingRequest, res ChatGLM.EmbeddingRe
 		EmbeddingRequestInfo: req.GetEmbeddingRequestInfo(),
 		Dimension:            1024,
 		Vectors:              res.Data[0].Embedding,
+		Usage: &model.LLMTokenCount{
+			TotalToken:  int64(res.Usage.TotalTokens),
+			PromptToken: int64(res.Usage.PromptTokens),
+		},
 	}, nil
 }

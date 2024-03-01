@@ -1,4 +1,4 @@
-package httpHandler_test
+package tests_http_test
 
 import (
 	"context"
@@ -10,17 +10,18 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/sashabaranov/go-openai"
-	"go.limit.dev/unollm/provider/ChatGLM"
+	"go.limit.dev/unollm/provider/Baichuan"
+	tests_http "go.limit.dev/unollm/tests_http"
 )
 
-func TestChatGLMStreaming(t *testing.T) {
+func GinTestBaichuanStreaming(t *testing.T) {
 	godotenv.Load("../.env")
 
-	client := GetClient(os.Getenv("TEST_ZHIPUAI_API"))
+	client := tests_http.GetClient(os.Getenv("TEST_BAICHUAN_API"))
 
 	resp, err := client.CreateChatCompletionStream(context.Background(),
 		openai.ChatCompletionRequest{
-			Model: ChatGLM.ModelGLM3Turbo,
+			Model: Baichuan.Baichuan2Turbo,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    "user",
@@ -45,14 +46,14 @@ func TestChatGLMStreaming(t *testing.T) {
 	}
 }
 
-func TestChatGLMBlocking(t *testing.T) {
+func GinTestBaichuanBlocking(t *testing.T) {
 	godotenv.Load("../.env")
 
-	client := GetClient(os.Getenv("TEST_ZHIPUAI_API"))
+	client := tests_http.GetClient(os.Getenv("TEST_BAICHUAN_API"))
 
 	resp, err := client.CreateChatCompletion(context.Background(),
 		openai.ChatCompletionRequest{
-			Model: ChatGLM.ModelGLM3Turbo,
+			Model: Baichuan.Baichuan2Turbo,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    "user",
@@ -67,14 +68,14 @@ func TestChatGLMBlocking(t *testing.T) {
 	log.Printf("%#v\n", resp.Choices[0])
 }
 
-func TestChatGLMFunctionCalling(t *testing.T) {
+func GinTestBaichuanFunctionCalling(t *testing.T) {
 	godotenv.Load("../.env")
 
-	client := GetClient(os.Getenv("TEST_ZHIPUAI_API"))
+	client := tests_http.GetClient(os.Getenv("TEST_BAICHUAN_API"))
 
 	resp, err := client.CreateChatCompletionStream(context.Background(),
 		openai.ChatCompletionRequest{
-			Model: ChatGLM.ModelGLM3Turbo,
+			Model: Baichuan.Baichuan2Turbo,
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    "user",
@@ -119,6 +120,6 @@ func TestChatGLMFunctionCalling(t *testing.T) {
 			t.Error(e)
 			break
 		}
-		log.Printf("%#v\n", cv.Choices[0].Delta.ToolCalls)
+		log.Printf("%#v\n", cv.Choices[0].Delta)
 	}
 }

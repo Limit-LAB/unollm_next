@@ -84,6 +84,7 @@ message EmbeddingResponse {
   EmbeddingRequestInfo embedding_request_info = 1;
   int32 dimension = 2;
   repeated float vectors = 3;
+  LLMTokenCount usage = 4;
 }
 
 message EmbeddingRequestInfo {

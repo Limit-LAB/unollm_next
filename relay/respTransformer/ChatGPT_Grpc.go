@@ -1,13 +1,17 @@
 package respTransformer
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"log"
+	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/model"
+	"go.limit.dev/unollm/utils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -88,4 +92,89 @@ func ChatGPTToGrpcStream(promptTokens int, resp *openai.ChatCompletionStream, sv
 			sv.Send(&pr)
 		}
 	}
+}
+
+func GrpcToChatGPTCompletion(model string, resp *model.LLMResponseSchema) openai.ChatCompletionResponse {
+	toolCalls := make([]openai.ToolCall, len(resp.ToolCalls))
+	for i, toolCall := range resp.ToolCalls {
+		toolCalls[i] = openai.ToolCall{
+			ID:   toolCall.Id,
+			Type: openai.ToolType("function"),
+			Function: openai.FunctionCall{
+				Name:      toolCall.Name,
+				Arguments: toolCall.Arguments,
+			},
+		}
+	}
+
+	message := openai.ChatCompletionMessage{
+		Role:      resp.Message.Role,
+		Content:   resp.Message.Content,
+		ToolCalls: toolCalls,
+	}
+
+	return openai.ChatCompletionResponse{
+		ID:      "grpc-response",
+		Object:  "chat.completion",
+		Created: time.Now().Unix(),
+		Model:   model,
+		Choices: []openai.ChatCompletionChoice{
+			{
+				Index:   0,
+				Message: message,
+			},
+		},
+	}
+}
+
+func OpenAIToGrpcEmbedding(res openai.EmbeddingResponse) (*model.EmbeddingResponse, error) {
+	return &model.EmbeddingResponse{
+		Dimension: int32(len(res.Data[0].Embedding)),
+		Vectors:   res.Data[0].Embedding,
+		Usage: &model.LLMTokenCount{
+			TotalToken:  int64(res.Usage.TotalTokens),
+			PromptToken: int64(res.Usage.PromptTokens),
+		},
+	}, nil
+}
+
+func GrpcStreamToChatGPT(c *gin.Context, model string, sv chan *model.PartialLLMResponse) {
+	utils.SetEventStreamHeaders(c)
+	c.Stream(func(w io.Writer) bool {
+		pr := <-sv
+		if pr.LlmTokenCount == nil {
+			toolcalls := make([]openai.ToolCall, len(pr.GetToolCalls()))
+			for i, _ := range pr.GetToolCalls() {
+				toolcalls[i] = openai.ToolCall{
+					ID:   pr.GetToolCalls()[i].Id,
+					Type: openai.ToolType("function"),
+					Function: openai.FunctionCall{
+						Name:      pr.GetToolCalls()[i].Name,
+						Arguments: pr.GetToolCalls()[i].Arguments,
+					},
+				}
+			}
+			message := openai.ChatCompletionStreamResponse{
+				Object:  "chat.completion.chunk",
+				Created: time.Now().Unix(),
+				Model:   model,
+				Choices: []openai.ChatCompletionStreamChoice{
+					{
+						Index: 0,
+						Delta: openai.ChatCompletionStreamChoiceDelta{
+							Role:      "assistant",
+							Content:   pr.GetContent(),
+							ToolCalls: toolcalls,
+						},
+					},
+				},
+			}
+			jsonResponse, _ := json.Marshal(message)
+			c.Render(-1, utils.CustomEvent{Data: "data: " + string(jsonResponse)})
+			return true
+		}
+
+		c.Render(-1, utils.CustomEvent{Data: "data: [DONE]"})
+		return false
+	})
 }

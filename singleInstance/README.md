@@ -1,2 +1,0 @@
-# Single Instance HTTP Server
-

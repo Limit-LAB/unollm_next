@@ -20,6 +20,7 @@ type UnoEmbeddingForwardServer struct {
 // mustEmbedUnimplementedUnoLLMv1Server implements model.UnoLLMv1Server.
 
 var _ model.UnoLLMv1Server = (*UnoForwardServer)(nil)
+var _ model.UnoEmbeddingv1Server = (*UnoEmbeddingForwardServer)(nil)
 
 const OPENAI_LLM_API = "openai"
 const CHATGLM_LLM_API = "chatglm"
@@ -92,8 +93,9 @@ func (uno *UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv mod
 
 func (uno *UnoEmbeddingForwardServer) EmbeddingRequestLLM(ctx context.Context, req *model.EmbeddingRequest) (res *model.EmbeddingResponse, err error) {
 	info := req.GetEmbeddingRequestInfo()
+
 	switch info.GetLlmApiType() {
-	case CHATGLM_LLM_API:
+	case "chatglm":
 		cli := NewChatGLMClient(&model.LLMRequestInfo{
 			LlmApiType: info.GetLlmApiType(),
 			Model:      info.GetModel(),
@@ -101,6 +103,15 @@ func (uno *UnoEmbeddingForwardServer) EmbeddingRequestLLM(ctx context.Context, r
 			Token:      info.GetToken(),
 		})
 		return ChatGLMEmbeddingRequest(cli, req)
+	case "openai":
+		cli := NewOpenAIClient(&model.LLMRequestInfo{
+			LlmApiType: info.GetLlmApiType(),
+			Model:      info.GetModel(),
+			Url:        info.GetUrl(),
+			Token:      info.GetToken(),
+		})
+		return OpenAIEmbeddingRequest(cli, req)
 	}
+
 	return nil, status.Errorf(codes.Unimplemented, "method EmbeddingRequestLLM not implemented")
 }
