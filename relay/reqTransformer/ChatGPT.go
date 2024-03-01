@@ -3,7 +3,7 @@ package reqTransformer
 import (
 	"log"
 
-	"github.com/sashabaranov/go-openai"
+	openai "github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/model"
 )
 
@@ -108,7 +108,7 @@ func ChatGPTGrpcChatCompletionReq(rs *model.LLMRequestSchema) openai.ChatComplet
 	for i, f := range info.Functions {
 		tools[i] = openai.Tool{
 			Type: "function",
-			Function: openai.FunctionDefinition{
+			Function: &openai.FunctionDefinition{
 				Name:        f.Name,
 				Description: f.Description,
 				Parameters: map[string]any{

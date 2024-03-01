@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sashabaranov/go-openai"
+	openai "github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/relay"
 	"go.limit.dev/unollm/relay/reqTransformer"
@@ -27,6 +27,13 @@ func getProvider(m string) (string, error) {
 		return "openai", nil
 	}
 	return "", errors.New("could not get provider")
+}
+
+func getEmbeddingProvider(m string) (string, error) {
+	if m == "embedding-2" {
+		return "chatglm", nil
+	}
+	return "openai", nil
 }
 
 func internalServerError(c *gin.Context, err error) {
@@ -95,7 +102,7 @@ func RegisterRoute(r *gin.Engine) {
 			if autoErr(c, c.BindJSON(&req)) {
 				return
 			}
-			provider, err := getProvider(req.Model)
+			provider, err := getEmbeddingProvider(req.Model)
 			if err != nil {
 				internalServerError(c, err)
 				return
@@ -115,27 +122,26 @@ func RegisterRoute(r *gin.Engine) {
 				internalServerError(c, err)
 				return
 			}
-			ores := map[string]any{
-				"object": "list",
-				"data": []openai.Embedding{
+			oores := openai.EmbeddingResponse{
+				Object: "list",
+				Data: []openai.Embedding{
 					{
 						Object:    "embedding",
 						Index:     0,
 						Embedding: res.Vectors,
 					},
 				},
-				"model": req.Model,
-				"usage": map[string]any{
-					"prompt_tokens": res.Usage.PromptToken,
-					"total_tokens":  res.Usage.TotalToken,
+				Model: openai.EmbeddingModel(req.Model),
+				Usage: openai.Usage{
+					PromptTokens: int(res.Usage.PromptToken),
+					TotalTokens:  int(res.Usage.TotalToken),
 				},
 			}
-			jres, err := json.Marshal(ores)
 			if err != nil {
 				internalServerError(c, err)
 				return
 			}
-			c.JSON(200, jres)
+			c.JSON(200, oores)
 		})
 
 	}

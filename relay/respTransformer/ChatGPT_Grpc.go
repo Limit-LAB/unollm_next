@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/sashabaranov/go-openai"
+	openai "github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/utils"
 	"google.golang.org/grpc/codes"

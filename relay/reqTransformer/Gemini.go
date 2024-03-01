@@ -2,7 +2,7 @@ package reqTransformer
 
 import (
 	"github.com/Limit-LAB/go-gemini/models"
-	"github.com/sashabaranov/go-openai"
+	openai "github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/model"
 )
 

@@ -2,7 +2,7 @@ package grpcServer
 
 import (
 	"github.com/Limit-LAB/go-gemini"
-	"github.com/sashabaranov/go-openai"
+	openai "github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/provider/Baichuan"
 	"go.limit.dev/unollm/provider/ChatGLM"

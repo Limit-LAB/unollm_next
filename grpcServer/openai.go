@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 
-	"github.com/sashabaranov/go-openai"
+	openai "github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/relay"
 	"go.limit.dev/unollm/relay/reqTransformer"
@@ -47,14 +47,15 @@ func OpenAIChatCompletionStreaming(cli *openai.Client, rs *model.LLMRequestSchem
 }
 
 type myEmbeddingRequest struct {
-	Text string
+	Text  string
+	Model string
 }
 
 func (emr myEmbeddingRequest) Convert() openai.EmbeddingRequest {
 
 	return openai.EmbeddingRequest{
 		Input:          emr.Text,
-		Model:          17,
+		Model:          openai.EmbeddingModel(emr.Model),
 		EncodingFormat: openai.EmbeddingEncodingFormatFloat,
 	}
 }
@@ -63,7 +64,8 @@ func OpenAIEmbeddingRequest(cli *openai.Client, req *model.EmbeddingRequest) (*m
 	log.Println("OPENAI_LLM_API")
 
 	res, err := cli.CreateEmbeddings(context.Background(), myEmbeddingRequest{
-		Text: req.Text,
+		Text:  req.Text,
+		Model: req.EmbeddingRequestInfo.Model,
 	})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())

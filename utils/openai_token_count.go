@@ -8,7 +8,7 @@ import (
 	"os"
 
 	"github.com/pkoukk/tiktoken-go"
-	"github.com/sashabaranov/go-openai"
+	openai "github.com/sashabaranov/go-openai"
 )
 
 var tkm *tiktoken.Tiktoken

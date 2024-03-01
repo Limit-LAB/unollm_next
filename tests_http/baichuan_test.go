@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/joho/godotenv"
-	"github.com/sashabaranov/go-openai"
+	openai "github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/provider/Baichuan"
 	tests_http "go.limit.dev/unollm/tests_http"
 )
@@ -86,7 +86,7 @@ func GinTestBaichuanFunctionCalling(t *testing.T) {
 			Tools: []openai.Tool{
 				{
 					Type: openai.ToolType("function"),
-					Function: openai.FunctionDefinition{
+					Function: &openai.FunctionDefinition{
 						Name:        "get_weather",
 						Description: "Get the weather of a location",
 						Parameters: map[string]any{

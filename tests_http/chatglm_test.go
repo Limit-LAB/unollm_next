@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/joho/godotenv"
-	"github.com/sashabaranov/go-openai"
+	openai "github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/provider/ChatGLM"
 	tests_http "go.limit.dev/unollm/tests_http"
 )
@@ -86,7 +86,7 @@ func TestChatGLMFunctionCalling(t *testing.T) {
 			Tools: []openai.Tool{
 				{
 					Type: openai.ToolType("function"),
-					Function: openai.FunctionDefinition{
+					Function: &openai.FunctionDefinition{
 						Name:        "get_weather",
 						Description: "Get the weather of a location",
 						Parameters: map[string]any{
@@ -122,4 +122,19 @@ func TestChatGLMFunctionCalling(t *testing.T) {
 		}
 		log.Printf("%#v\n", cv.Choices[0].Delta.ToolCalls)
 	}
+}
+
+func TestChatGLMEmbedding(t *testing.T) {
+	godotenv.Load("../.env")
+
+	client := tests_http.GetClient(os.Getenv("TEST_ZHIPUAI_API"))
+	resp, err := client.CreateEmbeddings(context.Background(), openai.EmbeddingRequest{
+		Input:          "我阐述你的梦",
+		Model:          "embedding-2",
+		EncodingFormat: "float",
+	})
+	if err != nil {
+		log.Panic(err)
+	}
+	log.Printf("%#v\n", resp)
 }

@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/sashabaranov/go-openai"
+	openai "github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/provider/ChatGLM"
 )
@@ -34,7 +34,7 @@ func functionCallingRequestMake(req *model.LLMRequestSchema) bool {
 		for i, f := range info.Functions {
 			tools[i] = openai.Tool{
 				Type: "function",
-				Function: openai.FunctionDefinition{
+				Function: &openai.FunctionDefinition{
 					Name:        f.Name,
 					Description: f.Description,
 					Parameters: map[string]any{

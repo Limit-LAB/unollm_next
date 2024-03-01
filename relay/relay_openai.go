@@ -3,7 +3,7 @@ package relay
 import (
 	"context"
 
-	"github.com/sashabaranov/go-openai"
+	openai "github.com/sashabaranov/go-openai"
 )
 
 // TODO: read max_tokens, n, stop, frequency_penalty, presence_penalty from meta

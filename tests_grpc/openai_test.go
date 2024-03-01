@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/joho/godotenv"
-	"github.com/sashabaranov/go-openai"
+	openai "github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/grpcServer"
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/utils"
@@ -140,7 +140,7 @@ func TestOpenAIEmbedding(t *testing.T) {
 	res, err := mockServer.EmbeddingRequestLLM(context.Background(), &model.EmbeddingRequest{
 		EmbeddingRequestInfo: &model.EmbeddingRequestInfo{
 			LlmApiType: grpcServer.OPENAI_LLM_API,
-			Model:      openai.AdaEmbeddingV2.String(),
+			Model:      string(openai.AdaEmbeddingV2),
 			Url:        "https://api.openai-sb.com/v1",
 			Token:      OPENAIApiKey,
 		},

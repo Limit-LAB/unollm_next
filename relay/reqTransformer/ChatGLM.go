@@ -1,7 +1,7 @@
 package reqTransformer
 
 import (
-	"github.com/sashabaranov/go-openai"
+	openai "github.com/sashabaranov/go-openai"
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/provider/ChatGLM"
 )
