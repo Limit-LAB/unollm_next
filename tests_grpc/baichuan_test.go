@@ -141,5 +141,5 @@ func TestBaichuanFunctionCalling(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	log.Printf("res: %#v\n", res.ToolCalls[0])
+	log.Printf("res: %#v", res.ToolCalls[0])
 }

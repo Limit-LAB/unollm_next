@@ -1,6 +1,7 @@
 package reqTransformer
 
 import (
+	"encoding/json"
 	"log"
 
 	openai "github.com/sashabaranov/go-openai"
@@ -21,9 +22,15 @@ func ChatGPTToGrpcRequest(api string, model_type string, token string, req opena
 		if !ok {
 			openai_params = make(map[string]any)
 		}
-		requireds, ok := openai_params["requireds"].([]string)
+		var requireds []string
+		openai_requireds, ok := openai_params["required"].([]any)
 		if !ok {
 			requireds = make([]string, 0)
+		} else {
+			requireds = make([]string, len(openai_requireds))
+			for i, v := range openai_requireds {
+				requireds[i] = v.(string)
+			}
 		}
 		openai_params_properties, ok := openai_params["properties"].(map[string]any)
 		if !ok {
@@ -45,9 +52,12 @@ func ChatGPTToGrpcRequest(api string, model_type string, token string, req opena
 			if ok {
 				param.Description = desc
 			}
-			enum, ok := m["enum"].([]string)
+			json.Marshal(m["enum"])
+			enum, ok := m["enum"].([]any)
 			if ok {
-				param.Enums = enum
+				for _, e := range enum {
+					param.Enums = append(param.Enums, e.(string))
+				}
 			}
 			params = append(params, &param)
 		}
@@ -63,6 +73,11 @@ func ChatGPTToGrpcRequest(api string, model_type string, token string, req opena
 	if req.ToolChoice == "none" {
 		usefc = false
 	}
+	url := "TODO: URL"
+	switch api {
+	case "moonshot":
+		url = "https://api.moonshot.cn/v1"
+	}
 	return &model.LLMRequestSchema{
 		Messages: messages,
 		LlmRequestInfo: &model.LLMRequestInfo{
@@ -71,7 +86,7 @@ func ChatGPTToGrpcRequest(api string, model_type string, token string, req opena
 			Temperature:        float64(req.Temperature),
 			TopP:               float64(req.TopP),
 			TopK:               float64(0),
-			Url:                "TODO: URL",
+			Url:                url,
 			Token:              token,
 			UseFunctionCalling: usefc,
 			Functions:          tools,
@@ -127,7 +142,7 @@ func ChatGPTGrpcChatCompletionReq(rs *model.LLMRequestSchema) openai.ChatComplet
 				tools[i].Function.Parameters.(map[string]any)["properties"].(map[string]any)[f.Parameters[j].Name].(map[string]any)["enum"] = f.Parameters[j].Enums
 			}
 		}
-		log.Printf("%#v\n", tools[i])
+		log.Printf("converting function call to grpc: %#v", tools[i].Function)
 	}
 	return openai.ChatCompletionRequest{
 		Model:       info.GetModel(),

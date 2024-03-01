@@ -130,7 +130,7 @@ func TestOpenAIFunctionCalling(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Printf("res: %#v\n", res.ToolCalls[0])
+	log.Printf("res: %#v", res.ToolCalls[0])
 }
 
 func TestOpenAIEmbedding(t *testing.T) {
@@ -149,5 +149,5 @@ func TestOpenAIEmbedding(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Printf("res: %#v\n", res)
+	log.Printf("res: %#v", res)
 }

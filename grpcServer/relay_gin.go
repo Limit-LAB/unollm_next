@@ -26,6 +26,9 @@ func getProvider(m string) (string, error) {
 	if strings.Contains(m, "gpt") {
 		return "openai", nil
 	}
+	if strings.Contains(m, "moonshot") {
+		return "moonshot", nil
+	}
 	return "", errors.New("could not get provider")
 }
 

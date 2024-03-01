@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	openai "github.com/sashabaranov/go-openai"
@@ -14,8 +15,34 @@ import (
 type Callings struct {
 }
 
+func removeWhiteSpaces(str string) string {
+	var b strings.Builder
+	b.Grow(len(str))
+	for _, ch := range str {
+		if ch != ' ' && ch != '\t' && ch != '\n' {
+			b.WriteRune(ch)
+		}
+	}
+	return b.String()
+}
 func getParams(url string) (params []ChatGLM.GLMFunctionCall, err error) {
+	url = removeWhiteSpaces(url)
 	err = json.Unmarshal([]byte(url), &params)
+	if err != nil {
+		// ```json<>```
+		uurl1, found1 := strings.CutPrefix(url, "```json")
+		if found1 {
+			uurl1, _ = strings.CutSuffix(uurl1, "```")
+			err = json.Unmarshal([]byte(uurl1), &params)
+			return
+		}
+		uurl2, found2 := strings.CutPrefix(url, "```")
+		if found2 {
+			uurl2, _ = strings.CutSuffix(uurl2, "```")
+			err = json.Unmarshal([]byte(uurl2), &params)
+			return
+		}
+	}
 	return
 }
 
@@ -53,7 +80,7 @@ func functionCallingRequestMake(req *model.LLMRequestSchema) bool {
 					tools[i].Function.Parameters.(map[string]any)["properties"].(map[string]any)[f.Parameters[j].Name].(map[string]any)["enum"] = f.Parameters[j].Enums
 				}
 			}
-			log.Printf("%#v\n", tools[i])
+			log.Printf("find function: %#v", tools[i].Function)
 		}
 
 		tools_json_byte, err := json.Marshal(tools)
@@ -80,7 +107,6 @@ func functionCallingResponseHandle(resp *model.LLMResponseSchema) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("%#v\n", function_calling)
 	resp.Message.Content = ""
 	resp.ToolCalls = []*model.ToolCall{}
 	for _, f := range function_calling {

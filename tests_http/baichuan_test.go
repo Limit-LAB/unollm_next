@@ -42,7 +42,7 @@ func GinTestBaichuanStreaming(t *testing.T) {
 			t.Error(e)
 			break
 		}
-		log.Printf("%#v\n", cv.Choices[0].Delta)
+		log.Printf("%#v", cv.Choices[0].Delta)
 	}
 }
 
@@ -65,7 +65,7 @@ func GinTestBaichuanBlocking(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	log.Printf("%#v\n", resp.Choices[0])
+	log.Printf("%#v", resp.Choices[0])
 }
 
 func GinTestBaichuanFunctionCalling(t *testing.T) {
@@ -120,6 +120,6 @@ func GinTestBaichuanFunctionCalling(t *testing.T) {
 			t.Error(e)
 			break
 		}
-		log.Printf("%#v\n", cv.Choices[0].Delta)
+		log.Printf("%#v", cv.Choices[0].Delta)
 	}
 }

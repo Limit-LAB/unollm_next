@@ -9,11 +9,10 @@ import (
 	"github.com/joho/godotenv"
 	"go.limit.dev/unollm/grpcServer"
 	"go.limit.dev/unollm/model"
-	"go.limit.dev/unollm/provider/ChatGLM"
 	"go.limit.dev/unollm/utils"
 )
 
-func TestChatGLM(t *testing.T) {
+func TestMoonShot(t *testing.T) {
 	godotenv.Load("../.env")
 
 	messages := make([]*model.LLMChatCompletionMessage, 0)
@@ -21,15 +20,15 @@ func TestChatGLM(t *testing.T) {
 		Role:    "user",
 		Content: "假如今天下大雨，我是否需要带伞？",
 	})
-	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
+	OPENAIApiKey := os.Getenv("TEST_MOONSHOT_API")
 	req_info := model.LLMRequestInfo{
-		LlmApiType:  grpcServer.CHATGLM_LLM_API,
-		Model:       ChatGLM.ModelGLM3Turbo,
+		LlmApiType:  grpcServer.MOONSHOT_LLM_API,
+		Model:       "moonshot-v1-8k",
 		Temperature: 0.9,
 		TopP:        0.9,
 		TopK:        1,
-		Url:         "",
-		Token:       zhipuaiApiKey,
+		Url:         "https://api.moonshot.cn/v1",
+		Token:       OPENAIApiKey,
 	}
 	req := model.LLMRequestSchema{
 		Messages:       messages,
@@ -43,7 +42,7 @@ func TestChatGLM(t *testing.T) {
 	log.Println("res: ", res)
 }
 
-func TestChatGLMStreaming(t *testing.T) {
+func TestMoonShotStreaming(t *testing.T) {
 	godotenv.Load("../.env")
 
 	messages := make([]*model.LLMChatCompletionMessage, 0)
@@ -51,15 +50,15 @@ func TestChatGLMStreaming(t *testing.T) {
 		Role:    "user",
 		Content: "假如今天下大雨，我是否需要带伞？",
 	})
-	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
+	OPENAIApiKey := os.Getenv("TEST_MOONSHOT_API")
 	req_info := model.LLMRequestInfo{
-		LlmApiType:  grpcServer.CHATGLM_LLM_API,
-		Model:       ChatGLM.ModelGLM3Turbo,
+		LlmApiType:  grpcServer.MOONSHOT_LLM_API,
+		Model:       "moonshot-v1-8k",
 		Temperature: 0.9,
 		TopP:        0.9,
 		TopK:        1,
-		Url:         "",
-		Token:       zhipuaiApiKey,
+		Url:         "https://api.moonshot.cn/v1",
+		Token:       OPENAIApiKey,
 	}
 	req := model.LLMRequestSchema{
 		Messages:       messages,
@@ -71,7 +70,7 @@ func TestChatGLMStreaming(t *testing.T) {
 	}
 	err := mockServer.StreamRequestLLM(&req, &mockServerPipe)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	for {
 		res := <-mockServerPipe.Stream
@@ -83,23 +82,23 @@ func TestChatGLMStreaming(t *testing.T) {
 	}
 }
 
-func TestChatGLMFunctionCalling(t *testing.T) {
+func TestMoonShotFunctionCalling(t *testing.T) {
 	godotenv.Load("../.env")
 
 	messages := make([]*model.LLMChatCompletionMessage, 0)
 	messages = append(messages, &model.LLMChatCompletionMessage{
 		Role:    "user",
-		Content: "北京今天天气怎么样？现在有几个朋友在北京？",
+		Content: "whats the weather like in Poston?",
 	})
-	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
+	OPENAIApiKey := os.Getenv("TEST_MOONSHOT_API")
 	req_info := model.LLMRequestInfo{
-		LlmApiType:  grpcServer.CHATGLM_LLM_API,
-		Model:       ChatGLM.ModelGLM3Turbo,
+		LlmApiType:  grpcServer.MOONSHOT_LLM_API,
+		Model:       "moonshot-v1-8k",
 		Temperature: 0.9,
 		TopP:        0.9,
 		TopK:        1,
-		Url:         "",
-		Token:       zhipuaiApiKey,
+		Url:         "https://api.moonshot.cn/v1",
+		Token:       OPENAIApiKey,
 		Functions: []*model.Function{
 			{
 				Name:        "get_weather",
@@ -112,22 +111,11 @@ func TestChatGLMFunctionCalling(t *testing.T) {
 					},
 					{
 						Name:  "unit",
+						Type:  "string",
 						Enums: []string{"celsius", "fahrenheit"},
 					},
 				},
-				Requireds: []string{"location"},
-			},
-			{
-				Name:        "get_friends_in_location",
-				Description: "Get the weather of a location",
-				Parameters: []*model.FunctionCallingParameter{
-					{
-						Name:        "location",
-						Type:        "string",
-						Description: "The city and state, e.g. San Francisco, CA",
-					},
-				},
-				Requireds: []string{"location"},
+				Requireds: []string{"location", "unit"},
 			},
 		},
 		UseFunctionCalling: true,
@@ -139,7 +127,7 @@ func TestChatGLMFunctionCalling(t *testing.T) {
 	mockServer := grpcServer.UnoForwardServer{}
 	res, err := mockServer.BlockingRequestLLM(context.Background(), &req)
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	log.Printf("res: %#v", res.ToolCalls[0])
 }

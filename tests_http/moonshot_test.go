@@ -10,18 +10,17 @@ import (
 
 	"github.com/joho/godotenv"
 	openai "github.com/sashabaranov/go-openai"
-	"go.limit.dev/unollm/provider/ChatGLM"
 	tests_http "go.limit.dev/unollm/tests_http"
 )
 
-func TestChatGLMStreaming(t *testing.T) {
+func TestMoonShotStreaming(t *testing.T) {
 	godotenv.Load("../.env")
 
-	client := tests_http.GetClient(os.Getenv("TEST_ZHIPUAI_API"))
+	client := tests_http.GetClient(os.Getenv("TEST_MOONSHOT_API"))
 
 	resp, err := client.CreateChatCompletionStream(context.Background(),
 		openai.ChatCompletionRequest{
-			Model: ChatGLM.ModelGLM3Turbo,
+			Model: "moonshot-v1-8k",
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    "user",
@@ -46,14 +45,14 @@ func TestChatGLMStreaming(t *testing.T) {
 	}
 }
 
-func TestChatGLMBlocking(t *testing.T) {
+func TestMoonShotBlocking(t *testing.T) {
 	godotenv.Load("../.env")
 
-	client := tests_http.GetClient(os.Getenv("TEST_ZHIPUAI_API"))
+	client := tests_http.GetClient(os.Getenv("TEST_MOONSHOT_API"))
 
 	resp, err := client.CreateChatCompletion(context.Background(),
 		openai.ChatCompletionRequest{
-			Model: ChatGLM.ModelGLM3Turbo,
+			Model: "moonshot-v1-8k",
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    "user",
@@ -68,14 +67,14 @@ func TestChatGLMBlocking(t *testing.T) {
 	log.Printf("%#v", resp.Choices[0])
 }
 
-func TestChatGLMFunctionCalling(t *testing.T) {
+func TestMoonShotFunctionCalling(t *testing.T) {
 	godotenv.Load("../.env")
 
-	client := tests_http.GetClient(os.Getenv("TEST_ZHIPUAI_API"))
+	client := tests_http.GetClient(os.Getenv("TEST_MOONSHOT_API"))
 
 	resp, err := client.CreateChatCompletionStream(context.Background(),
 		openai.ChatCompletionRequest{
-			Model: ChatGLM.ModelGLM3Turbo,
+			Model: "moonshot-v1-8k",
 			Messages: []openai.ChatCompletionMessage{
 				{
 					Role:    "user",
@@ -101,7 +100,7 @@ func TestChatGLMFunctionCalling(t *testing.T) {
 									"enum": []string{"celsius", "fahrenheit"},
 								},
 							},
-							"required": []string{"location"},
+							"required": []string{"location", "unit"},
 						},
 					},
 				},
@@ -117,24 +116,9 @@ func TestChatGLMFunctionCalling(t *testing.T) {
 			if errors.Is(e, io.EOF) {
 				break
 			}
-			t.Error(e)
+			log.Panic(e)
 			break
 		}
 		log.Printf("%#v", cv.Choices[0].Delta.ToolCalls)
 	}
-}
-
-func TestChatGLMEmbedding(t *testing.T) {
-	godotenv.Load("../.env")
-
-	client := tests_http.GetClient(os.Getenv("TEST_ZHIPUAI_API"))
-	resp, err := client.CreateEmbeddings(context.Background(), openai.EmbeddingRequest{
-		Input:          "我阐述你的梦",
-		Model:          "embedding-2",
-		EncodingFormat: "float",
-	})
-	if err != nil {
-		log.Panic(err)
-	}
-	log.Printf("%#v", resp)
 }

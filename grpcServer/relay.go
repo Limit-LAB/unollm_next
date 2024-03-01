@@ -27,12 +27,25 @@ const CHATGLM_LLM_API = "chatglm"
 const AZURE_OPENAI_LLM_API = "azure_openai"
 const BAICHUAN_LLM_API = "baichuan"
 const GEMINI_LLM_API = "gemini"
+const MOONSHOT_LLM_API = "moonshot"
 
 func (uno *UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
 	info := rs.GetLlmRequestInfo()
 	switch info.GetLlmApiType() {
 	case OPENAI_LLM_API:
 		cli := NewOpenAIClient(info)
+		return OpenAIChatCompletion(cli, rs)
+
+	case MOONSHOT_LLM_API:
+		cli := NewOpenAIClient(info)
+		if functionCallingRequestMake(rs) {
+			res, err := OpenAIChatCompletion(cli, rs)
+			if err != nil {
+				return nil, status.Errorf(codes.Internal, err.Error())
+			}
+			functionCallingResponseHandle(res)
+			return res, nil
+		}
 		return OpenAIChatCompletion(cli, rs)
 
 	case CHATGLM_LLM_API:
@@ -68,6 +81,18 @@ func (uno *UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv mod
 	switch info.GetLlmApiType() {
 	case OPENAI_LLM_API:
 		cli := NewOpenAIClient(info)
+		return OpenAIChatCompletionStreaming(cli, rs, sv)
+	case MOONSHOT_LLM_API:
+		cli := NewOpenAIClient(info)
+		if functionCallingRequestMake(rs) {
+			res, err := OpenAIChatCompletion(cli, rs)
+			if err != nil {
+				return status.Errorf(codes.Internal, err.Error())
+			}
+			functionCallingResponseHandle(res)
+			functionCallingResponseToStream(res, sv)
+			return nil
+		}
 		return OpenAIChatCompletionStreaming(cli, rs, sv)
 	case CHATGLM_LLM_API:
 		cli := NewChatGLMClient(info)
