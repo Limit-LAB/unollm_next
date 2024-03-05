@@ -3,7 +3,7 @@ FROM golang:1.21 AS builder
 COPY . /src
 WORKDIR /src
 
-RUN go build .
+RUN go build ./cmd/unollm
 
 FROM debian:stable-slim
 
