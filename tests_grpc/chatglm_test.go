@@ -112,6 +112,7 @@ func TestChatGLMFunctionCalling(t *testing.T) {
 					},
 					{
 						Name:  "unit",
+						Type:  "string",
 						Enums: []string{"celsius", "fahrenheit"},
 					},
 				},
