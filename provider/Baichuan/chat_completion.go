@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
+	"log/slog"
 	"net/http"
 )
 
@@ -29,8 +32,18 @@ func (c *Client) ChatCompletion(body ChatCompletionRequest) (result ChatCompleti
 
 	}
 	defer resp.Body.Close()
-
-	err = json.NewDecoder(resp.Body).Decode(&result)
+	responseBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return ChatCompletionResponse{}, fmt.Errorf("reading response body: %w", err)
+	}
+	if resp.StatusCode != http.StatusOK {
+		slog.Error("Baichuan ChatCompletion: response status code not 200",
+			"status_code", resp.StatusCode,
+			"response_body", string(responseBody),
+		)
+		return ChatCompletionResponse{}, ErrNotSuccess
+	}
+	json.Unmarshal(responseBody, &result)
 	if err != nil {
 		return ChatCompletionResponse{}, err
 
