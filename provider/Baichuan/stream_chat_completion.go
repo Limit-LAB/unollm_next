@@ -3,7 +3,10 @@ package Baichuan
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"io"
 	"log"
+	"log/slog"
 	"net/http"
 	"strings"
 
@@ -28,6 +31,11 @@ func (c *Client) ChatCompletionStreamingRequest(body ChatCompletionRequest) (cha
 	if err != nil {
 		return nil, err
 
+	}
+	if resp.StatusCode != 200 {
+		resposne, _ := io.ReadAll(resp.Body)
+		slog.Error("unexpected status code: %d", resp.StatusCode, "response body", string(resposne))
+		return nil, fmt.Errorf("unexpected status code: %d", resp.StatusCode)
 	}
 
 	reader := utils.NewEventStreamReader(resp.Body, 4096)
