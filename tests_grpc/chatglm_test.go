@@ -144,3 +144,44 @@ func TestChatGLMFunctionCalling(t *testing.T) {
 	}
 	log.Printf("res: %#v", res.ToolCalls[0])
 }
+
+func TestChatGLMImageStreaming(t *testing.T) {
+	godotenv.Load("../.env")
+	url := "https://www.baidu.com/img/flexible/logo/pc/result@2.png"
+	messages := make([]*model.LLMChatCompletionMessage, 0)
+	messages = append(messages, &model.LLMChatCompletionMessage{
+		Role:    "user",
+		Content: "请描述这张图片",
+		Images:  []string{url},
+	})
+	zhipuaiApiKey := os.Getenv("TEST_ZHIPUAI_API")
+	req_info := model.LLMRequestInfo{
+		LlmApiType:  grpcServer.CHATGLM_LLM_API,
+		Model:       ChatGLM.ModelGLM4V,
+		Temperature: 0.9,
+		TopP:        0.9,
+		TopK:        1,
+		Url:         "",
+		Token:       zhipuaiApiKey,
+	}
+	req := model.LLMRequestSchema{
+		Messages:       messages,
+		LlmRequestInfo: &req_info,
+	}
+	mockServer := grpcServer.UnoForwardServer{}
+	mockServerPipe := utils.MockServerStream{
+		Stream: make(chan *model.PartialLLMResponse, 1000),
+	}
+	err := mockServer.StreamRequestLLM(&req, &mockServerPipe)
+	if err != nil {
+		t.Error(err)
+	}
+	for {
+		res := <-mockServerPipe.Stream
+		log.Println(res)
+		if res.LlmTokenCount != nil {
+			log.Println(res.LlmTokenCount)
+			return
+		}
+	}
+}

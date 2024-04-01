@@ -10,9 +10,22 @@ const (
 	ModelGLM4V     = "glm-4v"
 )
 
+type ChatCompletionTextContent struct {
+	Type string `json:"type"`
+	Text string `json:"text"`
+}
+
+type Image struct {
+	Url string `json:"url"`
+}
+type ChatCompletionImageContent struct {
+	Type     string `json:"type"`
+	ImageUrl Image  `json:"image_url"`
+}
+
 type ChatCompletionMessage struct {
 	Role      string        `json:"role"`
-	Content   string        `json:"content"`
+	Content   any           `json:"content"`
 	ToolCalls []GLMToolCall `json:"tool_calls,omitempty"`
 }
 

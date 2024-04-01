@@ -49,9 +49,20 @@ func ChatGLMGrpcChatCompletionReq(rs *model.LLMRequestSchema) ChatGLM.ChatComple
 	}
 
 	for _, m := range messages {
+		contents := make([]any, 0)
+		contents = append(contents, ChatGLM.ChatCompletionTextContent{
+			Type: "text",
+			Text: m.GetContent(),
+		})
+		for _, i := range m.GetImages() {
+			contents = append(contents, ChatGLM.ChatCompletionImageContent{
+				Type:     "image_url",
+				ImageUrl: ChatGLM.Image{Url: i},
+			})
+		}
 		req.Messages = append(req.Messages, ChatGLM.ChatCompletionMessage{
 			Role:    m.GetRole(),
-			Content: m.GetContent(),
+			Content: contents,
 		})
 	}
 	return req
@@ -88,8 +99,13 @@ func ChatGLMFromOpenAIChatCompletionReq(req openai.ChatCompletionRequest) ChatGL
 
 	for _, m := range req.Messages {
 		zpReq.Messages = append(zpReq.Messages, ChatGLM.ChatCompletionMessage{
-			Role:    m.Role,
-			Content: m.Content,
+			Role: m.Role,
+			Content: []any{
+				ChatGLM.ChatCompletionTextContent{
+					Type: "text",
+					Text: m.Content,
+				},
+			},
 		})
 	}
 	return zpReq
