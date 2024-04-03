@@ -140,13 +140,7 @@ func RegisterRoute(r *gin.Engine) {
 					TotalTokens:  int(res.Usage.TotalToken),
 				},
 			}
-			if err != nil {
-				internalServerError(c, err)
-				return
-			}
 			c.JSON(200, oores)
 		})
-
 	}
-
 }

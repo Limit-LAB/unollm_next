@@ -1,6 +1,8 @@
 package grpcServer
 
 import (
+	"log"
+
 	"go.limit.dev/unollm/model"
 	"go.limit.dev/unollm/provider/Baichuan"
 	"go.limit.dev/unollm/relay"
@@ -8,7 +10,6 @@ import (
 	"go.limit.dev/unollm/relay/respTransformer"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"log"
 )
 
 func BaichuanChatCompletion(cli *Baichuan.Client, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
@@ -33,9 +34,7 @@ func BaichuanChatCompletionStream(cli *Baichuan.Client, rs *model.LLMRequestSche
 	res, err := relay.BaiChuanChatCompletionStreamingRequest(cli, req)
 
 	if err != nil {
-		if err != nil {
-			return status.Errorf(codes.Internal, err.Error())
-		}
+		return status.Errorf(codes.Internal, err.Error())
 	}
 
 	return respTransformer.BaiChuanToGrpcStream(res, sv)

@@ -31,13 +31,12 @@ func ChatGPTToGrpcCompletion(resp openai.ChatCompletionResponse) (*model.LLMResp
 		CompletionToken: int64(resp.Usage.CompletionTokens),
 	}
 	toolCalls := make([]*model.ToolCall, len(resp.Choices[0].Message.ToolCalls))
-	for i, _ := range resp.Choices[0].Message.ToolCalls {
-		toolcall := model.ToolCall{
-			Id:        resp.Choices[0].Message.ToolCalls[i].ID,
-			Name:      resp.Choices[0].Message.ToolCalls[i].Function.Name,
-			Arguments: resp.Choices[0].Message.ToolCalls[i].Function.Arguments,
+	for i, toolCall := range resp.Choices[0].Message.ToolCalls {
+		toolCalls[i] = &model.ToolCall{
+			Id:        toolCall.ID,
+			Name:      toolCall.Function.Name,
+			Arguments: toolCall.Function.Arguments,
 		}
-		toolCalls[i] = &toolcall
 	}
 	retResp := model.LLMResponseSchema{
 		Message:       &retMessage,
@@ -76,18 +75,18 @@ func ChatGPTToGrpcStream(promptTokens int, resp *openai.ChatCompletionStream, sv
 			i++
 
 			toolCalls := make([]*model.ToolCall, len(response.Choices[0].Delta.ToolCalls))
-			for i, _ := range response.Choices[0].Delta.ToolCalls {
-				toolcall := model.ToolCall{
-					Id:        response.Choices[0].Delta.ToolCalls[i].ID,
-					Name:      response.Choices[0].Delta.ToolCalls[i].Function.Name,
-					Arguments: response.Choices[0].Delta.ToolCalls[i].Function.Arguments,
+			for i, toolCall := range response.Choices[0].Delta.ToolCalls {
+				toolCalls[i] = &model.ToolCall{
+					Id:        toolCall.ID,
+					Name:      toolCall.Function.Name,
+					Arguments: toolCall.Function.Arguments,
 				}
-				toolCalls[i] = &toolcall
 			}
 			pr := model.PartialLLMResponse{
 				Response: &model.PartialLLMResponse_Content{
 					Content: message,
 				},
+				ToolCalls: toolCalls,
 			}
 			sv.Send(&pr)
 		}
@@ -143,14 +142,14 @@ func GrpcStreamToChatGPT(c *gin.Context, model string, sv chan *model.PartialLLM
 	c.Stream(func(w io.Writer) bool {
 		pr := <-sv
 		if pr.LlmTokenCount == nil {
-			toolcalls := make([]openai.ToolCall, len(pr.GetToolCalls()))
-			for i, _ := range pr.GetToolCalls() {
-				toolcalls[i] = openai.ToolCall{
-					ID:   pr.GetToolCalls()[i].Id,
+			toolCalls := make([]openai.ToolCall, len(pr.GetToolCalls()))
+			for i, toolCall := range pr.ToolCalls {
+				toolCalls[i] = openai.ToolCall{
+					ID:   toolCall.Id,
 					Type: openai.ToolType("function"),
 					Function: openai.FunctionCall{
-						Name:      pr.GetToolCalls()[i].Name,
-						Arguments: pr.GetToolCalls()[i].Arguments,
+						Name:      toolCall.Name,
+						Arguments: toolCall.Arguments,
 					},
 				}
 			}
@@ -164,7 +163,7 @@ func GrpcStreamToChatGPT(c *gin.Context, model string, sv chan *model.PartialLLM
 						Delta: openai.ChatCompletionStreamChoiceDelta{
 							Role:      "assistant",
 							Content:   pr.GetContent(),
-							ToolCalls: toolcalls,
+							ToolCalls: toolCalls,
 						},
 					},
 				},

@@ -3,12 +3,13 @@ package respTransformer
 import (
 	"errors"
 	"fmt"
+	"io"
+
 	"github.com/Limit-LAB/go-gemini"
 	"github.com/Limit-LAB/go-gemini/models"
 	"go.limit.dev/unollm/model"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
-	"io"
 )
 
 func GeminiToGrpcCompletion(resp models.GenerateContentResponse) (*model.LLMResponseSchema, error) {
@@ -78,6 +79,9 @@ func GeminiToGrpcStream(resp *gemini.GenerateContentStreamer, sv model.UnoLLMv1_
 		}
 
 		_, msg, err := getGeminiContent(response)
+		if err != nil {
+			return err
+		}
 		pr := model.PartialLLMResponse{
 			Response: &model.PartialLLMResponse_Content{
 				Content: msg,
