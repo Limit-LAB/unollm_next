@@ -151,3 +151,45 @@ func TestOpenAIEmbedding(t *testing.T) {
 	}
 	log.Printf("res: %#v", res)
 }
+
+func TestOpenAIImageStreaming(t *testing.T) {
+	godotenv.Load("../.env")
+	OPENAIApiKey := os.Getenv("TEST_OPENAI_API")
+	url := "https://www.baidu.com/img/flexible/logo/pc/result@2.png"
+	messages := make([]*model.LLMChatCompletionMessage, 0)
+	messages = append(messages, &model.LLMChatCompletionMessage{
+		Role:    "user",
+		Content: "请描述这张图片",
+		Images:  []string{url},
+	})
+
+	req_info := model.LLMRequestInfo{
+		LlmApiType:  grpcServer.OPENAI_LLM_API,
+		Model:       openai.GPT4VisionPreview,
+		Temperature: 0.9,
+		TopP:        0.9,
+		TopK:        1,
+		Url:         "https://api.openai-sb.com/v1",
+		Token:       OPENAIApiKey,
+	}
+	req := model.LLMRequestSchema{
+		Messages:       messages,
+		LlmRequestInfo: &req_info,
+	}
+	mockServer := grpcServer.UnoForwardServer{}
+	mockServerPipe := utils.MockServerStream{
+		Stream: make(chan *model.PartialLLMResponse, 1000),
+	}
+	err := mockServer.StreamRequestLLM(&req, &mockServerPipe)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for {
+		res := <-mockServerPipe.Stream
+		log.Println(res)
+		if res.LlmTokenCount != nil {
+			log.Println(res.LlmTokenCount)
+			return
+		}
+	}
+}
