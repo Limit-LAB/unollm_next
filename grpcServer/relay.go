@@ -28,6 +28,7 @@ const AZURE_OPENAI_LLM_API = "azure_openai"
 const BAICHUAN_LLM_API = "baichuan"
 const GEMINI_LLM_API = "gemini"
 const MOONSHOT_LLM_API = "moonshot"
+const ANTHROPIC_LLM_API = "anthropic"
 
 func (uno *UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.LLMRequestSchema) (*model.LLMResponseSchema, error) {
 	info := rs.GetLlmRequestInfo()
@@ -35,7 +36,9 @@ func (uno *UnoForwardServer) BlockingRequestLLM(ctx context.Context, rs *model.L
 	case OPENAI_LLM_API:
 		cli := NewOpenAIClient(info)
 		return OpenAIChatCompletion(cli, rs)
-
+	case ANTHROPIC_LLM_API:
+		cli := NewAnthropicClient(info)
+		return AnthropicChatCompletion(cli, rs)
 	case MOONSHOT_LLM_API:
 		cli := NewOpenAIClient(info)
 		if functionCallingRequestMake(rs) {
@@ -82,6 +85,9 @@ func (uno *UnoForwardServer) StreamRequestLLM(rs *model.LLMRequestSchema, sv mod
 	case OPENAI_LLM_API:
 		cli := NewOpenAIClient(info)
 		return OpenAIChatCompletionStreaming(cli, rs, sv)
+	case ANTHROPIC_LLM_API:
+		cli := NewAnthropicClient(info)
+		return AnthropicChatCompletionStreaming(cli, rs, sv)
 	case MOONSHOT_LLM_API:
 		cli := NewOpenAIClient(info)
 		if functionCallingRequestMake(rs) {

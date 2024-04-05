@@ -13,6 +13,7 @@ message LLMChatCompletionMessage {
   string role = 1;
   string content = 2;
   optional string tool_call_id = 3;
+  repeated string images = 4;
 }
 
 

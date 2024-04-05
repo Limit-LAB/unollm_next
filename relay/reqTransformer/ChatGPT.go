@@ -99,9 +99,22 @@ func ChatGPTGrpcChatCompletionReq(rs *model.LLMRequestSchema) openai.ChatComplet
 	messages := rs.GetMessages()
 	var openaiMessages []openai.ChatCompletionMessage
 	for _, m := range messages {
+		content := make([]openai.ChatMessagePart, 0)
+		content = append(content, openai.ChatMessagePart{
+			Type: "text",
+			Text: m.GetContent(),
+		})
+		for _, i := range m.GetImages() {
+			content = append(content, openai.ChatMessagePart{
+				Type: "image_url",
+				ImageURL: &openai.ChatMessageImageURL{
+					URL: i,
+				},
+			})
+		}
 		openaiMessages = append(openaiMessages, openai.ChatCompletionMessage{
-			Role:    m.GetRole(),
-			Content: m.GetContent(),
+			Role:         m.GetRole(),
+			MultiContent: content,
 		})
 	}
 	if len(rs.LlmRequestInfo.Functions) == 0 {

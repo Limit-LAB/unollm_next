@@ -10,7 +10,7 @@ func ChatGLMToGrpcCompletion(res ChatGLM.ChatCompletionResponse) (*model.LLMResp
 	content := res.Choices[0].Message.Content
 	retMessage := model.LLMChatCompletionMessage{
 		Role:    res.Choices[0].Message.Role,
-		Content: content,
+		Content: content.(string),
 	}
 	count := model.LLMTokenCount{
 		TotalToken:      int64(res.Usage.TotalTokens),
@@ -50,7 +50,7 @@ func ChatGLMToGrpcStream(_r *ChatGLM.ChatCompletionStreamingResponse, sv model.U
 
 			resp := model.PartialLLMResponse{
 				Response: &model.PartialLLMResponse_Content{
-					Content: chunk.Choices[0].Delta.Content,
+					Content: chunk.Choices[0].Delta.Content.(string),
 				},
 				ToolCalls: toolCalls,
 			}
