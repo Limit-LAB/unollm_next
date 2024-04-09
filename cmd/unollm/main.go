@@ -37,7 +37,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	service := grpcServer.UnoForwardServer{}
-	model.RegisterUnoLLMv1Server(svr, &service)
+	forwardService := grpcServer.UnoForwardServer{}
+	embeddingService := grpcServer.UnoEmbeddingForwardServer{}
+	model.RegisterUnoLLMv1Server(svr, &forwardService)
+	model.RegisterUnoEmbeddingv1Server(svr, &embeddingService)
 	svr.Serve(tcpList)
 }
