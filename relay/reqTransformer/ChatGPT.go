@@ -77,6 +77,8 @@ func ChatGPTToGrpcRequest(api string, model_type string, token string, req opena
 	switch api {
 	case "moonshot":
 		url = "https://api.moonshot.cn/v1"
+	case "deepseek":
+		url = "https://api.deepseek.com/v1"
 	}
 	return &model.LLMRequestSchema{
 		Messages: messages,

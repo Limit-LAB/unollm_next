@@ -29,6 +29,9 @@ func getProvider(m string) (string, error) {
 	if strings.Contains(m, "moonshot") {
 		return "moonshot", nil
 	}
+	if strings.Contains(m, "deepseek") {
+		return "deepseek", nil
+	}
 	return "", errors.New("could not get provider")
 }
 
