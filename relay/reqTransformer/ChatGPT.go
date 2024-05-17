@@ -5,6 +5,7 @@ import (
 	"log"
 
 	openai "github.com/sashabaranov/go-openai"
+	openaischema "github.com/sashabaranov/go-openai/jsonschema"
 	"go.limit.dev/unollm/model"
 )
 
@@ -123,26 +124,30 @@ func ChatGPTGrpcChatCompletionReq(rs *model.LLMRequestSchema) openai.ChatComplet
 
 	tools := make([]openai.Tool, len(info.Functions))
 	for i, f := range info.Functions {
+		params := openaischema.Definition{
+			Type:       openaischema.Object,
+			Properties: make(map[string]openaischema.Definition),
+			Required:   make([]string, 0),
+		}
+		params.Required = append(params.Required, f.Requireds...)
+
+		for _, param := range f.Parameters {
+			openaiParam := openaischema.Definition{
+				Type:        openaischema.DataType(param.Type),
+				Description: param.Description,
+				Enum:        make([]string, 0),
+			}
+			openaiParam.Enum = append(openaiParam.Enum, param.Enums...)
+			params.Properties[param.Name] = openaiParam
+		}
+
 		tools[i] = openai.Tool{
 			Type: "function",
 			Function: &openai.FunctionDefinition{
 				Name:        f.Name,
 				Description: f.Description,
-				Parameters: map[string]any{
-					"type":       "object",
-					"properties": map[string]any{},
-					"required":   f.Requireds,
-				},
+				Parameters:  params,
 			},
-		}
-		for j := 0; j < len(f.Parameters); j++ {
-			tools[i].Function.Parameters.(map[string]any)["properties"].(map[string]any)[f.Parameters[j].Name] = map[string]any{
-				"type":        f.Parameters[j].Type,
-				"description": f.Parameters[j].Description,
-			}
-			if len(f.Parameters[j].Enums) != 0 {
-				tools[i].Function.Parameters.(map[string]any)["properties"].(map[string]any)[f.Parameters[j].Name].(map[string]any)["enum"] = f.Parameters[j].Enums
-			}
 		}
 		log.Printf("converting function call to grpc: %#v", tools[i].Function)
 	}
